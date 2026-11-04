@@ -251,12 +251,23 @@ const rel=e=>{const t=held.get(e.pointerId);if(t){t.classList.remove('on');held.
 document.addEventListener('pointerup',rel);document.addEventListener('pointercancel',rel);
 /* fila inferior */
 $('#bt').append(mk('i','screw'));['UTILITY','IMPORT/EXPORT','PAD SETTING','EFX SETTING','PROJECT'].forEach(t=>$('#bt').append(B(t)));$('#bt').append(mk('i','screw'));
-/* onda pixelada */
-function wave(){const c=$('#wv'),x=c.getContext('2d');x.clearRect(0,0,168,46);
- x.fillStyle=getComputedStyle(unit).getPropertyValue('--lcd').trim();
- for(let i=0;i<40;i++){const p=i%10,env=Math.exp(-p/3)*(p?1:.5),h=Math.max(2,Math.round(21*env*(.7+.3*Math.abs(Math.sin(i*2.3)))/2)*2);x.fillRect(4+i*4,23-h,3,h*2)}
- x.fillRect(0,22,168,2)}
+/* waveform real + recorte IN/OUT táctil */
+let trimState=null,activeTrimTarget="start",trimPointer=false;
+function wave(){const c=$('#wv'),x=c.getContext('2d'),w=168,h=46;x.clearRect(0,0,w,h);const lcd=getComputedStyle(unit).getPropertyValue('--lcd').trim();x.fillStyle="#001000";x.fillRect(0,0,w,h);
+ if(trimState&&trimState.waveform&&trimState.waveform.length){x.fillStyle=lcd;const data=trimState.waveform;for(let i=0;i<data.length;i++){const xx=i*w/data.length,lo=data[i][0],hi=data[i][1],y1=h*(.5-hi*.46),y2=h*(.5-lo*.46);x.fillRect(xx,y1,Math.max(1,w/data.length-0.5),Math.max(1,y2-y1))}}
+ else{x.fillStyle=lcd;for(let i=0;i<40;i++){const p=i%10,env=Math.exp(-p/3)*(p?1:.5),bar=Math.max(2,Math.round(21*env*(.7+.3*Math.abs(Math.sin(i*2.3)))/2)*2);x.fillRect(4+i*4,23-bar,3,bar*2)}}
+ if(trimState){const r=trimState.range||{start:0,end:1},a=Math.max(0,Math.min(1,r.start)),b=Math.max(a,Math.min(1,r.end));x.fillStyle="#ff343455";x.fillRect(0,0,w*a,h);x.fillRect(w*b,0,w*(1-b),h);x.strokeStyle="#fff";x.lineWidth=1.5;x.beginPath();x.moveTo(w*a,0);x.lineTo(w*a,h);x.moveTo(w*b,0);x.lineTo(w*b,h);x.stroke();x.fillStyle="#fff";x.font="8px monospace";x.fillText("IN",Math.min(w-18,w*a+2),8);x.fillText("OUT",Math.max(2,Math.min(w-20,w*b+2)),h-2)}
+ x.strokeStyle=lcd;x.globalAlpha=.55;x.beginPath();x.moveTo(0,h/2);x.lineTo(w,h/2);x.stroke();x.globalAlpha=1}
 wave();
+const waveCanvas=$('#wv');
+function trimPosition(e){const r=waveCanvas.getBoundingClientRect();return Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))}
+function sendTrim(e,commit){zpBridgeSend("creator.sample.trim.set",{target:activeTrimTarget,position:trimPosition(e),commit:!!commit})}
+waveCanvas.addEventListener("pointerdown",e=>{e.preventDefault();trimPointer=true;waveCanvas.setPointerCapture(e.pointerId);sendTrim(e,false)});
+waveCanvas.addEventListener("pointermove",e=>{if(trimPointer)sendTrim(e,false)});
+["pointerup","pointercancel","lostpointercapture"].forEach(type=>waveCanvas.addEventListener(type,e=>{if(trimPointer){trimPointer=false;sendTrim(e,true)}}));
+window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-trim-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;trimState=d;wave()});
+window.addEventListener("zp-engine-result",e=>{const d=e.detail?.result?.data;if(d?.target==="start"||d?.target==="end")activeTrimTarget=d.target});
+
 requestAnimationFrame(()=>requestAnimationFrame(fit));
 /* temas: toca MENU */
 const skins=['verde','ambar','cian','rojo'];
