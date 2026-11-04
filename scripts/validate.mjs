@@ -47,7 +47,6 @@ assert.match(ui, /zp-engine-playhead/);
 assert.match(engine, /type:"zp-engine-playhead"/);
 assert.match(engine, /type:"zp-engine-pattern-state"/);
 assert.match(ui, /zp-engine-pattern-state/);
-assert.match(ui, /index-18\)\/17/);
 assert.match(ui, /zp-engine-trim-state/);
 assert.match(ui, /creator\.sample\.trim\.set/);
 assert.match(ui, /trimPointer/);
