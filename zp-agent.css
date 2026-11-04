@@ -55,3 +55,11 @@
 .zp-agent-target-active{outline:2px solid #c5ff45!important;outline-offset:3px!important;filter:drop-shadow(0 0 5px #c5ff45)!important;animation:zpAgentTargetPulse 1.2s ease-in-out infinite alternate;}
 @keyframes zpAgentTargetPulse{from{box-shadow:0 0 3px #c5ff45}to{box-shadow:0 0 13px #c5ff45,0 0 22px #80ff39}}
 @media(max-width:420px){#zp-agent-inspector{max-height:105px}#zp-agent-devtools{max-height:38%}#zp-agent-code{min-height:78px}}
+
+/* Lx/Rx: encoders independientes de navegación y control contextual */
+.lx,.rx{position:relative;touch-action:none;user-select:none;-webkit-user-select:none}
+.lx::before,.rx::before{position:absolute;left:50%;top:-13px;transform:translateX(-50%);font:800 9px/1 ui-monospace,monospace;letter-spacing:.08em;color:var(--lcd);text-shadow:0 0 5px var(--lcd)}
+.lx::before{content:'Lx'}
+.rx::before{content:'Rx'}
+.lx.lx-active{filter:drop-shadow(0 0 8px var(--lcd))}
+.lx-active{outline:2px solid var(--lcd)!important;outline-offset:2px;box-shadow:0 0 10px var(--lcd)!important}
