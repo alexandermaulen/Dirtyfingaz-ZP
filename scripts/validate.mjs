@@ -144,6 +144,13 @@ assert.match(agent, /document\.addEventListener\("pointerdown"/);
 assert.match(agent, /zp-agent-window/);
 assert.match(agent, /zp-agent-launcher/);
 assert.match(agent, /item\.risk==="write"/);
+assert.match(agent, /item\.risk==="destructive"/, "Las acciones destructivas deben exigir confirmación.");
+for (const command of ["creator.sample.chop", "creator.pattern.clear", "creator.bpm.adjust", "creator.pattern.select", "creator.fx.sample.drive.toggle"]) {
+  assert.ok(agent.includes(command), "Acción del agente sin catálogo: " + command);
+}
+for (const intent of ["sample.chop", "pattern.clear", "bpm.up", "bpm.down", "bank.A", "bank.B", "bank.C", "bank.D", "fx.drive"]) {
+  assert.ok(agent.includes('"'+intent+'"'), "Intención del agente faltante: " + intent);
+}
 assert.doesNotMatch(agent, /\bfetch\s*\(|new\s+WebSocket\s*\(|\beval\s*\(/, "El agente local no debe realizar llamadas remotas ni ejecutar código arbitrario");
 assert.match(ui, /zp-agent\.css/);
 assert.match(ui, /zp-agent\.js/);
