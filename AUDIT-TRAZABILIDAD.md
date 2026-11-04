@@ -295,3 +295,46 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - Longitud de nota limitada al espacio restante hasta el final de los 16 pasos.
 - Mensajes de telemetría LCD/Piano Roll validados por origen y ventana del iframe del motor.
 - Song Mode publica el banco activo al avanzar, manteniendo sincronizada la vista de notas.
+
+
+## 13. Cuestionario maestro y agente contextual local · 2026-11-04
+
+### Documentación incorporada
+- `docs/CUESTIONARIO-MAESTRO-DIRTYFINGAZ-ZP.md`: especificación maestra de producto, arquitectura, motor, datos, Cloudflare/Supabase, agente, seguridad, calidad y beta.
+- `docs/ARQUITECTURA-AGENTE-CONTEXTUAL.md`: contrato de contexto, catálogo de acciones, niveles de permisos, arquitectura objetivo y pruebas de aceptación.
+
+### Agente contextual v0.1
+- Se incorporó `zp-agent.js` y `zp-agent.css` en Creator.
+- Ventana flotante con arrastre táctil, minimizar, maximizar/restaurar, resize y cierre; launcher para reabrir.
+- Captura contexto desde controles enfocados/pulsados: etiqueta, módulo, identificador DOM y metadatos explícitos si existen.
+- Diccionario local de pads/samples, trim, Piano Roll, secuenciador, FX, proyectos, render, Radio Grid y tempo.
+- Catálogo allowlist: detener, play/pause, abrir selector de muestras, guardar proyecto (con confirmación) y abrir Project Manager.
+- El agente escucha eventos de ACK/error/timeout del bridge y comunica el resultado real.
+- No hace llamadas remotas, no ejecuta texto arbitrario y no modifica archivos GitHub. No es todavía un LLM remoto; es la base contextual y de acciones deterministas.
+- Los recursos se precargan en PWA; caché actualizada a `dirtyfingaz-zp-shell-v8`.
+
+### Corrección adicional del secuenciador
+- La estructura real de `#gr` contiene 17 elementos antes de la primera fila de celdas: esquina superior + 16 encabezados de pasos; cada fila añade etiqueta + 16 celdas.
+- Se unificaron los tres cálculos de padId (playhead, estado de patrón e interacción) a `Math.floor((index-18)/17)+1`.
+- Se añadió una prueba de las 9 filas × 16 pasos contra los índices reales del grid.
+- La causa del CI fallido era que la aserción exigía tres ocurrencias de una fórmula mientras la ruta de patrón utilizaba una fórmula equivalente distinta. La inspección del DOM permitió normalizar las tres rutas y añadir prueba de los 144 casos.
+
+### Evidencia GitHub
+- Rama: `feat/hybrid-hardware-ui-system`.
+- SHA de código con corrección de secuenciador y agente: `24116e03d266d8c14e6cf5a92aa4636f20bb5f2d`.
+- GitHub Actions run `41885854130`: **SUCCESS**, job validate.
+- Documentación y commits de agente se mantienen sólo en rama de desarrollo. No se ha solicitado ni ejecutado merge a main.
+
+### Estado de infraestructura observado
+- Supabase `dirtyfingaz-os`: `ACTIVE_HEALTHY`, PostgreSQL 17, schema `public` sin tablas y sin Edge Functions.
+- No se crearon tablas, políticas RLS, secrets ni migraciones.
+- Wrangler configura Worker-first para `/api/*` y binding Durable Object `RADIO_ROOMS`; no se verificó despliegue Cloudflare para este corte.
+- No existe todavía endpoint remoto de IA ni proveedor/modelo configurado.
+
+### Próximo orden técnico
+1. QA de ventana flotante y acciones en Safari iOS; validar ACK/error y no interferencia con pads/knobs.
+2. Añadir pruebas E2E de contexto y de las acciones registradas.
+3. Definir proveedor de IA, autenticación Supabase JWT, límites y permisos antes del endpoint Worker.
+4. Diseñar migraciones y RLS en Supabase; revisión previa antes de aplicarlas.
+5. Decidir almacenamiento binario R2 vs Supabase Storage.
+6. Habilitar herramientas de programación sólo con diff, rama feat/* y PR; nunca merge automático.
