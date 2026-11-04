@@ -43,6 +43,10 @@ assert.match(engine, /zp-engine-error/);
 assert.match(shell, /e\.source!==frame\?\.contentWindow/);
 assert.match(shell, /e\.data\?\.source!=='creator\.engine'/);
 assert.match(engine, /source:"creator\.engine"/);
+assert.match(engine, /saveProjectSample\(currentProjectId,n,slice,sampleNames\[n\],ranges\[n\]\)/);
+assert.match(engine, /saveProjectSample\(currentProjectId,activePad,samples\[activePad\],sampleNames\[activePad\],ranges\[activePad\]\)/);
+assert.match(engine, /projectDialog\.querySelector\("#zp-project-name"\)\.value=currentProjectName/);
+
 assert.match(storage, /DB_VERSION = 2/);
 for (const api of ["saveProjectSample", "getProjectSamples", "listProjects", "deleteProject"]) {
   assert.ok(storage.includes("function " + api), "Storage API faltante: " + api);
