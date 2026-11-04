@@ -181,14 +181,17 @@ Para cada hito registrar fecha/hora, SHA, archivos, contrato afectado, pruebas, 
 
 - La rama ya contiene la ventana flotante del agente en Creator: launcher, drag, resize, minimizar, maximizar y cerrar.
 - El cliente local inspecciona controles mediante pointerdown/focusin y mantiene un diccionario de ayuda por módulo.
-- El estado actual se identifica como modo local sin IA remota. No se presenta como modelo generativo conectado.
+- El cliente ya puede consultar un endpoint de IA remota; mientras no exista un Preview desplegado con el binding, conserva el modo local como fallback. No se presenta como conectado en producción.
 - Se amplió el catálogo de acciones con detener/reproducir, selector de muestras, guardar/gestionar proyecto, subir/bajar BPM, bancos A–D, Drive, chop y limpiar patrón.
 - Guardar requiere confirmación; chop y limpiar patrón requieren confirmación destructiva.
 - Las acciones pasan por zpBridgeSend y esperan ACK/error del motor. No se añadió ejecución arbitraria ni llamadas remotas desde el cliente.
 - scripts/validate.mjs incorpora aserciones del catálogo y de la confirmación de acciones destructivas.
 - Commits de esta intervención: a709efd58c69c68841b3a44c0ace9d35899eaabc (documentación), 42baeeed50717be41a1fa8ea7c4a41c9df21a808 (acciones del agente), 4e02f2c03761a87a7df159d7c865f2f3545421af (validación).
 - Estado CI del último commit: aún no confirmado por un run/check asociado; el endpoint de estado no devolvió checks.
-- Pendiente crítico: conectar proveedor IA detrás del Worker, añadir autenticación/limitación de uso, y construir modo desarrollador GitHub con diff y aprobación por acción. Esto requiere credenciales del lado servidor, nunca en el navegador.
+- El Worker ya incluye /api/agent/chat con Workers AI y modelo @cf/openai/gpt-oss-20b, habilitado sólo en Previews. El endpoint limita tamaño, historial y peticiones por IP, valida origen y sanitiza contexto. El rate limit en memoria es una barrera de Preview, no un control suficiente para producción.
+- La IA remota aún no está desplegada ni probada en Cloudflare; no afirmar conexión hasta probarla en Preview.
+- El modelo gpt-oss-20b ofrece function calling/reasoning y actualmente publica precios de USD 0.20 por millón de tokens de entrada y USD 0.30 por millón de salida; Workers AI anuncia una asignación gratuita diaria de 10.000 Neurons. Verificar precios/límites antes de habilitar uso real.
+- Pendiente: herramientas estructuradas generadas por IA, autenticación real, límites durables, memoria RAG/Supabase y modo desarrollador GitHub con diff y aprobación por acción. Credenciales siempre del lado servidor.
 
 
 ### Actualización de implementación posterior
@@ -200,3 +203,17 @@ Para cada hito registrar fecha/hora, SHA, archivos, contrato afectado, pruebas, 
 - Se añadieron pruebas estáticas para SHIFT + PAD, identidad del pad, acciones del menú y metadatos de contexto.
 - Commits adicionales: c7034e70f9176956a1723379c67be06f3995ced4 (GUI/SHIFT+PAD), e54ab4466c98609d8c2f3718096a4cdb9d5e3a16 (metadatos del motor), 46f3a18526ac22e8d7885ecad18e5b47453536bb (contexto del agente), 3f08b2d78f3957453277be900d6ba1b607051ff (tests).
 - CI: workflow configurado para push a esta rama, pero no hay check/run asociado visible en la consulta actual. Estado de validación: pendiente, no PASS.
+
+
+### IA remota Cloudflare · diseño actual
+
+- Endpoint: POST /api/agent/chat.
+- Modelo configurado: @cf/openai/gpt-oss-20b (Workers AI).
+- Binding AI declarado únicamente dentro de previews.
+- AI_AGENT_ENABLED=false en configuración top-level y true en previews.
+- El Worker rechaza la ruta fuera de ENVIRONMENT=preview.
+- El cliente manda mensaje, historial acotado y contexto semántico; no manda audio binario ni credenciales.
+- El modelo sólo redacta recomendaciones. La ejecución sigue en el catálogo local de acciones y el bridge GUI↔motor.
+- No se han añadido tablas ni migraciones Supabase. El agente aún no consulta Supabase.
+- No se ha desplegado el Worker desde esta intervención; la IA remota permanece sin QA real hasta probar /api/agent/chat en el Preview.
+- Último cambio de backend: 5f66918aa851c7d3df6b517feb2e3d2145b0eae8.
