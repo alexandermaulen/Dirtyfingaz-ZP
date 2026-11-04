@@ -295,7 +295,7 @@ function bindKnob(el,inf){let a=0,y0=0,a0=0,on=0,lx=0,ly=0;const set=v=>{a=inf?v
 /* botones */
 const B=(t,cls)=>{const b=mk('div','b '+(cls||''),t);return b};
 function buildAdaptivePanel(side,groups,encoder){
- const root=side==='L'?$('#cl'):$('#cr');root.classList.add('adaptive-side-panel');root.dataset.panel=side;
+ const root=side==='L'?$('#cl'):$('#cr');root.replaceChildren();root.classList.add('adaptive-side-panel');root.dataset.panel=side;
  const nav=mk('div','panel-group-nav'),primary=mk('div','panel-primary'),secondary=mk('div','panel-secondary');secondary.hidden=true;
  let activeGroup=0,expanded=false,holdTimer=null,held=false,activeOption=null,context='sample';
  const contextFor=()=>{const el=window.__zpLxTarget;if(!el)return 'sample';if(el.matches?.('[data-midi-target],.piano-note,.piano-cell')||el.closest?.('.piano-grid,.piano-tools'))return 'piano';if(el.matches?.('.trim-marker')||el.dataset?.trimTarget)return 'sample';if(el.closest?.('#gr'))return 'pattern';if(/FX|FILTER|RESONATOR|DELAY|ISOLATOR|MFX/i.test(el.textContent||''))return 'fx';return 'sample'};
@@ -321,8 +321,11 @@ const panelDefinitions={
   {id:'R3x',label:'R3x',options:['STEREO','PAN','CHORUS','PHASER','FLANGER','MASTER FX','OUTPUT']}
  ]
 };
-const leftPanel=buildAdaptivePanel('L',panelDefinitions.left),rightPanel=buildAdaptivePanel('R',panelDefinitions.right);
-window.addEventListener('focusin',()=>{leftPanel.selectContext();rightPanel.selectContext()});
+let leftPanel=buildAdaptivePanel('L',panelDefinitions.left),rightPanel=buildAdaptivePanel('R',panelDefinitions.right);
+fetch('./zp-agent-registry.json').then(r=>{if(!r.ok)throw new Error('Registry unavailable');return r.json()}).then(reg=>{const p=reg.panelSystem?.panels;if(p?.left?.length&&p?.right?.length){leftPanel=buildAdaptivePanel('L',p.left);rightPanel=buildAdaptivePanel('R',p.right)}}).catch(err=>console.warn('Panel registry fallback:',err.message));
+const refreshPanelContext=()=>{leftPanel.selectContext();rightPanel.selectContext()};
+window.addEventListener('focusin',refreshPanelContext);
+window.addEventListener('zp-panel-context-change',refreshPanelContext);
 function row(cols,tags,btns,cls){const w=mk('div');const tg=mk('div','row tg');tg.style.gridTemplateColumns=cols;
  tags.forEach(([t,n])=>{const s=mk('span','',t);s.style.gridColumn='span '+n;tg.append(s)});
  const r=mk('div','row '+(cls||''));r.style.gridTemplateColumns=cols;
@@ -336,7 +339,7 @@ if(trimPhaseButton){trimPhaseButton.classList.add("trim-phase-button");trimPhase
 /* Lx recorre herramientas y funciones sin ejecutarlas; Rx conserva PUSH ENTER. */
 (()=>{let angle=null,remainder=0,index=-1,active=null;const selector='.b,.piano-tools button,.trim-marker,[data-midi-target],.lcd-action,#play,#bpmWheel';
  const targets=()=>[...document.querySelectorAll(selector)].filter(el=>!el.closest('#zp-agent-window')&&!el.disabled&&el.getAttribute('aria-hidden')!=='true'&&el.getClientRects().length);
- const choose=direction=>{if(window.__zpTrimPhase===3)return;const list=targets();if(!list.length)return;index=(index+direction+list.length)%list.length;const el=list[index];if(active)active.classList.remove('lx-active');active=el;active.classList.add('lx-active');if(!el.hasAttribute('tabindex'))el.tabIndex=-1;el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});window.__zpLxTarget=el;window.__zpLx={index,total:list.length,direction,target:el.dataset.agentContext||el.dataset.trimTarget||el.dataset.midiTarget||el.textContent.trim().replace(/\s+/g,' ').slice(0,48)};};
+ const choose=direction=>{if(window.__zpTrimPhase===3)return;const list=targets();if(!list.length)return;index=(index+direction+list.length)%list.length;const el=list[index];if(active)active.classList.remove('lx-active');active=el;active.classList.add('lx-active');if(!el.hasAttribute('tabindex'))el.tabIndex=-1;el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});window.__zpLxTarget=el;window.dispatchEvent(new CustomEvent('zp-panel-context-change'));window.__zpLx={index,total:list.length,direction,target:el.dataset.agentContext||el.dataset.trimTarget||el.dataset.midiTarget||el.textContent.trim().replace(/\s+/g,' ').slice(0,48)};};
  lx.addEventListener('pointerdown',()=>{angle=parseFloat(getComputedStyle(lx).getPropertyValue('--r'))||0;remainder=0});
  lx.addEventListener('pointermove',()=>{const next=parseFloat(getComputedStyle(lx).getPropertyValue('--r'))||0;if(angle===null){angle=next;return}remainder+=next-angle;angle=next;let steps=Math.trunc(remainder/14);if(!steps)return;remainder-=steps*14;const direction=Math.sign(steps);for(let n=0;n<Math.min(Math.abs(steps),24);n++)choose(direction)});
  ['pointerup','pointercancel'].forEach(type=>lx.addEventListener(type,()=>{angle=null}));
