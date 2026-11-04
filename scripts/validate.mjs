@@ -155,6 +155,12 @@ for (const intent of ["sample.chop", "pattern.clear", "bpm.up", "bpm.down", "ban
 assert.doesNotMatch(agent, /\bfetch\s*\(|new\s+WebSocket\s*\(|\beval\s*\(/, "El agente local no debe realizar llamadas remotas ni ejecutar código arbitrario");
 assert.match(ui, /zp-agent\.css/);
 assert.match(ui, /zp-agent\.js/);
+assert.match(ui, /shiftControl\?\.classList\.contains\("lit"\)/, "SHIFT + PAD debe abrir configuración contextual.");
+assert.match(ui, /pad\.dataset\.padId=String\(i\+1\)/, "Cada pad debe exponer su identidad al agente.");
+assert.match(ui, /data-pad-action="mute"/);
+assert.match(ui, /zp-agent-runtime-context/);
+assert.match(engine, /project:\{id:currentProjectId,name:currentProjectName\}/);
+assert.match(agent, /zp-agent-runtime-context/);
 assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v8/);
 assert.match(read("sw.js"), /\.\/zp-agent\.js/);
 
