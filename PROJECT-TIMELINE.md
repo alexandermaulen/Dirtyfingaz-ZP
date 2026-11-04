@@ -125,3 +125,34 @@ Mejorar la pantalla LCD/LED y el flujo de sample editing sin desacoplar la GUI d
 - Estado de funcionamiento real en navegador/dispositivo: pendiente.
 - Próximo bloque: revisar el diseño Piano Roll como editor de notas (pitch/longitud/velocidad), refinar el visualizador de transientes y validar la alerta de peak con audio real.
 - No se modificó main, no se hizo merge y Supabase permanece fuera del alcance.
+
+
+## 7. Creator · Piano Roll MIDI real · 2026-11-04
+
+### Objetivo
+Evolucionar Pattern Edit desde la grilla de pads/pasos a un editor MIDI de notas, manteniendo el patrón clásico y el motor de audio desacoplado de la GUI.
+
+### Contrato GUI ↔ motor
+- GUI: creator.html dibuja el teclado, la rejilla de 16 pasos, notas, controles y gestos táctiles.
+- Motor: creator-engine.html es dueño de las notas MIDI, validación, scheduling, reproducción y persistencia.
+- Bridge: comandos creator.piano.note.upsert, creator.piano.note.delete y creator.piano.notes.clear; estado de vuelta mediante zp-engine-piano-state.
+- Formato por nota: id, step (0–15), pitch MIDI (36–96), length (1–16, limitado por el final del patrón) y velocity (1–127).
+- Almacenamiento: pianoNotes se integra en projectSnapshot v6; proyectos anteriores sin pianoNotes cargan con listas vacías, conservando sus patrones y samples.
+
+### Implementación
+- Teclado de dos octavas con etiquetas de notas y desplazamiento por octava.
+- Rejilla de 16 pasos con regla superior numerada.
+- DRAW/SELECT, cuantización 1/16–1/8–1/4, longitud de nota, velocity, eliminar nota y limpiar notas del pad.
+- Drag horizontal/vertical para mover notas; borde derecho para redimensionar duración.
+- Zoom y desplazamiento dentro del LCD.
+- El scheduler dispara las notas por paso, aplicando pitch, velocity y longitud a la reproducción del pad.
+- Los pasos clásicos siguen funcionando cuando no existe una nota MIDI en ese paso; una nota MIDI sustituye el disparo clásico en su mismo paso para evitar doble golpe.
+
+### Evidencia
+- Rama: feat/hybrid-hardware-ui-system.
+- HEAD de código: 23a434ec767fee2412dc719c8a51a7022f8774cb.
+- CI del último commit de GUI: [run 41877908234 · QUEUED](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41877908234).
+- Archivos: creator.html, creator-engine.html, scripts/validate.mjs.
+- Validador ampliado con contratos MIDI, scheduling, comandos y persistencia.
+- QA real en Safari iOS/iPhone y audio con samples todavía pendiente.
+- main no se modificó y no hubo merge; Supabase permanece fuera del alcance.
