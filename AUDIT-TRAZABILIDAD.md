@@ -271,7 +271,7 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 
 ### Pruebas estáticas añadidas
 - scripts/validate.mjs comprueba presencia de Piano Roll, controles de velocity, gestos de drag/resize, comandos registrados, scheduler MIDI y snapshot persistente.
-- CI para el último commit de GUI (b7363a6ef234c823de3194ccda5e22f444ff3c0a) quedó en cola al corte de esta bitácora: run 41878092266.
+- CI para el último commit de GUI (b7363a6ef234c823de3194ccda5e22f444ff3c0a) quedó en cola al corte de esta bitácora: run 41878177445.
 - SHA de motor que incorpora la reproducción de notas y la persistencia: 5a22793de89abb9aa0d8a73e7f90cc064bcac48c.
 - Commit del validador MIDI: 3880a00536bcd51ac031548a43a946282d075853.
 
