@@ -2,8 +2,8 @@
 
 **Corte de contexto:** 2026-11-04  
 **Rama de trabajo:** `feat/hybrid-hardware-ui-system`  
-**HEAD verificado al abrir este registro:** `653569f0c318408dc9527a857ee17ee1fbedbd2e`  
-**CI del HEAD anterior:** [run 41870648909 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41870648909)  
+**HEAD verificado al último corte:** `e8d3722c9cfdf93d8915f13c636902cb0edc1218`  
+**CI del último HEAD:** [run 41875733973 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41875733973)  
 **Creación de la bitácora:** commit `f2787c48b98b8fd38739786da664a61680cf1126`; [CI 41870939896 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41870939896)  
 **Regla de seguridad:** no escribir en `main`, no mover refs de `main`, no fusionar PR. Supabase `dirtyfingaz-os` permanece fuera del alcance.
 
@@ -97,3 +97,29 @@ Cuando el usuario solicite cualquiera de estas frases, recuperar este archivo y 
 - **“Cronograma pendiente”**: fases abiertas, dependencias y siguiente paso ejecutable.
 
 **Regla permanente:** cada cambio relevante actualiza esta bitácora y su espejo en Notion. Mantener separados GUI y motor; definir contrato antes de tocar ambos. No modificar `main`, no hacer merge y no tocar Supabase.
+
+## 6. Creator · actualización de pantalla LED y edición de samples · 2026-11-04
+
+### Objetivo
+Mejorar la pantalla LCD/LED y el flujo de sample editing sin desacoplar la GUI del motor de audio.
+
+### Cambios registrados
+- **creator-engine.html:** el motor calcula marcadores de transientes a partir de la forma de onda, publica estado BPM y telemetría de peak; incorpora slicing de transientes en pads vacíos y preview del pad activo.
+- **creator.html:** controles LCD BROWSE, TRNS y audition; menú DIRTYFINGAZ OS dentro de la pantalla con cambio de tema bajo THEME/COLOR; rueda vertical táctil para BPM; barra de transporte por pasos con estado rojo al superar el umbral de peak; barra compacta de Piano Roll con zoom +/- y scroll horizontal.
+- La reproducción del pad reutiliza el sample y el rango IN/OUT que consume el motor; el recorte existente sigue enviando cambios por el bridge y persiste al confirmar.
+- El editor conserva la grilla de 16 pasos y las nueve filas de pads. El zoom amplía el área horizontal sin alterar el patrón guardado.
+
+### Evidencia
+- Rama: feat/hybrid-hardware-ui-system.
+- Último HEAD: e8d3722c9cfdf93d8915f13c636902cb0edc1218.
+- GitHub Actions: [run 41875733973 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41875733973).
+- Archivos principales: creator.html, creator-engine.html.
+- Los primeros intentos de CI fallaron por separadores de línea literales introducidos durante las ediciones; ambos puntos se corrigieron y el SHA final pasó el validador.
+- Preview Cloudflare: URL histórica conocida, sin despliegue verificado para este SHA.
+- QA físico: falta probar audio, detección de transientes, scroll/zoom y BPM en Safari iOS/iPhone 11+.
+
+### Resultado y pendientes
+- Estado de código y CI: PASS.
+- Estado de funcionamiento real en navegador/dispositivo: pendiente.
+- Próximo bloque: revisar el diseño Piano Roll como editor de notas (pitch/longitud/velocidad), refinar el visualizador de transientes y validar la alerta de peak con audio real.
+- No se modificó main, no se hizo merge y Supabase permanece fuera del alcance.
