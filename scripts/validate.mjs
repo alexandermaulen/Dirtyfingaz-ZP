@@ -250,6 +250,22 @@ assert.equal(agentRegistry.layout.mount.Lx, "#cl");
 assert.equal(agentRegistry.layout.mount.Rx, "#cr");
 assert.equal(agentRegistry.controls.Lx.adaptive, true);
 assert.equal(agentRegistry.controls.Rx.adaptive, true);
+assert.equal(agentRegistry.panelSystem.presentation, "hybrid");
+assert.equal(agentRegistry.panelSystem.activation, "hold");
+assert.equal(agentRegistry.panelSystem.dock, "side");
+assert.deepEqual(agentRegistry.panelSystem.panels.left.map(x=>x.id), ["L1x","L2x","L3x"]);
+assert.deepEqual(agentRegistry.panelSystem.panels.right.map(x=>x.id), ["R1x","R2x","R3x"]);
+assert.match(ui, /function buildAdaptivePanel\(side,groups,encoder\)/);
+assert.match(ui, /holdTimer=setTimeout\(\(\)=>\{held=true;expanded=true;renderOptions\(\)\},420\)/);
+assert.match(ui, /fetch\('\.\/zp-agent-registry\.json'\)/);
+assert.match(ui, /zp-panel-option-select/);
+assert.match(ui, /zp-panel-context-change/);
+assert.match(ui, /mode:'selection-only'/);
+assert.match(agent, /zp-panel-option-select/);
+assert.match(agent, /Panel L3x/);
+assert.match(agentCss, /\.panel-secondary\[hidden\]\{display:none\}/);
+assert.match(agentCss, /\.adaptive-side-panel/);
+
 
 console.log("OK: agente contextual local, allowlist y assets PWA.");
 console.log("OK: Piano Roll MIDI, edición de notas, reproducción y persistencia.");
