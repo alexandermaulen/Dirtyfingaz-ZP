@@ -149,7 +149,7 @@ canvas{width:168px;height:46px}
 <style id="zp-iphone11-fullscreen">
 html,body{width:100%;height:100%;min-height:100%;margin:0;overflow:hidden;background:#041a06}
 body{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;padding:0;min-height:0;height:100dvh;width:100vw;overflow:hidden;isolation:isolate}
-body::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;transform:translate(-50%,-50%);width:var(--zp-stage-width,min( calc(100vw - 24px), 56.25dvh ));aspect-ratio:9/16;border:1px solid #17451a;border-radius:22px;background:radial-gradient(ellipse at 50% 15%,#0d2a0d,#041004 72%);box-shadow:inset 0 0 40px #0009,0 0 35px #0008;pointer-events:none}
+body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;overflow:hidden}body::before{content:none!important;display:none!important}
 .unit{flex:none;width:430px;max-width:none;margin:0;transform-origin:center center;will-change:transform}
 .hd{gap:9px;min-width:0}
 .home-arrow{appearance:none;-webkit-appearance:none;display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;min-height:34px;padding:0;margin:0;border:2px solid #061b05;border-radius:7px;background:linear-gradient(180deg,#267d16,#0a3508);color:var(--tx);font:800 25px/1 'Courier New',monospace;text-shadow:0 0 7px var(--lcd);box-shadow:inset 0 1px #dfff8c66,0 0 0 1px var(--bd2),0 2px 5px #0009;touch-action:manipulation}
@@ -213,7 +213,7 @@ body::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;transform:
 const $=s=>document.querySelector(s),unit=$('#unit'),scr=$('#scr');
 const mk=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
 /* escala adaptable: viewport visual, orientación y áreas seguras */
-const fit=()=>{const vv=window.visualViewport,w=vv?vv.width:document.documentElement.clientWidth,h=vv?vv.height:window.innerHeight;const safeTop=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("padding-top"))||0;const safeBottom=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("padding-bottom"))||0;const usableH=Math.max(320,h-safeTop-safeBottom-16);const stageW=Math.max(260,Math.min(w-12,usableH*9/16));const stageH=stageW*16/9;const scale=Math.min(stageW/(unit.offsetWidth+8),stageH/(unit.offsetHeight+8));document.documentElement.style.setProperty("--zp-stage-width",stageW+"px");unit.style.zoom="1";unit.style.transform="scale("+Math.max(.42,Math.min(1.2,scale))+")";};
+const fit=()=>{const vv=window.visualViewport;const w=vv?vv.width:document.documentElement.clientWidth;const h=vv?vv.height:window.innerHeight;const scale=Math.min(w/unit.offsetWidth,h/unit.offsetHeight);unit.style.zoom="1";unit.style.transform="scale("+Math.max(.1,scale)+")";};
 fit();addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>setTimeout(fit,300));window.visualViewport?.addEventListener('resize',fit,{passive:true});document.fonts&&document.fonts.ready.then(fit);
 /* perillas */
 [['VOLUME','<span>MIN</span><span>MAX</span>'],['CTRL 1','&#9670; CUTOFF &#9670;'],['CTRL 2','RESONANCE'],['CTRL 3','&#9670; DRIVE &#9670;']].forEach(([n,s])=>{
