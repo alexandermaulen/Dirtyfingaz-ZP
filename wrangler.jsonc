@@ -16,12 +16,12 @@
       }
     ]
   },
-  "migrations": [
-    {
-      "tag": "v1-radio-rooms",
-      "new_sqlite_classes": ["RadioRoom"]
+  "exports": {
+    "RadioRoom": {
+      "type": "durable-object",
+      "storage": "sqlite"
     }
-  ],
+  },
   "vars": {
     "ENVIRONMENT": "production"
   },
