@@ -280,16 +280,33 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
 <script>
 (()=>{
  const frame=document.getElementById("zp-engine");
- let ready=false;const queue=[];
+ let ready=false,sequence=0;const queue=[],pending=new Map();
+ const dispatch=(type,detail)=>window.dispatchEvent(new CustomEvent(type,{detail}));
+ const sendPacket=packet=>{if(!frame.contentWindow){pending.delete(packet.requestId);return}frame.contentWindow.postMessage(packet,location.origin)};
  window.zpBridgeSend=(command,payload={})=>{
-  const packet={type:"zp-engine-command",command,payload};
-  if(ready)frame.contentWindow.postMessage(packet,location.origin);else queue.push(packet);
+  if(typeof command!=="string"||!command.startsWith("creator."))throw new TypeError("Comando Creator inválido");
+  const requestId="creator-ui-"+(++sequence)+"-"+Date.now();
+  const packet={type:"zp-engine-command",protocolVersion:1,source:"creator.ui",timestamp:Date.now(),requestId,command,payload:payload&&typeof payload==="object"?payload:{}};
+  const timer=setTimeout(()=>{if(pending.has(requestId)){pending.delete(requestId);dispatch("zp-engine-timeout",{requestId,command})}},8000);
+  pending.set(requestId,{command,timer});
+  if(ready)sendPacket(packet);else queue.push(packet);
+  return requestId;
  };
  window.addEventListener("message",ev=>{
-  if(ev.source!==frame.contentWindow||ev.origin!==location.origin)return;
-  if(ev.data?.type==="zp-engine-ready"){ready=true;while(queue.length)frame.contentWindow.postMessage(queue.shift(),location.origin);}
-  if(ev.data?.type==="zp-engine-error")console.error("Creator engine:",ev.data.command,ev.data.message);
+  if(ev.source!==frame.contentWindow||ev.origin!==location.origin||!ev.data)return;
+  const data=ev.data;
+  if(data.type==="zp-engine-ready"&&data.protocolVersion===1){ready=true;while(queue.length)sendPacket(queue.shift());dispatch("zp-engine-ready",data);return}
+  if(data.type==="zp-engine-ack"||data.type==="zp-engine-error"){
+   const item=pending.get(data.requestId);
+   if(item){clearTimeout(item.timer);pending.delete(data.requestId)}
+   dispatch(data.type==="zp-engine-ack"?"zp-engine-result":"zp-engine-error",data);
+   if(data.type==="zp-engine-error")console.error("Creator engine:",data.command,data.error||data.message);
+  }
  });
+ window.addEventListener("zp-engine-timeout",ev=>console.error("Creator engine timeout:",ev.detail.command));
+ window.addEventListener("zp-engine-error",ev=>console.error("Creator engine error:",ev.detail.command,ev.detail.error||ev.detail.message));
+ window.addEventListener("zp-engine-result",ev=>{if(ev.detail.result?.ok===false)console.error("Creator command failed:",ev.detail.command,ev.detail.result.error)});
+
  const norm=s=>(s||"").replace(/<[^>]*>/g,"").replace(/\s+/g,"").toUpperCase();
  const allButtons=()=>[...document.querySelectorAll("#rows .b,#bt .b,#cl .b,#cr .b")];
  const bind=(label,fn)=>{
@@ -356,7 +373,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
   zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
  });
  /* Salida al hub ZP */
- const goHome=()=>parent.postMessage({type:"zp-exit-creator"},"*");
+ const goHome=()=>parent.postMessage({type:"zp-exit-creator",source:"creator.ui",timestamp:Date.now()} ,location.origin);
  document.getElementById("creator-home")?.addEventListener("click",goHome);
  bind("EXIT",goHome);
 })();
