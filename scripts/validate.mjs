@@ -41,7 +41,8 @@ const missing = [...new Set(sent)].filter((command) => !commands.includes(comman
 assert.match(ui, /repeat\(16,minmax\(0,1fr\)\)/, "La GUI debe mostrar 16 pasos");
 assert.match(ui, /s<=16/);
 assert.match(ui, /Math\.min\(15,Number\(cell\.dataset\.s\)\|\|0\)/);
-assert.match(ui, /index-1\)\/17/);
+assert.match(ui, /offset=cellIndex-18/);
+assert.match(ui, /Math\.floor\(offset\/17\)\+1/);
 assert.match(ui, /zp-engine-playhead/);
 assert.match(engine, /type:"zp-engine-playhead"/);
 assert.match(engine, /type:"zp-engine-pattern-state"/);
