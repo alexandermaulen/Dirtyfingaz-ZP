@@ -64,6 +64,17 @@
 .lx.lx-active{filter:drop-shadow(0 0 8px var(--lcd))}
 .lx-active{outline:2px solid var(--lcd)!important;outline-offset:2px;box-shadow:0 0 10px var(--lcd)!important}
 
-.lx{width:80px;height:80px;margin:-20px 0;justify-self:center;z-index:3}
-@media(max-width:620px){.lx{width:58px;height:58px}}
-@media(max-height:700px){.lx{width:56px;height:56px}}
+/* Encoders integrados en los raíles laterales del deck. */
+.mid .col{height:100%;min-width:0;justify-content:space-evenly;gap:2px}
+.mid .col .b{min-height:30px;font-size:13px;padding:2px}
+.mid .col .lx,.mid .col .rx{width:50px;height:50px;min-width:50px;min-height:50px;margin:0;flex:none;align-self:center;justify-self:center}
+.mid .col .lx::before,.mid .col .rx::before{top:-10px}
+.lx{z-index:4}
+@media(max-width:620px){
+ .mid .col .b{min-height:28px;font-size:12px}
+ .mid .col .lx,.mid .col .rx{width:46px;height:46px;min-width:46px;min-height:46px}
+}
+@media(max-height:700px){
+ .mid .col .b{min-height:26px}
+ .mid .col .lx,.mid .col .rx{width:42px;height:42px;min-width:42px;min-height:42px}
+}
