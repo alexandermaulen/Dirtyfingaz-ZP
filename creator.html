@@ -296,7 +296,11 @@ function bindKnob(el,inf){let a=0,y0=0,a0=0,on=0,lx=0,ly=0;const set=v=>{a=inf?v
 const B=(t,cls)=>{const b=mk('div','b '+(cls||''),t);return b};
 function buildAdaptivePanel(side,groups,encoder){
  const root=side==='L'?$('#cl'):$('#cr');root.replaceChildren();root.classList.add('adaptive-side-panel');root.dataset.panel=side;
- const nav=mk('div','panel-group-nav'),primary=mk('div','panel-primary'),secondary=mk('div','panel-secondary');secondary.hidden=true;
+ const nav=mk('div','panel-group-nav'),physical=mk('div','legacy-button-stack'),primary=mk('div','panel-primary'),secondary=mk('div','panel-secondary');secondary.hidden=true;
+ const physicalActions=side==='L'?
+  [['DRIVE',()=>zpBridgeSend("creator.fx.master.toggle",{name:"drive"})],['DELAY',()=>zpBridgeSend("creator.fx.master.toggle",{name:"delay"})],['FILTER',()=>zpBridgeSend("creator.fx.master.toggle",{name:"filter"})]]:
+  [['LOAD',()=>zpBridgeSend("creator.sample.load.request")],['CHOP',()=>zpBridgeSend("creator.sample.chop")],['CLEAR',()=>zpBridgeSend("creator.sample.clear")]];
+ physicalActions.forEach(([label,action])=>{const b=B(label,'legacy-physical-button');b.dataset.legacyPort=side+'.'+label.toLowerCase();b.setAttribute('role','button');b.setAttribute('aria-label',label+' · botón lateral físico');b.tabIndex=0;b.addEventListener('click',action);b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();b.click()}});physical.append(b)});
  let activeGroup=0,expanded=false,holdTimer=null,held=false,activeOption=null,context='sample';
  const contextFor=()=>{const el=window.__zpLxTarget;if(!el)return 'sample';if(el.matches?.('[data-midi-target],.piano-note,.piano-cell')||el.closest?.('.piano-grid,.piano-tools'))return 'piano';if(el.matches?.('.trim-marker')||el.dataset?.trimTarget)return 'sample';if(el.closest?.('#gr'))return 'pattern';if(/FX|FILTER|RESONATOR|DELAY|ISOLATOR|MFX/i.test(el.textContent||''))return 'fx';return 'sample'};
  const optionsFor=(group)=>{const ctx=contextFor();context=ctx;return (group.contexts?.[ctx]||group.options||[]).map(x=>typeof x==='string'?{label:x,id:x.toLowerCase().replace(/[^a-z0-9]+/g,'-')}:x)};
@@ -307,7 +311,7 @@ function buildAdaptivePanel(side,groups,encoder){
  secondary.hidden=!expanded;root.dataset.expanded=String(expanded);
  };
  const renderOptions=()=>{secondary.hidden=!expanded;root.dataset.expanded=String(expanded)};
- root.append(nav,primary,secondary);render();return {root,render,selectContext:()=>{const next=contextFor();if(next!==context){context=next;render()}}};
+ root.append(nav,physical,primary,secondary);render();return {root,render,selectContext:()=>{const next=contextFor();if(next!==context){context=next;render()}}};
 }
 const panelDefinitions={
  left:[
@@ -483,7 +487,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  const allButtons=()=>[...document.querySelectorAll("#rows .b,#bt .b,#cl .b,#cr .b")];
  const bind=(label,fn)=>{
   const key=norm(label);
-  allButtons().filter(el=>norm(el.textContent)===key).forEach(el=>el.addEventListener("click",fn));
+  allButtons().filter(el=>norm(el.textContent)===key&&!el.classList.contains("legacy-physical-button")).forEach(el=>el.addEventListener("click",fn));
  };
  /* Pads: nueve superficies limpias, conectadas al motor real */
  const shiftControl=by("SHIFT");
