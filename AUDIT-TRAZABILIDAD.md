@@ -386,5 +386,5 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - El cursor de movimiento libre se representa como retícula visible sobre el Piano Roll.
 - El motor conserva `micro` (0..0.999 de un paso) en cada nota y programa su reproducción con ese offset, permitiendo microtiming real en vez de sólo mover visualmente el bloque.
 - La edición MIDI sigue entrando por `creator.piano.note.upsert` y conserva persistencia de proyecto; no se modifica el contrato del bridge.
-- CI: run `41887619402` completó `validate` en SUCCESS para SHA `eb1eee612e37570ab30cf3a44e1f38b64d5862ec`. Las mejoras de información contextual y cursor se añadieron después y están pendientes de validación en el nuevo SHA.
+- CI: run `41887880916` completó `validate` en SUCCESS para SHA `965e5bfcd9a903b0dca7f4541b9876c9594ca8d1`, incluyendo controles de información MIDI, selector de destino del rotor, cursor libre y nuevas aserciones.
 - Pruebas de dispositivo aún pendientes: gesto táctil continuo, rotor, SHIFT con teclado externo y reproducción de microtiming en Safari iOS.
