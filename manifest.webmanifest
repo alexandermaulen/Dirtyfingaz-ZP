@@ -1,0 +1,24 @@
+{
+  "name": "DIRTYFINGAZ ZP 1",
+  "short_name": "DIRTYFINGAZ ZP",
+  "description": "Radio Grid y laboratorio musical DIRTYFINGAZ",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "background_color": "#030803",
+  "theme_color": "#061406",
+  "icons": [
+    {
+      "src": "./zp-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
