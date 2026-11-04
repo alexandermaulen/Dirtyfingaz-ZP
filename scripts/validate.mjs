@@ -197,6 +197,22 @@ assert.match(ui, /data-pad-action="mute"/);
 assert.match(ui, /zp-agent-runtime-context/);
 assert.match(engine, /project:\{id:currentProjectId,name:currentProjectName\}/);
 assert.match(agent, /zp-agent-runtime-context/);
+assert.match(agent, /zp-agent-registry\.json/, "El agente debe cargar el registro JSON de parámetros.");
+assert.match(agent, /parameterKeyFor/, "El agente debe identificar el parámetro seleccionado.");
+assert.match(agent, /zp-agent-target-active/, "El parámetro seleccionado debe resaltarse en la GUI.");
+assert.match(agent, /zp-agent-param-apply/, "El inspector debe ofrecer aplicación de parámetros permitidos.");
+assert.match(agent, /data-code-template="engine"/, "El agente debe incluir composición de código ENGINE.");
+assert.match(agent, /data-code-template="bridge"/, "El agente debe incluir composición de código BRIDGE.");
+assert.match(agent, /data-code-template="test"/, "El agente debe incluir composición de pruebas.");
+assert.match(agent, /autoCloseMs:AUTO_CLOSE_MS/);
+assert.match(read("zp-agent-registry.json"), /"version": "1\.0\.0"/);
+assert.match(read("zp-agent-registry.json"), /"key": "trim\.start"/);
+assert.match(read("zp-agent-registry.json"), /"key": "midi\.velocity"/);
+assert.match(radioWorker, /selectedParameter/);
+assert.match(radioWorker, /zp-agent-registry\.json/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v9/);
+assert.match(read("sw.js"), /zp-agent-registry\.json/);
+
 assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v8/);
 assert.match(read("sw.js"), /\.\/zp-agent\.js/);
 
