@@ -280,7 +280,7 @@
       "wrap": true,
       "commands": [],
       "contextEvent": "focusin",
-      "mount": "#cl",
+      "mount": ".mid>.lx",
       "placement": "left-side-rail",
       "adaptive": true,
       "activation": {
@@ -305,7 +305,7 @@
         "creator.sample.trim.set",
         "creator.control.set"
       ],
-      "mount": "#cr",
+      "mount": ".mid>.rx",
       "placement": "right-side-rail",
       "adaptive": true,
       "scrollFallback": {
@@ -363,15 +363,15 @@
     "behavior": "adaptive",
     "spacing": "compact",
     "mount": {
-      "Lx": "#cl",
-      "Rx": "#cr"
+      "Lx": ".mid>.lx",
+      "Rx": ".mid>.rx"
     },
     "responsiveSizes": {
       "default": "50px",
       "narrow": "46px",
       "shortViewport": "42px"
     },
-    "notes": "Lx/Rx permanecen dentro del chassis, en los raíles laterales del GUI. La reubicación es visual y no altera el bridge ni el estado del motor.",
+    "notes": "Lx/Rx se montan como controles maestros dentro de .mid y ocupan raíles laterales del módulo. Al abrir Piano Roll, la GUI los reubica temporalmente en el dock inferior; el bridge y el estado del motor permanecen independientes.",
     "contextualControls": {
       "IN": {
         "context": "sample",
