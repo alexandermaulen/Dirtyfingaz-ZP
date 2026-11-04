@@ -296,6 +296,88 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
  .mid>.fx button{font-size:6px!important}
 }
 
+
+/* =========================================================
+   DIRTYFINGAZ ZP1 · CREATOR MASTER LAYOUT
+   Visual source: DIRTYFINGAZ-ZP-REFERENCIA-INTERFAZ-MAESTRA
+   Engine and command bindings remain in the existing runtime.
+========================================================= */
+:root{--chassis:#36d51e;--chassis-dark:#167d0c;--rim:#9dff46;--lcd:#d4ff58;--ink:#031603;--screen:#061b08;--key:#0c5209}
+html,body{background:#070b07!important;min-height:100%;overflow-x:hidden!important}
+body{display:flex!important;align-items:flex-start!important;justify-content:center!important;padding:8px 0 18px!important}
+#app{width:min(430px,calc(100vw - 12px))!important;height:auto!important;min-height:0!important;max-height:none!important;position:relative!important;left:auto!important;top:auto!important;transform:none!important;zoom:1!important;
+ padding:10px 11px 9px!important;margin:4px auto!important;display:flex!important;flex-direction:column!important;gap:9px!important;overflow:visible!important;
+ border:4px solid #000!important;border-radius:26px!important;background:linear-gradient(155deg,#43e522 0%,#218d12 52%,#0d4c08 100%)!important;
+ box-shadow:inset 0 0 0 3px #a4ff55,0 0 0 3px #145d0b,0 0 0 6px #000,0 0 30px #55ff3844!important;color:#f2ff45!important}
+#app:before{content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;z-index:0;background:radial-gradient(#0004 1px,transparent 1.5px) 0 0/4px 4px}
+#app>*{position:relative;z-index:1}
+.title{height:42px!important;min-height:42px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 5px!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.title>span{font:italic 800 27px/1 'Arial Narrow',Impact,sans-serif!important;letter-spacing:-1px!important;color:#f3ff39!important;text-shadow:2px 2px #000,-1px -1px #000!important}
+.title small{font:italic 800 14px/1 monospace!important;color:#f3ff39!important}
+.title .back{height:27px!important;min-height:27px!important;padding:0 9px!important;font-size:10px!important}
+.knobs{order:2!important;width:100%!important;height:auto!important;min-height:100px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:2px!important;padding:7px 5px 4px!important;border:3px solid #000!important;border-radius:28px!important;background:linear-gradient(#14740d,#063806)!important;box-shadow:inset 0 0 0 2px #8ef447,inset 0 5px 10px #0008!important}
+.knob{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:3px!important;font:800 10px/1 monospace!important;color:#f5ff57!important;text-shadow:1px 1px #000!important}
+.kb{width:62px!important;height:62px!important;min-width:62px!important;min-height:62px!important;border:2px solid #000!important;border-radius:50%!important;background:repeating-conic-gradient(#244b1b 0 5deg,#071b06 5deg 10deg)!important;box-shadow:0 0 0 3px #9bff51,0 0 0 5px #000,0 5px 0 #0008!important}
+.kb i{inset:9px!important;border-radius:50%!important;background:radial-gradient(circle at 35% 28%,#38702a,#071b06 70%)!important;box-shadow:inset 0 2px 5px #000,0 0 0 1px #b5ff70!important}
+.mid{order:3!important;width:100%!important;height:190px!important;min-height:190px!important;display:grid!important;grid-template-columns:74px minmax(0,1fr) 74px 66px!important;gap:5px!important;align-items:center!important;padding:5px!important;border:3px solid #000!important;border-radius:32px!important;background:linear-gradient(145deg,#16720d,#052b05)!important;box-shadow:inset 0 0 0 2px #8fff43,inset 0 6px 10px #0008!important;overflow:visible!important}
+.mid>.fx{position:static!important;inset:auto!important;display:flex!important;flex-direction:column!important;justify-content:center!important;gap:8px!important;width:100%!important;min-width:0!important;height:auto!important}
+.mid>.fx button{min-width:0!important;width:100%!important;height:46px!important;min-height:46px!important;padding:3px!important;font:800 10px/1.05 monospace!important;letter-spacing:-.3px!important;border:2px solid #000!important;border-radius:12px!important;background:linear-gradient(#14710d,#032803)!important;box-shadow:inset 0 0 0 2px #76d93b,0 3px 0 #000!important;color:#efff49!important}
+.mid>.disp{grid-column:2!important;grid-row:1!important;width:100%!important;height:178px!important;min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;overflow:hidden!important;border:6px solid #48a923!important;border-radius:50%!important;background:radial-gradient(circle,#0b310b,#031404 72%)!important;box-shadow:0 0 0 3px #000,inset 0 0 0 3px #000,inset 0 0 24px #000,0 0 18px #b2ff4b66!important}
+.screen-head{width:82%!important;font:8px monospace!important;color:#baff6b!important}
+.screen-name{font:11px monospace!important;letter-spacing:.04em!important;color:#d8ff71!important;text-align:center!important}
+.mid canvas{width:90%!important;height:66px!important;max-height:66px!important}
+.screen-tabs{display:flex!important;gap:3px!important;width:90%!important}
+.screen-tabs button{min-width:0!important;flex:1!important;height:22px!important;min-height:22px!important;padding:1px!important;font:8px monospace!important}
+.screen-actions{width:90%!important;min-height:20px!important;display:flex!important;justify-content:center!important;gap:4px!important}
+.screen-actions button{min-width:0!important;min-height:22px!important;height:22px!important;padding:2px 4px!important;font:8px monospace!important}
+.mid>.value-panel{grid-column:4!important;grid-row:1!important;width:66px!important;min-width:66px!important;max-width:66px!important;height:168px!important;padding:5px 2px!important;gap:5px!important;border:2px solid #000!important;border-radius:12px!important;background:linear-gradient(#0b5208,#031d03)!important;box-shadow:inset 0 0 0 1px #9aff4c!important}
+.mid .value-head span{font:800 11px monospace!important}
+.mid .value-encoder-wrap .kb{width:49px!important;height:49px!important;min-width:49px!important;min-height:49px!important}
+.mid .value-encoder-wrap .kb b{inset:14px!important}
+.mid .value-encoder-wrap .kb i{top:5px!important;height:12px!important;transform-origin:2px 25px!important}
+.mid .value-encoder-wrap output{font:800 12px monospace!important}
+.mid .value-target{font:6px monospace!important;min-height:14px!important}
+.mid .fx-readout{font:6px monospace!important}
+.control-deck{order:4!important;width:100%!important;display:flex!important;flex-direction:column!important;gap:6px!important;padding:6px!important;border:3px solid #000!important;border-radius:18px!important;background:#0b4b08!important;box-shadow:inset 0 0 0 2px #80e93e!important}
+.row{display:flex!important;flex-wrap:nowrap!important;gap:5px!important;align-items:center!important;justify-content:space-between!important}
+.row button{flex:1!important;min-width:0!important;min-height:34px!important;height:34px!important;padding:2px!important;font:800 9px/1 monospace!important;border:2px solid #000!important;border-radius:9px!important;background:linear-gradient(#12650c,#032603)!important;color:#efff4a!important;box-shadow:inset 0 0 0 1px #6acb34,0 2px 0 #000!important}
+.transport-row{display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important}
+.transport-row span{font:8px monospace!important;color:#d9ff6a!important}
+.transport-row strong{font:10px monospace!important}
+.action-row button{font-size:8px!important}
+.sequencer{order:5!important;width:100%!important;padding:7px!important;border:3px solid #000!important;border-radius:14px!important;background:linear-gradient(#0c4a08,#031e03)!important;box-shadow:inset 0 0 0 2px #83ed3f!important}
+.seq-top{display:flex!important;justify-content:space-between!important;align-items:center!important;font:9px monospace!important;color:#d8ff67!important;margin-bottom:6px!important}
+.step-grid{display:grid!important;grid-template-columns:repeat(16,minmax(0,1fr))!important;gap:3px!important}
+.step-grid button{min-width:0!important;width:100%!important;height:23px!important;min-height:23px!important;padding:0!important;font:8px monospace!important;border:1px solid #000!important;border-radius:4px!important;background:#082d07!important;color:#a8e95a!important}
+.step-grid button.active{background:#caff51!important;color:#062005!important;box-shadow:0 0 8px #caff51!important}
+.step-grid button.playing{outline:2px solid #fff!important}
+.pads{order:6!important;width:100%!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important;padding:7px 4px!important;border:3px solid #000!important;border-radius:20px!important;background:#0c4d08!important;box-shadow:inset 0 0 0 2px #84eb40!important}
+.pc{min-width:0!important}
+.pad{width:100%!important;height:76px!important;min-height:76px!important;padding:0!important;border:4px solid #000!important;border-radius:13px!important;background:linear-gradient(145deg,#18770e,#042b04)!important;box-shadow:inset 0 0 0 3px #48b92b,inset 0 0 15px #000b,0 3px 0 #000!important}
+.pad b,.pad small{display:none!important}
+.pad.on,.pad:active{background:radial-gradient(circle at 50% 42%,#f5ff87,#a5ff3c 75%)!important;box-shadow:inset 0 0 0 3px #fff,inset 0 0 15px #fff8,0 0 20px #b5ff4c!important}
+.pad.muted{opacity:.45!important}
+.pad.solo{outline:2px solid #fff!important}
+.lowerDeck{order:7!important;width:100%!important;padding:6px!important;border:3px solid #000!important;border-radius:14px!important;background:#0b4a08!important;box-shadow:inset 0 0 0 2px #80e93e!important}
+.sp-commands{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:4px!important}
+.sp-commands button{min-width:0!important;min-height:31px!important;height:31px!important;padding:1px!important;font:800 8px monospace!important;border:2px solid #000!important;border-radius:8px!important;background:linear-gradient(#146b0d,#032603)!important;color:#f2ff4b!important;box-shadow:inset 0 0 0 1px #74d63a,0 2px 0 #000!important}
+.foot{order:8!important;display:flex!important;justify-content:space-around!important;align-items:center!important;height:25px!important;padding:3px!important;border:2px solid #000!important;border-radius:10px!important;background:#0b4307!important;font:8px monospace!important;color:#d9ff6b!important}
+@media(max-width:380px){
+ #app{padding:8px 7px!important;gap:7px!important}
+ .knobs{min-height:86px!important}.kb{width:52px!important;height:52px!important;min-width:52px!important;min-height:52px!important}
+ .mid{grid-template-columns:58px minmax(0,1fr) 58px 56px!important;height:162px!important;min-height:162px!important;gap:3px!important;padding:3px!important}
+ .mid>.fx button{height:39px!important;min-height:39px!important;font-size:8px!important}
+ .mid>.disp{height:150px!important}
+ .mid>.value-panel{width:56px!important;min-width:56px!important;max-width:56px!important;height:145px!important}
+ .mid .value-encoder-wrap .kb{width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important}
+ .pad{height:67px!important;min-height:67px!important}
+ .step-grid{gap:1px!important}.step-grid button{font-size:7px!important}
+}
+@media(max-height:700px) and (orientation:landscape){
+ body{align-items:flex-start!important}
+ #app{width:min(430px,calc(100vw - 16px))!important}
+}
+
 </style></head><body><div id="app"></div>
 <script src="./zp-storage.js"></script>
 <script src="./zp-core.js"></script>
@@ -407,7 +489,7 @@ runtime.register("creator.project.save",()=>saveSession());
 runtime.register("creator.export.wav",()=>exportWav());
 runtime.on("command:failed",e=>notify(e.result.error.message));
 
-const title=$("div","title",'<span>DIRTYFINGAZ ZP1</span><small>BEAT LAB</small>'),back=button("← SALIR");back.className="back";back.onclick=()=>parent.postMessage({type:"zp-exit-creator"},"*");title.append(back);app.append(title);
+const title=$("div","title",'<span>DIRTYFINGAZ Z</span><small>BY TAPES CROMO · CREATOR</small>'),back=button("← SALIR");back.className="back";back.onclick=()=>parent.postMessage({type:"zp-exit-creator"},"*");title.append(back);app.append(title);
 const knobDefs=[["MASTER",.58],["PAD VOL",.85],["PITCH",.5],["FILTER",1]],knobSetters=[];
 let knobs=$("div","knobs");
 knobDefs.forEach(([label,initial],idx)=>{let w=$("div","knob","<span>"+label+"</span>"),k=$("div","kb","<i></i>"),v=initial,y0=null,v0=0;const set=x=>{v=Math.max(0,Math.min(1,x));k.firstChild.style.transform="rotate("+(-135+270*v)+"deg)";if(idx===0&&master)master.gain.setTargetAtTime(v,ctx.currentTime,.02);if(idx===1){padLevels[activePad]=v}else if(idx===2){padPitch[activePad]=(v-.5)*24}else if(idx===3){padFilter[activePad]=300+v*17700}};knobSetters.push({set,get:()=>v});set(v);k.addEventListener("pointerdown",e=>{k.setPointerCapture(e.pointerId);y0=e.clientY;v0=v;audio()});k.addEventListener("pointermove",e=>{if(y0!==null)set(v0+(y0-e.clientY)/130)});["pointerup","pointercancel"].forEach(ev=>k.addEventListener(ev,()=>y0=null));w.append(k);knobs.append(w)});app.append(knobs);
@@ -444,7 +526,7 @@ valueGroup.append(valueHead,valueWheel.wrap,valueTargetLabel,fxReadout);
 mid.append(valueGroup);
 const lowerDeck=$("div","control-deck lowerDeck");lowerDeck.append(commandRow);
 app.append(lowerDeck);
-const footer=$("div","foot","<span>SP-606 HYBRID OS</span><span>9 PADS</span><span>WAV</span>");app.append(footer);
+const footer=$("div","foot","<span>DIRTYFINGAZ ENGINE</span><span>9 PADS</span><span>WAV</span>");app.append(footer);
 
 
 function updateValueReadout(){if(valueOutput){let r=ranges[activePad]||{start:0,end:1};valueOutput.textContent=Math.round(r[valueTarget]*100)+"%";if(valueTargetLabel)valueTargetLabel.textContent=(activeTab==="RECORTE"?"RECORTE · "+(valueTarget==="start"?"IN":"OUT"):systemMenu?"SYSTEM MENU":"FX CONTROL");}}
