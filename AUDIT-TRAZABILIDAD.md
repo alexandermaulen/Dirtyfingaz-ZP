@@ -98,3 +98,40 @@ El bridge debe verificar origen y ventana emisora en ambos sentidos, devolver re
 - **QA pendiente:** la conexión estática existe, pero no se ha probado la interacción real en navegador/dispositivo.
 
 Esta auditoría es estática. No declara éxito de reproducción, rendimiento, compatibilidad física ni despliegue en Cloudflare.
+
+
+## 7. Actualización de implementación · 2026-11-04
+
+**Rama:** feat/hybrid-hardware-ui-system  
+**Estado:** código integrado en desarrollo; despliegue Cloudflare y QA Safari pendientes.
+
+### Creator / secuenciador y samples
+
+- La GUI visible ahora representa 16 pasos y mapea las filas a los 9 pads del motor.
+- El motor publica el playhead por el bridge para mantener sincronizada la pantalla exterior.
+- La forma de onda exterior recibe una reducción de datos del sample real; el gesto táctil IN/OUT actualiza el rango y persiste al finalizar el gesto en IndexedDB.
+- El control Import/Export abre el Project Manager. Crear un proyecto guarda primero la sesión activa.
+- Se incorporó reverb por convolución al motor, junto a Drive, Delay y Filter.
+
+### Render
+
+- Diálogo de render con WAV PCM 16/24 bit y MP3 128/192/256 kbps.
+- Selector de 44.1/48 kHz, 1/2/4/8 barras por banco y banco actual o secuencia A-D.
+- El render offline incorpora patrones, samples, pitch, niveles, mute/solo y efectos activos.
+- Encoder lamejs 1.2.1 se incluye localmente para render MP3 offline; atribución y licencia LGPL-3.0 en THIRD-PARTY-NOTICES.md.
+
+### Radio Grid
+
+- Nuevo radio-worker.mjs con Durable Object RadioRoom, presencia, señalización WebSocket y relay de mensajes WebRTC.
+- wrangler.jsonc declara binding RADIO_ROOMS, export SQLite y ejecución Worker-first para /api/*.
+- UI conecta salas a través de /api/radio/rooms/{roomId}; los colaboradores pueden compartir audio de micrófono P2P y los espectadores reciben las pistas remotas.
+- Identidad temporal de invitado. Autenticación, TURN, persistencia de perfiles y retransmisión de audio interno del Creator siguen pendientes.
+
+### Verificación ejecutada
+
+- Sintaxis JavaScript comprobada para HTML principal, Creator GUI, motor, service worker, core, storage y encoder MP3.
+- Sintaxis del Worker comprobada tras adaptar el módulo ES para la comprobación local.
+- Configuración Wrangler parseada como JSON y binding/export SQLite comprobados.
+- Comandos enviados por GUI comparados con handlers registrados y rutas especiales; no se encontraron comandos sin handler.
+- Encoder MP3 instanciado y probado con un bloque PCM de silencio; generó bytes de cierre MP3.
+- No verificado: ejecución real de OfflineAudioContext en Safari, export WAV/MP3 completo, audio P2P entre dos dispositivos, migración/deploy Durable Object en Cloudflare, ni prueba táctil iPhone 11.
