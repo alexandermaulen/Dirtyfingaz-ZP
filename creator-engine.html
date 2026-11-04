@@ -385,7 +385,7 @@ function scheduleStep(){
   const scheduledStep=stepIndex,scheduledBank=activeBank,scheduledAt=Math.max(nextStepTime,now+.003),generation=transportGeneration;
   for(let n=1;n<=9;n++)if(patternData[scheduledBank][n][scheduledStep])playPad(n,scheduledAt);
   const visualDelay=Math.max(0,(scheduledAt-now)*1000);
-  setTimeout(()=>{if(playing&&generation===transportGeneration){playheadStep=scheduledStep;refreshSteps()}},visualDelay);
+  setTimeout(()=>{if(playing&&generation===transportGeneration){playheadStep=scheduledStep;refreshSteps();parent.postMessage({type:"zp-engine-playhead",protocolVersion:1,source:"creator.engine",step:scheduledStep,bank:scheduledBank,activePad:activePad},location.origin)}},visualDelay);
   nextStepTime+=beat;stepIndex=(stepIndex+1)%16;
   if(stepIndex===0&&songMode){songPosition=(songPosition+1)%songOrder.length;activeBank=songOrder[songPosition];bankButtons.forEach(b=>b.classList.toggle("active",b.dataset.bank===activeBank))}
   if(stepIndex===0&&!looping){stopTransport();break}
