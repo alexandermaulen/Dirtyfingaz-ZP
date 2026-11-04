@@ -130,7 +130,7 @@ Códigos sugeridos: INVALID_INPUT, NOT_FOUND, NOT_READY, PERMISSION_DENIED, PERS
 - [x] Definir el contrato común y documentar los límites actuales.
 - [ ] Introducir un bus de eventos/adaptador compartido en Creator sin alterar su motor de audio.
 - [ ] Extraer el estado y los casos de uso del Creator fuera del DOM.
-- [ ] Añadir persistencia de muestras con IndexedDB detrás de AssetStorage.
+- [x] Añadir persistencia de muestras y proyectos con IndexedDB detrás de AssetStorage.
 - [ ] Aplicar el mismo patrón a Simple Mixer.
 - [ ] Definir contratos de identidad, salas y presencia para Radio Grid.
 - [ ] Conectar catálogo y streaming mediante repositorios.
