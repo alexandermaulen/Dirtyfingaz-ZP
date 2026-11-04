@@ -41,7 +41,7 @@ const missing = [...new Set(sent)].filter((command) => !commands.includes(comman
 assert.match(ui, /repeat\(16,minmax\(0,1fr\)\)/, "La GUI debe mostrar 16 pasos");
 assert.match(ui, /s<=16/);
 assert.match(ui, /Math\.min\(15,Number\(cell\.dataset\.s\)\|\|0\)/);
-assert.match(ui, /index-17\)\/17/);
+assert.match(ui, /index-1\)\/17/);
 assert.match(ui, /zp-engine-playhead/);
 assert.match(engine, /type:"zp-engine-playhead"/);
 assert.match(ui, /zp-engine-trim-state/);
@@ -52,6 +52,16 @@ assert.match(engine, /payload\.commit&&samples\[activePad\]/);
 assert.match(engine, /new window\.lamejs\.Mp3Encoder/);
 assert.match(engine, /function makeWavBlob/);
 assert.match(engine, /function renderAudio/);
+assert.match(engine, /function exportProjectFile\(/);
+assert.match(engine, /function importProjectFile\(/);
+assert.match(engine, /function createProject\(/);
+assert.match(engine, /masterOut\.connect\(offline\.destination\)/);
+assert.match(ui, /Math\.floor\(\(rowIndex-1\)\/17\)\+1/);
+assert.match(radioWorker, /message\.type === "room-state"/);
+assert.match(shell, /radio-roster/);
+assert.match(shell, /radio-chat/);
+assert.match(shell, /zpRadioBroadcastState/);
+
 assert.match(engine, /creator\.export\.render/);
 assert.match(engine, /createConvolver\(\)/);
 assert.match(engine, /fxState=\{drive:false,delay:false,filter:false,reverb:false\}/);
