@@ -321,24 +321,26 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
 }
 </style>
 <style id="zp-piano-encoder-dock">
-/* Piano Roll: LCD arriba y dock Lx/Rx independiente debajo, sin superponer la cuadrícula. */
+/* Piano Roll: LCD central y encoders laterales independientes, a altura de pulgares. */
 .piano-encoder-dock{display:none}
-.mid.piano-open .scr.pr{top:6px;left:8px;right:8px;bottom:60px;width:auto;height:auto;margin:0;transform:none;border-radius:14px}
-.mid.piano-open .scr.pr .v2{position:absolute;inset:0;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:3px;padding:6px 8px 5px}
-.mid.piano-open .scr.pr .piano-viewport{width:calc(100% - 56px);margin-inline:28px;min-height:0;flex:1;align-self:center;overflow:auto;border-radius:5px}
-.mid.piano-open .piano-encoder-dock{position:absolute;display:flex;left:12px;right:12px;bottom:6px;height:48px;min-height:48px;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:2px 9px 4px;border:1px solid color-mix(in srgb,var(--lcd) 65%,transparent);border-radius:14px;background:linear-gradient(180deg,#092408,#020c02);box-shadow:inset 0 1px 0 #ffffff20,0 2px 0 #0008}
-.mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{position:relative;left:auto;right:auto;top:auto;bottom:auto;z-index:4;display:block;flex:none;width:42px;height:42px;min-width:42px;min-height:42px;margin:0;touch-action:none}
+.mid.piano-open .scr.pr{top:6px;left:62px;right:62px;bottom:6px;width:auto;height:auto;margin:0;transform:none;border-radius:14px}
+.mid.piano-open .scr.pr .v2{position:absolute;inset:0;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:3px;padding:6px 5px}
+.mid.piano-open .scr.pr .piano-viewport{width:100%;margin:0;min-height:0;flex:1;align-self:center;overflow:auto;border-radius:5px}
+.mid.piano-open .piano-encoder-dock{position:absolute;inset:0;display:block;pointer-events:none;margin:0;padding:0;border:0;background:none;box-shadow:none}
+.mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{position:absolute;top:auto;bottom:30px;z-index:6;display:block;pointer-events:auto;flex:none;width:46px;height:46px;min-width:46px;min-height:46px;margin:0;touch-action:none}
+.mid.piano-open .piano-encoder-dock>.lx{left:7px;right:auto}
+.mid.piano-open .piano-encoder-dock>.rx{left:auto;right:7px}
 .mid.piano-open .piano-encoder-dock>.lx i,.mid.piano-open .piano-encoder-dock>.rx i{inset:6px}
-.mid.piano-open .piano-encoder-dock>.lx::before,.mid.piano-open .piano-encoder-dock>.rx::before{top:-9px;font-size:8px}
+.mid.piano-open .piano-encoder-dock>.lx::before,.mid.piano-open .piano-encoder-dock>.rx::before{top:-10px;font-size:9px}
 .mid.piano-open .piano-encoder-dock>.rx i::after{display:block}
 @media(max-width:380px){
- .mid.piano-open .scr.pr{left:6px;right:6px;bottom:56px}
- .mid.piano-open .piano-encoder-dock{left:8px;right:8px;height:44px;min-height:44px}
- .mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{width:38px;height:38px;min-width:38px;min-height:38px}
+ .mid.piano-open .scr.pr{left:54px;right:54px}
+ .mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{width:40px;height:40px;min-width:40px;min-height:40px;bottom:32px}
+ .mid.piano-open .piano-encoder-dock>.lx{left:5px}
+ .mid.piano-open .piano-encoder-dock>.rx{right:5px}
 }
 @media(max-height:700px){
- .mid.piano-open .scr.pr{bottom:54px}
- .mid.piano-open .piano-encoder-dock{height:42px;min-height:42px}
+ .mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{bottom:24px}
 }
 </style>
 </head>
