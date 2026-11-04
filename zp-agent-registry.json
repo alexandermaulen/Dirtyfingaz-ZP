@@ -312,6 +312,27 @@
           "selected-target-is-trim-or-midi"
         ]
       }
+    },
+    "IN": {
+      "label": "IN",
+      "role": "sample-start-encoder",
+      "owner": "creator.ui+creator-engine.html",
+      "input": "pointer-rotation",
+      "behavior": "Control independiente de START/IN, visible sólo en contexto Sample; no sustituye Lx ni Rx y se oculta en Pattern/Piano Edit.",
+      "existingSelector": ".in-encoder",
+      "command": "creator.sample.trim.set",
+      "payload": {
+        "target": "start",
+        "position": "number[0..range.end)",
+        "commit": "boolean"
+      },
+      "mount": ".mid",
+      "placement": "immediately-right-of-Lx",
+      "visibility": {
+        "showWhen": "sample-context",
+        "hideWhen": "piano-open"
+      },
+      "persistence": "commit:true"
     }
   },
   "layout": {
@@ -327,7 +348,17 @@
       "narrow": "46px",
       "shortViewport": "42px"
     },
-    "notes": "Lx/Rx permanecen dentro del chassis, en los raíles laterales del GUI. La reubicación es visual y no altera el bridge ni el estado del motor."
+    "notes": "Lx/Rx permanecen dentro del chassis, en los raíles laterales del GUI. La reubicación es visual y no altera el bridge ni el estado del motor.",
+    "contextualControls": {
+      "IN": {
+        "context": "sample",
+        "position": "right-of-Lx",
+        "independent": true
+      },
+      "Lx": "preserved",
+      "Rx": "preserved",
+      "SHIFT": "preserved"
+    }
   },
   "trimControl": {
     "version": "1.0.0",
