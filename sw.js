@@ -1,4 +1,4 @@
-const CACHE='dirtyfingaz-zp-shell-v10';
+const CACHE='dirtyfingaz-zp-shell-v11';
 const CORE=['./','./index.html','./creator.html','./creator-engine.html','./zp-core.js','./zp-storage.js','./zp-ui-system.css','./zp-agent.css','./zp-agent.js','./zp-agent-registry.json','./manifest.webmanifest','./zp-icon.svg','./vendor/lame.min.js'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
