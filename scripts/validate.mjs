@@ -147,7 +147,7 @@ assert.doesNotMatch(agent, /\bfetch\s*\(|new\s+WebSocket\s*\(|\beval\s*\(/, "El 
 assert.match(ui, /zp-agent\.css/);
 assert.match(ui, /zp-agent\.js/);
 assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v8/);
-assert.match(read("sw.js"), /\.\\/zp-agent\.js/);
+assert.match(read("sw.js"), /\.\/zp-agent\.js/);
 
 console.log("OK: agente contextual local, allowlist y assets PWA.");
 console.log("OK: Piano Roll MIDI, edición de notas, reproducción y persistencia.");
