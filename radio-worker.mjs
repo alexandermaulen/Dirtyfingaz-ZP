@@ -134,7 +134,16 @@ const AGENT_SYSTEM = [
   "Cloudflare coordina API y sesiones; Supabase será persistencia estructurada cuando se apruebe su esquema y RLS.",
   "Puedes recomendar acciones locales registradas, pero no afirmes que las ejecutaste. La interfaz solicita aprobación y valida la allowlist.",
   "No solicites ni expongas secretos, tokens, claves ni datos personales. No sugieras editar main, fusionar o desplegar producción.",
-  "Para cambios de código, propone un plan y un diff verificable; no inventes que GitHub fue modificado."
+  "Para cambios de código, propone un plan y un diff verificable; no inventes que GitHub fue modificado.",
+  "Actúas como copiloto de arquitectura y desarrollo de DIRTYFINGAZ ZP. Al retomar una sesión reconstruye rama, SHA, archivos, CI, preview, auditoría y tareas pendientes con evidencia disponible; no inventes continuidad.",
+  "La fuente de verdad de controles y parámetros es zp-agent-registry.json. Usa el parámetro seleccionado y su definición JSON para explicar rango, unidad, propietario, comando, payload y dependencias. Si no existe en el registro, declara que falta registrarlo.",
+  "El contrato de arquitectura es: creator.html = GUI y selección; creator-engine.html = audio, scheduler y estado autoritativo; zp-core.js = utilidades/runtime; zp-storage.js = IndexedDB y aislamiento de proyectos; radio-worker.mjs = API contextual y Radio Grid; sw.js = caché offline; scripts/validate.mjs = contratos y pruebas estáticas.",
+  "Toda función que cruce GUI y motor requiere contrato explícito, protocolo versionado, requestId, ACK/error, timeout, validación de payload y prueba en ambos lados. No dupliques estado del motor en la GUI.",
+  "Al recomendar configuración, indica valor actual observado, rango permitido, valor propuesto, motivo, impacto audible/visual, dependencias y forma de revertir. Distingue valor observado, inferencia y recomendación.",
+  "Al componer código, genera bloques separados para JSON, GUI, bridge, engine y validator. Incluye rutas reales, nombres de comandos, validación, límites, ACK/error, persistencia y pruebas. No mezcles snippets de capas distintas.",
+  "Nunca uses eval, Function, ejecución arbitraria, acceso libre al repositorio ni comandos no registrados. Los snippets son propuestas para revisión; los cambios de código deben validarse antes de integrarse.",
+  "Para aplicar parámetros en vivo, usa únicamente comandos y parámetros presentes en zp-agent-registry.json y confirma que el motor respondió ACK. No afirmes que un cambio se aplicó sólo porque se envió.",
+  "Mantén el desarrollo en feat/hybrid-hardware-ui-system. No modifiques main, no hagas merge, no despliegues producción ni cambies Supabase/esquemas sin autorización explícita."
 ].join("\n");
 
 async function handleAgentChat(request, env) {
@@ -170,15 +179,34 @@ async function handleAgentChat(request, env) {
   const message = cleanText(input?.message, 2000);
   if (!message) return json({ ok: false, error: "MESSAGE_REQUIRED" }, 400);
   const rawContext = input.context && typeof input.context === "object" ? input.context : {};
+  let registry = null;
+  try {
+    const registryResponse = await env.ASSETS.fetch(new Request(new URL("/zp-agent-registry.json", requestUrl.origin)));
+    if (registryResponse.ok) registry = await registryResponse.json();
+  } catch {}
+  const parameterKey = cleanText(rawContext.parameterKey, 80);
+  const selectedParameter = Array.isArray(registry?.parameters) ? registry.parameters.find(item => item.key === parameterKey) || null : null;
+  const rawParameterValue = Number(rawContext.parameterValue);
   const context = {
+    app: cleanText(rawContext.app, 60),
     module: cleanText(rawContext.module, 40),
     surface: cleanText(rawContext.surface, 60),
     control: cleanText(rawContext.control, 60),
     label: cleanText(rawContext.label, 90),
+    parameterKey,
+    parameterValue: Number.isFinite(rawParameterValue) && selectedParameter ? Math.max(Number(selectedParameter.min ?? 0), Math.min(Number(selectedParameter.max ?? 1), rawParameterValue)) : null,
+    selectedParameter,
     padId: rawContext.padId !== null && rawContext.padId !== undefined && rawContext.padId !== "" && Number.isFinite(Number(rawContext.padId)) ? Math.max(1, Math.min(9, Number(rawContext.padId))) : null,
     bank: ["A", "B", "C", "D"].includes(rawContext.bank) ? rawContext.bank : null,
     bpm: rawContext.bpm !== null && rawContext.bpm !== undefined && rawContext.bpm !== "" && Number.isFinite(Number(rawContext.bpm)) ? Math.max(40, Math.min(240, Number(rawContext.bpm))) : null,
-    projectName: cleanText(rawContext.projectName, 80)
+    projectId: cleanText(rawContext.projectId, 80),
+    projectName: cleanText(rawContext.projectName, 80),
+    trimTarget: ["start", "end"].includes(rawContext.trimTarget) ? rawContext.trimTarget : null,
+    midiTarget: ["step", "pitch", "length", "velocity"].includes(rawContext.midiTarget) ? rawContext.midiTarget : null,
+    transport: cleanText(rawContext.transport, 24),
+    agentVersion: cleanText(rawContext.agentVersion, 20),
+    workflow: cleanText(rawContext.workflow, 60),
+    registryVersion: cleanText(registry?.version, 20)
   };
   const history = Array.isArray(input.history) ? input.history.slice(-8).filter(item =>
     item && ["user", "assistant"].includes(item.role) && typeof item.content === "string"
@@ -190,7 +218,7 @@ async function handleAgentChat(request, env) {
     { role: "user", content: message }
   ];
   try {
-    const result = await env.AI.run(AGENT_MODEL, { messages, max_tokens: 600, temperature: 0.2 });
+    const result = await env.AI.run(AGENT_MODEL, { messages, max_tokens: 1000, temperature: 0.2 });
     const reply = typeof result?.response === "string" ? result.response :
       typeof result?.choices?.[0]?.message?.content === "string" ? result.choices[0].message.content : "";
     if (!reply) return json({ ok: false, error: "EMPTY_MODEL_RESPONSE" }, 502);
