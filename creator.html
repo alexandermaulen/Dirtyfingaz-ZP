@@ -288,19 +288,15 @@ fit();addEventListener('resize',fit,{passive:true});addEventListener('orientatio
 /* perillas */
 [['VOLUME','<span>MIN</span><span>MAX</span>'],['CTRL 1','&#9670; CUTOFF &#9670;'],['CTRL 2','RESONANCE'],['CTRL 3','&#9670; DRIVE &#9670;']].forEach(([n,s])=>{
  const k=mk('div','k','<label>'+n+'</label>'),kb=mk('div','knob','<i></i>');k.append(kb,mk('div','sub',s));$('#kn').append(k);bindKnob(kb)});
-function bindKnob(el,inf){let a=0,y0=0,a0=0,on=0,lx=0,ly=0;const set=v=>{a=inf?v:Math.max(-135,Math.min(135,v));el.style.setProperty('--r',a+'deg')};
+function bindKnob(el,inf){let a=0,y0=0,a0=0,on=0,lx=0,ly=0,lastPulse=0;const set=v=>{a=inf?v:Math.max(-135,Math.min(135,v));el.style.setProperty('--r',a+'deg')};const pulse=()=>{if(!el.dataset.rotor)return;const now=performance.now();if(now-lastPulse<90)return;lastPulse=now;document.querySelectorAll('.scr .v1,.scr .v2,.scr .l1,.scr .l2').forEach(node=>{node.classList.remove('zp-value-tick');void node.offsetWidth;node.classList.add('zp-value-tick')})};
  el.addEventListener('pointerdown',e=>{on=1;y0=e.clientY;lx=e.clientX;ly=e.clientY;a0=a;el.setPointerCapture(e.pointerId)});
- el.addEventListener('pointermove',e=>{if(!on)return;if(inf){set(a+((e.clientX-lx)-(e.clientY-ly))*1.25);lx=e.clientX;ly=e.clientY}else set(a0+(y0-e.clientY)*2.2)});
+ el.addEventListener('pointermove',e=>{if(!on)return;if(inf){set(a+((e.clientX-lx)-(e.clientY-ly))*1.25);lx=e.clientX;ly=e.clientY}else set(a0+(y0-e.clientY)*2.2);pulse()});
  const up=()=>on=0;el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)}
 /* botones */
 const B=(t,cls)=>{const b=mk('div','b '+(cls||''),t);return b};
 function buildAdaptivePanel(side,groups,encoder){
  const root=side==='L'?$('#cl'):$('#cr');root.replaceChildren();root.classList.add('adaptive-side-panel');root.dataset.panel=side;
- const nav=mk('div','panel-group-nav'),physical=mk('div','legacy-button-stack'),primary=mk('div','panel-primary'),secondary=mk('div','panel-secondary');secondary.hidden=true;
- const physicalActions=side==='L'?
-  [['DRIVE',()=>zpBridgeSend("creator.fx.master.toggle",{name:"drive"})],['DELAY',()=>zpBridgeSend("creator.fx.master.toggle",{name:"delay"})],['FILTER',()=>zpBridgeSend("creator.fx.master.toggle",{name:"filter"})]]:
-  [['LOAD',()=>zpBridgeSend("creator.sample.load.request")],['CHOP',()=>zpBridgeSend("creator.sample.chop")],['CLEAR',()=>zpBridgeSend("creator.sample.clear")]];
- physicalActions.forEach(([label,action])=>{const b=B(label,'legacy-physical-button');b.dataset.legacyPort=side+'.'+label.toLowerCase();b.setAttribute('role','button');b.setAttribute('aria-label',label+' · botón lateral físico');b.tabIndex=0;b.addEventListener('click',action);b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();b.click()}});physical.append(b)});
+ const nav=mk('div','panel-group-nav'),primary=mk('div','panel-primary'),secondary=mk('div','panel-secondary');secondary.hidden=true;
  let activeGroup=0,expanded=false,holdTimer=null,held=false,activeOption=null,context='sample';
  const contextFor=()=>{const el=window.__zpLxTarget;if(!el)return 'sample';if(el.matches?.('[data-midi-target],.piano-note,.piano-cell')||el.closest?.('.piano-grid,.piano-tools'))return 'piano';if(el.matches?.('.trim-marker')||el.dataset?.trimTarget)return 'sample';if(el.closest?.('#gr'))return 'pattern';if(/FX|FILTER|RESONATOR|DELAY|ISOLATOR|MFX/i.test(el.textContent||''))return 'fx';return 'sample'};
  const optionsFor=(group)=>{const ctx=contextFor();context=ctx;return (group.contexts?.[ctx]||group.options||[]).map(x=>typeof x==='string'?{label:x,id:x.toLowerCase().replace(/[^a-z0-9]+/g,'-')}:x)};
@@ -311,7 +307,7 @@ function buildAdaptivePanel(side,groups,encoder){
  secondary.hidden=!expanded;root.dataset.expanded=String(expanded);
  };
  const renderOptions=()=>{secondary.hidden=!expanded;root.dataset.expanded=String(expanded)};
- root.append(nav,physical,primary,secondary);render();return {root,render,selectContext:()=>{const next=contextFor();if(next!==context){context=next;render()}}};
+ root.append(nav,primary,secondary);render();return {root,render,selectContext:()=>{const next=contextFor();if(next!==context){context=next;render()}}};
 }
 const panelDefinitions={
  left:[
@@ -326,7 +322,7 @@ const panelDefinitions={
  ]
 };
 let leftPanel=buildAdaptivePanel('L',panelDefinitions.left),rightPanel=buildAdaptivePanel('R',panelDefinitions.right);
-fetch('./zp-agent-registry.json').then(r=>{if(!r.ok)throw new Error('Registry unavailable');return r.json()}).then(reg=>{const p=reg.panelSystem?.panels;if(p?.left?.length&&p?.right?.length){leftPanel=buildAdaptivePanel('L',p.left);rightPanel=buildAdaptivePanel('R',p.right)}}).catch(err=>console.warn('Panel registry fallback:',err.message));
+fetch('./zp-agent-registry.json').then(r=>{if(!r.ok)throw new Error('Registry unavailable');return r.json()}).then(reg=>{const p=reg.panelSystem?.panels;if(p?.left?.length&&p?.right?.length){leftPanel=buildAdaptivePanel('L',p.left);rightPanel=buildAdaptivePanel('R',p.right);leftPanel.root.append(lx);rightPanel.root.append(pe)}}).catch(err=>console.warn('Panel registry fallback:',err.message));
 const refreshPanelContext=()=>{leftPanel.selectContext();rightPanel.selectContext()};
 window.addEventListener('focusin',refreshPanelContext);
 window.addEventListener('zp-panel-context-change',refreshPanelContext);
