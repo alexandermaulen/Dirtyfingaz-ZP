@@ -212,9 +212,6 @@
     "main_protected": false,
     "repository_rulesets": [],
     "note": "main settings were not changed; this policy is declarative until repository protection is separately configured.",
-    "active_development_branch": "feat/zp-master-implementation-roadmap",
-    "active_development_head": "7e19eb0b91f13f2d2f133ad2bf1b50e527e8c276",
-    "branch_sync": "main ancestor integrated; 194 commits ahead, 0 behind",
-    "validation": "workflow reproducible; blocked by missing adaptive panel implementation"
+    "active_development_branch": "feat/zp-master-implementation-roadmap"
   }
 }
