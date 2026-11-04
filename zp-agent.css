@@ -136,3 +136,16 @@
 /* Overrides finales: conservar el tamaño de los encoders en escritorio y móvil. */
 .adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:66px;height:66px;min-width:66px;min-height:66px}
 @media(max-width:620px){.adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:58px;height:58px;min-width:58px;min-height:58px}}
+
+/* Agent idle sequence: warning, 40% fade, compact glitch curtain. */
+#zp-agent-window.idle-warning{border-color:#c5ff45;box-shadow:0 0 0 1px #c5ff4540,0 14px 55px #000d}
+#zp-agent-window.idle-fade{animation:zpAgentFade40 2.2s ease-in-out forwards;pointer-events:none}
+@keyframes zpAgentFade40{0%{opacity:1;filter:none}100%{opacity:.4;filter:saturate(.65)}}
+#zp-agent-window.idle-curtain{transform-origin:top center;animation:zpAgentCurtain .62s steps(5,end) forwards;pointer-events:none}
+@keyframes zpAgentCurtain{0%{opacity:.4;clip-path:inset(0 0 0 0);transform:scaleY(1) skewX(0);filter:none}22%{clip-path:inset(0 0 18% 0);transform:translateX(-2px) scaleY(.82) skewX(-1deg);filter:hue-rotate(35deg)}48%{clip-path:inset(0 0 52% 0);transform:translateX(2px) scaleY(.48) skewX(1deg);filter:contrast(1.5)}76%{clip-path:inset(0 0 82% 0);transform:translateX(-1px) scaleY(.18);filter:hue-rotate(-25deg)}100%{opacity:0;clip-path:inset(0 0 100% 0);transform:translateX(0) scaleY(0);filter:none}}
+#zp-agent-github{margin:0 9px 7px;border:1px solid #355d25;border-radius:8px;background:#071307;max-height:34%;overflow:auto;flex:none}
+#zp-agent-github summary{padding:8px;color:#c5ff45;font-size:10px;font-weight:800;letter-spacing:.04em;cursor:pointer}
+.zp-agent-github-actions{display:flex;flex-wrap:wrap;gap:5px;padding:0 7px 7px}
+.zp-agent-github-actions button{border:1px solid #557b38;border-radius:5px;background:#10250b;color:#c5ff45;padding:6px 8px;font-size:10px;min-height:30px!important}
+#zp-agent-github-result{padding:0 8px 8px;color:#a8c998;font:10px/1.45 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){#zp-agent-window.idle-fade,#zp-agent-window.idle-curtain{animation-duration:.01ms;animation-iteration-count:1}}
