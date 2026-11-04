@@ -52,6 +52,6 @@
 .zp-agent-dev-buttons button,.zp-agent-dev-actions button{border:1px solid #557b38;border-radius:5px;background:#10250b;color:#c5ff45;padding:6px 8px;font-size:10px;touch-action:manipulation}
 #zp-agent-code{display:block;width:calc(100% - 14px);margin:0 7px 7px;min-height:90px;max-height:180px;resize:vertical;border:1px solid #456b31;border-radius:6px;background:#020a02;color:#e7ffd9;padding:8px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;touch-action:pan-y;user-select:text;-webkit-user-select:text}
 #zp-agent-window textarea{font-size:16px}
-.zp-agent-target-active{outline:2px solid #c5ff45!important;outline-offset:3px!important;filter:drop-shadow(0 0 5px #c5ff45)!important;animation:zpAgentTargetPulse 1.2s ease-in-out infinite alternate;position:relative;z-index:5}
+.zp-agent-target-active{outline:2px solid #c5ff45!important;outline-offset:3px!important;filter:drop-shadow(0 0 5px #c5ff45)!important;animation:zpAgentTargetPulse 1.2s ease-in-out infinite alternate;}
 @keyframes zpAgentTargetPulse{from{box-shadow:0 0 3px #c5ff45}to{box-shadow:0 0 13px #c5ff45,0 0 22px #80ff39}}
 @media(max-width:420px){#zp-agent-inspector{max-height:105px}#zp-agent-devtools{max-height:38%}#zp-agent-code{min-height:78px}}
