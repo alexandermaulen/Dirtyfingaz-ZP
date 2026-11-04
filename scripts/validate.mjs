@@ -235,6 +235,22 @@ assert.match(read("sw.js"), /zp-agent-registry\.json/);
 assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v8/);
 assert.match(read("sw.js"), /\.\/zp-agent\.js/);
 
+// Encoders laterales adaptativos: montaje GUI, fallback informativo y registro.
+assert.match(ui, /\$\('#cl'\)\.append\(lx\)/, "Lx debe montarse en el raíl lateral izquierdo.");
+assert.match(ui, /\$\('#cr'\)\.append\(pe\)/, "Rx debe montarse en el raíl lateral derecho.");
+assert.match(ui, /row\('repeat\(6,1fr\)'/, "La fila principal debe liberar el espacio de los encoders laterales.");
+assert.match(ui, /window\.__zpLxTarget=el/, "Lx debe publicar el destino seleccionado para Rx.");
+assert.match(ui, /mode:'context-scroll'/, "Rx debe desplazar el contenedor contextual cuando no hay edición activa.");
+assert.match(ui, /window\.__zpTrimRotor\?\.active\|\|window\.__zpMidiRotorActive/, "El scroll contextual no debe interferir con trim ni MIDI.");
+assert.match(agentCss, /\.mid \.col \.lx,\.mid \.col \.rx/, "Los dos encoders deben compartir el raíl lateral compacto.");
+assert.equal(agentRegistry.layout.encoderPlacement, "sides");
+assert.equal(agentRegistry.layout.behavior, "adaptive");
+assert.equal(agentRegistry.layout.spacing, "compact");
+assert.equal(agentRegistry.layout.mount.Lx, "#cl");
+assert.equal(agentRegistry.layout.mount.Rx, "#cr");
+assert.equal(agentRegistry.controls.Lx.adaptive, true);
+assert.equal(agentRegistry.controls.Rx.adaptive, true);
+
 console.log("OK: agente contextual local, allowlist y assets PWA.");
 console.log("OK: Piano Roll MIDI, edición de notas, reproducción y persistencia.");
 console.log("OK: sintaxis de " + sources.length + " archivos y " + inlineScripts + " scripts inline.");
