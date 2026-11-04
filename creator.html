@@ -152,7 +152,7 @@ canvas{width:168px;height:46px}
 .transport-line i{display:block;height:100%;width:0;background:linear-gradient(90deg,#47e34b,#baff62);box-shadow:0 0 8px #58ff4c;transition:width .045s linear}
 .transport-line.peak i{background:linear-gradient(90deg,#ff8a35,#ff2525);box-shadow:0 0 10px #ff2525}
 .piano-tools{display:flex;align-items:center;justify-content:space-between;gap:4px;flex:none;height:15px;font:10px VT323,monospace}
-.piano-tools button{min-width:24px;height:14px;padding:0 5px;border:1px solid var(--lcd);border-radius:3px;background:#092208;color:var(--lcd);font:12px/1 VT323,monospace}
+.piano-tools button{min-width:24px;height:14px;padding:0 5px;border:1px solid var(--lcd);border-radius:3px;background:#092208;color:var(--lcd);font:12px/1 VT323,monospace}.piano-tools button.selected{background:var(--lcd);color:#061606}.piano-tools button:disabled{opacity:.35}
 .grid-viewport{min-height:0;flex:1;width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--lcd) #031503;-webkit-overflow-scrolling:touch}
 .grid-viewport .gr{width:100%;min-width:100%;transform-origin:left top}
 .grid-viewport::-webkit-scrollbar{height:4px}.grid-viewport::-webkit-scrollbar-thumb{background:var(--lcd)}
@@ -418,12 +418,12 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  const scr=$('#scr'),v2=document.querySelector('.v2'),grid=$('#gr'),bpm=$('#bpmWheel'),menu=$('#menu'),browse=$('#browse');
  if(!scr||!v2||!grid||!bpm||!menu||!browse)return;
  const line=mk('div','transport-line'),fill=mk('i');line.append(fill);
- const tools=mk('div','piano-tools','<strong>PIANO ROLL · 16 STEP</strong><span><button type="button" id="zpZoomOut">−</button> <button type="button" id="zpZoomIn">+</button></span>');
+ const tools=mk('div','piano-tools','<button type="button" id="zpZoomOut">−</button><button type="button" id="zpDraw" class="selected">DRAW</button><button type="button" id="zpSnap">SNAP 1/16</button><button type="button" id="zpClear">CLR</button><button type="button" id="zpZoomIn">+</button>');
  const viewport=mk('div','grid-viewport');grid.parentNode.insertBefore(viewport,grid);viewport.append(grid);
  const ph=v2.querySelector('.ph');v2.insertBefore(line,grid.parentNode);v2.insertBefore(tools,viewport);
  let zoom=1;const applyZoom=()=>{grid.style.width=(zoom*100)+'%';grid.style.minWidth=(zoom*100)+'%';$('#zpZoomOut').disabled=zoom<=1;$('#zpZoomIn').disabled=zoom>=2.5};
  $('#zpZoomOut').onclick=()=>{zoom=Math.max(1,+(zoom-.25).toFixed(2));applyZoom()};
- $('#zpZoomIn').onclick=()=>{zoom=Math.min(2.5,+(zoom+.25).toFixed(2));applyZoom()};applyZoom();
+ $('#zpZoomIn').onclick=()=>{zoom=Math.min(2.5,+(zoom+.25).toFixed(2));applyZoom()};applyZoom();let drawMode=true,snapSize=1;const drawButton=$('#zpDraw'),snapButton=$('#zpSnap');drawButton.onclick=()=>{drawMode=!drawMode;drawButton.classList.toggle('selected',drawMode);drawButton.textContent=drawMode?'DRAW':'SELECT'};snapButton.onclick=()=>{snapSize=snapSize===1?2:snapSize===2?4:1;snapButton.textContent='SNAP 1/'+(16/snapSize)};$('#zpClear').onclick=()=>window.zpBridgeSend?.('creator.pattern.clear',{});grid.addEventListener('click',e=>{const cell=e.target.closest('.c');if(!cell)return;if(!drawMode){e.stopImmediatePropagation();const children=[...grid.children],index=children.indexOf(cell),padId=Math.max(1,Math.min(9,Math.floor((index-1)/17)+1));window.zpBridgeSend?.('creator.pad.select',{padId});return}const original=Number(cell.dataset.s)||0;cell.dataset.s=Math.round(original/snapSize)*snapSize;queueMicrotask(()=>{cell.dataset.s=original})},true);
  let bpmValue=120,lastY=null,remainder=0;
  const adjustTempo=delta=>{bpmValue=Math.max(40,Math.min(240,bpmValue+delta));bpm.textContent='BPM:'+bpmValue;window.zpBridgeSend?.('creator.bpm.adjust',{delta})};
  bpm.addEventListener('pointerdown',e=>{lastY=e.clientY;remainder=0;bpm.setPointerCapture(e.pointerId)});
