@@ -554,7 +554,7 @@ window.addEventListener("message",async function(ev){
   if(command==="creator.sample.load.request"){file.click();result={ok:true,data:{status:"file-picker-opened"},requestId};}
   else if(command==="creator.pad.select"){setActivePad(Math.max(1,Math.min(9,Number(payload.padId)||1)));result={ok:true,data:{padId:activePad},requestId};}
   else if(command==="creator.sample.trim.target.toggle"){trimTarget=trimTarget==="start"?"end":"start";valueTarget=trimTarget;updateScreen();updateValueReadout();result={ok:true,data:{target:trimTarget},requestId};}
-  else if(command==="creator.sample.trim.set"){const target=payload.target==="end"?"end":"start";setTrimValue(target,Number(payload.position));valueTarget=target;trimTarget=target;updateValueReadout();if(samples[activePad])await assetStorage.saveProjectSample(currentProjectId,activePad,samples[activePad],sampleNames[activePad],ranges[activePad]);result={ok:true,data:{target:target,range:ranges[activePad]||{start:0,end:1}},requestId};}
+  else if(command==="creator.sample.trim.set"){const target=payload.target==="end"?"end":"start";setTrimValue(target,Number(payload.position));valueTarget=target;trimTarget=target;updateValueReadout();if(payload.commit&&samples[activePad])await assetStorage.saveProjectSample(currentProjectId,activePad,samples[activePad],sampleNames[activePad],ranges[activePad]);result={ok:true,data:{target:target,range:ranges[activePad]||{start:0,end:1},persisted:!!payload.commit},requestId};}
   else if(command==="creator.control.set"){
    const v=Math.max(0,Math.min(1,Number(payload.value)||0));audio();
    if(payload.name==="master")master.gain.setTargetAtTime(v,ctx.currentTime,.02);
