@@ -62,17 +62,57 @@
     "knob": "dark circular encoder with phosphor index",
     "display": "black glass waveform/LCD panel",
     "pad": "raised square trigger with active flash",
-    "sequencer": "compact step matrix with distinct playhead"
+    "sequencer": "compact step matrix with distinct playhead",
+    "streamingShell": "dark phosphor radio dashboard, shared navigation, station cards, catalog, bottom player and embedded Music Creator"
   },
   "states": {
     "default": "dim phosphor text on black glass",
     "hover": "slightly brighter border and glow",
     "active": "phosphor fill with dark text",
     "playing": "white/bright outline plus glow",
-    "disabled": "35% opacity"
+    "disabled": "35% opacity",
+    "remotePresence": "not connected until ZP1 backend is approved and provisioned"
   },
   "responsive": {
     "creator": "preserve existing sampler control geometry",
     "inspection": "square overlay, viewport constrained, internal scroll"
+  },
+  "platformShell": {
+    "purpose": "Aplicación de streaming que integra Music Creator, catálogo, estaciones y comunidad dentro de una sola navegación",
+    "visualInheritance": "Comparte la misma identidad PHOSPHOR RADIO del sampler Creator",
+    "navigation": [
+      "home",
+      "creator",
+      "mixer",
+      "streaming",
+      "radio",
+      "community"
+    ],
+    "creatorIntegration": {
+      "mode": "embedded-iframe",
+      "src": "creator.html",
+      "sameProduct": true,
+      "exitMessage": "zp-exit-creator"
+    },
+    "streaming": {
+      "features": [
+        "music creator",
+        "publish mixes",
+        "listen to community creations",
+        "radio stations",
+        "three-channel mixer"
+      ],
+      "currentStatus": "UI integrada; streaming remoto y presencia de usuarios pendientes de backend"
+    },
+    "identity": {
+      "displayPattern": "USER NR/{sequence}",
+      "currentScope": "local placeholder until a dedicated ZP1 identity backend is configured",
+      "globalUniquenessRequires": "server-side identity sequence"
+    },
+    "release": {
+      "workingBranch": "creator-layout-master-reference",
+      "productionBranch": "main",
+      "previewRequired": true
+    }
   }
 }
