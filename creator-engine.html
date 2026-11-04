@@ -513,23 +513,33 @@ function fit(){const designHeight=app.classList.contains("inspect-mode")?414:896
 loadSession();bpmText.textContent=bpm+" BPM";bankButtons.forEach(b=>b.classList.toggle("active",b.dataset.bank===activeBank));updatePadLabels();updateScreen();setKnobValues();refreshSteps();requestAnimationFrame(draw);fit();addEventListener("resize",fit);addEventListener("orientationchange",fit);document.addEventListener("gesturestart",e=>e.preventDefault());document.addEventListener("touchmove",e=>{if(!e.target.closest(".kb,.trim-mini,.sp-dial"))e.preventDefault()},{passive:false});document.addEventListener("pointerdown",()=>{try{navigator.wakeLock?.request("screen")}catch(e){}},{once:true});
 
 /* HOST BRIDGE · motor aislado de la nueva capa Creator */
-window.addEventListener("message",function(ev){
+window.addEventListener("message",async function(ev){
  if(ev.source!==parent||ev.origin!==location.origin||!ev.data||ev.data.type!=="zp-engine-command")return;
- const command=ev.data.command,payload=ev.data.payload||{};
+ const packet=ev.data,command=packet.command,payload=packet.payload||{},requestId=packet.requestId;
+ const reply=(type,data)=>parent.postMessage({type:type,protocolVersion:1,source:"creator.engine",requestId,command,...data},location.origin);
+ if(packet.protocolVersion!==1||packet.source!=="creator.ui"||typeof requestId!=="string"||requestId.length>120||typeof command!=="string"||!command.startsWith("creator.")){
+  reply("zp-engine-error",{error:{code:"INVALID_MESSAGE",message:"Paquete de comando inválido",source:"creator.engine"}});return;
+ }
  try{
-  if(command==="creator.sample.load.request"){file.click();}
-  else if(command==="creator.pad.select"){setActivePad(Math.max(1,Math.min(9,Number(payload.padId)||1)));}
-  else if(command==="creator.sample.trim.target.toggle"){trimTarget=trimTarget==="start"?"end":"start";valueTarget=trimTarget;updateScreen();updateValueReadout();}
+  let result=null;
+  if(command==="creator.sample.load.request"){file.click();result={ok:true,data:{status:"file-picker-opened"},requestId};}
+  else if(command==="creator.pad.select"){setActivePad(Math.max(1,Math.min(9,Number(payload.padId)||1)));result={ok:true,data:{padId:activePad},requestId};}
+  else if(command==="creator.sample.trim.target.toggle"){trimTarget=trimTarget==="start"?"end":"start";valueTarget=trimTarget;updateScreen();updateValueReadout();result={ok:true,data:{target:trimTarget},requestId};}
   else if(command==="creator.control.set"){
    const v=Math.max(0,Math.min(1,Number(payload.value)||0));audio();
    if(payload.name==="master")master.gain.setTargetAtTime(v,ctx.currentTime,.02);
-   if(payload.name==="cutoff")filterBus.frequency.setTargetAtTime(300+v*17700,ctx.currentTime,.02);
-   if(payload.name==="resonance")filterBus.Q.setTargetAtTime(.1+v*17.9,ctx.currentTime,.02);
-   if(payload.name==="drive"){fxAmount=v;driveAmount(v*35);}
-   if(payload.name==="fx-amount"){fxAmount=v;applyFxAmount();}
-  }else{runtime.execute(command,payload);}
-  parent.postMessage({type:"zp-engine-ack",command:command},location.origin);
- }catch(error){parent.postMessage({type:"zp-engine-error",command:command,message:String(error&&error.message||error)},location.origin);}
+   else if(payload.name==="cutoff")filterBus.frequency.setTargetAtTime(300+v*17700,ctx.currentTime,.02);
+   else if(payload.name==="resonance")filterBus.Q.setTargetAtTime(.1+v*17.9,ctx.currentTime,.02);
+   else if(payload.name==="drive"){fxAmount=v;driveAmount(v*35);}
+   else if(payload.name==="fx-amount"){fxAmount=v;applyFxAmount();}
+   else throw Object.assign(new Error("Parámetro desconocido: "+payload.name),{code:"INVALID_INPUT"});
+   result={ok:true,data:{name:payload.name,value:v},requestId};
+  }else{
+   result=await runtime.execute(command,payload);
+   if(!result||result.ok===false){reply("zp-engine-error",{result:result,error:result?.error||{code:"COMMAND_FAILED",message:"El comando no pudo ejecutarse",source:"creator.core"}});return;}
+  }
+  reply("zp-engine-ack",{result:result});
+ }catch(error){reply("zp-engine-error",{error:{code:error.code||"ENGINE_ERROR",message:String(error&&error.message||error),source:"creator.engine"}});}
 });
-parent.postMessage({type:"zp-engine-ready"},location.origin);
+parent.postMessage({type:"zp-engine-ready",protocolVersion:1,source:"creator.engine"},location.origin);
 </script></body></html>
