@@ -395,14 +395,14 @@ function row(cols,tags,btns,cls){const w=mk('div');const tg=mk('div','row tg');t
  const r=mk('div','row '+(cls||''));r.style.gridTemplateColumns=cols;
  btns.forEach(b=>{if(typeof b==='string'){const x=B(b);r.append(x)}else r.append(b)});w.append(tg,r);$('#rows').append(w);return r}
 const lx=mk('div','knob lx','<i></i>');lx.dataset.rotor='Lx';lx.setAttribute('role','button');lx.setAttribute('aria-label','Lx: navegación de controles del GUI');lx.tabIndex=0;bindKnob(lx,1);$('.mid').append(lx);
-const pe=mk('div','knob pe rx','<i></i>');pe.dataset.rotor='Rx';pe.setAttribute('role','button');pe.setAttribute('aria-label','Rx: ajuste contextual del área de trabajo');pe.tabIndex=0;bindKnob(pe,1);$('.mid').append(pe);
+const pe=mk('div','knob pe rx','<i></i>');pe.dataset.rotor='Rx';pe.setAttribute('role','button');pe.setAttribute('aria-label','Rx: OUT del sample y control maestro derecho');pe.tabIndex=0;bindKnob(pe,1);$('.mid').append(pe);
 const inEncoder=mk('div','knob in-encoder','<i></i>');inEncoder.dataset.rotor='IN';inEncoder.setAttribute('role','button');inEncoder.setAttribute('aria-label','IN: posición inicial del sample');inEncoder.tabIndex=0;bindKnob(inEncoder,1);$('.mid').append(inEncoder);
 const setLxContext=active=>{lx.classList.toggle('context-active',!!active);lx.setAttribute('aria-hidden',active?'false':'true');lx.tabIndex=active?0:-1;};setLxContext(false);
 row('repeat(6,1fr)',[['PATTERN SEQUENCER',3],['SAMPLE EDIT',3]],
  ['PATTERN<br>SELECT','PATTERN<br>EDIT','RECORD<br>SETTING','START/<br>END','PITCH<br>SPEED','MARK'],'big ra');
 const trimPhaseButton=[...document.querySelectorAll("#rows .b")].find(b=>b.textContent.replace(/\s/g,"")==="START/END");
 if(trimPhaseButton){trimPhaseButton.classList.add("trim-phase-button");trimPhaseButton.innerHTML='<span>START/END</span><i class="trim-phase-led" aria-hidden="true"></i>';trimPhaseButton.setAttribute("aria-live","polite");}
-/* Lx recorre herramientas y funciones sin ejecutarlas; Rx conserva PUSH ENTER. */
+/* Lx y Rx son controles maestros: Lx navega el contexto de edición; Rx controla OUT en Sample y parámetros contextuales en otros modos. */
 (()=>{let angle=null,remainder=0,index=-1,active=null;const selector='.b,.piano-tools button,.trim-marker,[data-midi-target],.lcd-action,#play,#bpmWheel';
  const targets=()=>[...document.querySelectorAll(selector)].filter(el=>!el.closest('#zp-agent-window')&&!el.disabled&&el.getAttribute('aria-hidden')!=='true'&&el.getClientRects().length);
  const choose=direction=>{if(window.__zpPianoEncoderMode||window.__zpTrimPhase===3)return;const list=targets();if(!list.length)return;index=(index+direction+list.length)%list.length;const el=list[index];if(active)active.classList.remove('lx-active');active=el;active.classList.add('lx-active');if(!el.hasAttribute('tabindex'))el.tabIndex=-1;el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});window.__zpLxTarget=el;window.dispatchEvent(new CustomEvent('zp-panel-context-change'));window.__zpLx={index,total:list.length,direction,target:el.dataset.agentContext||el.dataset.trimTarget||el.dataset.midiTarget||el.textContent.trim().replace(/\s+/g,' ').slice(0,48)};};
