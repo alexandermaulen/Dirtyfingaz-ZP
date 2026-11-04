@@ -5,5 +5,12 @@
   "assets": {
     "directory": "./"
   },
-  "previews": {}
+  "vars": {
+    "ENVIRONMENT": "production"
+  },
+  "previews": {
+    "vars": {
+      "ENVIRONMENT": "preview"
+    }
+  }
 }
