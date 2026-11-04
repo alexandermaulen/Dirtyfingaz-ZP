@@ -500,7 +500,8 @@ runtime.register("creator.project.list",()=>assetStorage.listProjects());
 runtime.register("creator.project.load",async p=>{if(!p.id)throw Object.assign(new Error("Falta el ID del proyecto"),{code:"INVALID_INPUT"});await saveSession(true);return loadSession(p.id)});
 runtime.register("creator.project.create",async p=>{await saveSession(true);return createProject(p.name)});
 runtime.register("creator.project.delete",async p=>{if(!p.id||p.id===currentProjectId)throw Object.assign(new Error("Guarda o cambia de proyecto antes de eliminarlo"),{code:"INVALID_INPUT"});await assetStorage.deleteProject(p.id);return {deleted:p.id}});
-runtime.register("creator.export.wav",()=>exportWav());
+runtime.register("creator.export.wav",()=>openExportDialog());
+runtime.register("creator.export.render",p=>renderAudio(p));
 runtime.on("command:failed",e=>notify(e.result.error.message));
 
 const title=$("div","title",'<span>DIRTYFINGAZ ZP1</span><small>BEAT LAB</small>'),back=button("← SALIR"),guiToggle=button("GUI");back.className="back";guiToggle.className="back gui-toggle";guiToggle.title="Vista cuadrada de componentes y parámetros";back.onclick=()=>parent.postMessage({type:"zp-exit-creator",source:"creator.engine",timestamp:Date.now()},location.origin);title.append(guiToggle,back);app.append(title);
