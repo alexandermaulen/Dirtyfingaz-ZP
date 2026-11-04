@@ -227,6 +227,24 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
  .value-buttons button{height:32px;min-height:32px!important}
 }
 
+
+/* MPC1000 STYLE VALUE DATA WHEEL · rotary encoder */
+.value-panel{gap:7px!important;padding:7px 5px!important;justify-content:center!important}
+.value-panel .value-head{padding-bottom:4px!important}
+.value-panel .value-head span{font-size:15px!important}
+.value-panel .value-head small{font-size:5px!important}
+.value-panel .value-encoder-wrap{width:100%;gap:5px!important}
+.value-panel .value-encoder-wrap>span{font:7px monospace!important;letter-spacing:.12em}
+.value-panel .value-encoder-wrap .kb{width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important;border-radius:50%!important;touch-action:none!important;cursor:ns-resize;background:radial-gradient(circle at 34% 25%,#3d7025 0%,#183b10 28%,#071b06 62%,#020802 100%)!important;border:3px solid #071a05!important;box-shadow:inset 0 3px 5px #baff5c35,inset 0 -7px 10px #000e,0 0 0 2px #9aff4a,0 0 0 5px #041a06,0 0 0 6px #50c828aa,0 0 19px #9aff4a88,0 5px 10px #000c!important}
+.value-panel .value-encoder-wrap .kb:after{content:"";position:absolute;inset:8px;border:1px dashed #c9ff6c66;border-radius:50%;pointer-events:none}
+.value-panel .value-encoder-wrap .kb b{position:absolute;inset:25px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#315c1d,#071706 72%);border:1px solid #b7ff6377;box-shadow:inset 0 2px 5px #000b,0 0 9px #9aff4a35;pointer-events:none}
+.value-panel .value-encoder-wrap .kb i{top:8px!important;left:50%;height:19px!important;width:4px!important;margin-left:-2px!important;transform-origin:2px 34px!important;border-radius:3px!important;background:linear-gradient(#f5ffbd,#b8ff55)!important;box-shadow:0 0 7px #d8ff4f,0 0 13px #9aff4a!important;z-index:2}
+.value-panel .value-encoder-wrap output{font:bold 18px monospace!important;color:#eaff9a!important;text-shadow:0 0 9px #d8ff4f!important}
+.value-panel .value-target{font:6px monospace!important;min-height:17px!important}
+.value-panel .fx-readout{font:6px monospace!important;padding-top:5px!important}
+.value-panel .fx-readout strong{font-size:12px!important}
+.value-buttons,.value-big{display:none!important}
+@media(max-height:760px){.value-panel .value-encoder-wrap .kb{width:76px!important;height:76px!important;min-width:76px!important;min-height:76px!important}.value-panel .value-encoder-wrap .kb b{inset:21px}.value-panel .value-encoder-wrap .kb i{transform-origin:2px 29px!important}}
 </style></head><body><div id="app"></div>
 <script src="./zp-core.js"></script>
 <script>
@@ -367,15 +385,9 @@ const fxWheel=drawValueWheel(null,"FX CTRL",.25,v=>{fxAmount=v;applyFxAmount()})
 const valueOutput=valueWheel.output,fxValueOutput=fxWheel.output;
 const valueGroup=$("div","value-panel");
 const valueHead=$("div","value-head","<span>VALUE</span><small>PARAMETER CONTROL</small>");
-const valueBig=$("div","value-big");valueBig.append(valueOutput);
 const valueTargetLabel=$("div","value-target","RECORTE · IN");
-const valueButtons=$("div","value-buttons");
-const valueMinus=button("−"),valuePlus=button("+");
-valueMinus.onclick=()=>{if(systemMenu){changeValue(-1);return}if(activeTab==="RECORTE"){changeValue(-4);updateValueReadout()}else if(activeTab==="EFECTOS"){changeValue(-4)}};
-valuePlus.onclick=()=>{if(systemMenu){changeValue(1);return}if(activeTab==="RECORTE"){changeValue(4);updateValueReadout()}else if(activeTab==="EFECTOS"){changeValue(4)}};
-valueButtons.append(valueMinus,valuePlus);
 const fxReadout=$("div","fx-readout","FX AMOUNT <strong>25%</strong>");
-valueGroup.append(valueHead,valueBig,valueTargetLabel,valueButtons,fxReadout);
+valueGroup.append(valueHead,valueWheel.wrap,valueTargetLabel,fxReadout);
 mid.append(valueGroup);
 const lowerDeck=$("div","control-deck lowerDeck");lowerDeck.append(commandRow);
 app.append(lowerDeck);
@@ -418,7 +430,7 @@ function enterSystemMenu(){
 }
 
 function exitSystemMenu(){if(systemMenu){if(menuPage==="MAIN"){systemMenu=false;updateScreen()}else if(menuPage==="SYSTEM CONFIG"||menuPage==="SYSTEM CTRL"||menuPage==="SYSTEM INIT"){menuPage="SYSTEM";menuIndex=0;updateScreen()}else{menuPage="MAIN";menuIndex=0;updateScreen()}}else{activeTab="MUESTRA";updateScreen()}}
-function drawValueWheel(el,label,initial,onValue,extraClass=""){let wrap=$("div","sp-dial"),k=$("div","kb value-wheel"+(extraClass?" "+extraClass:""),"<i></i>"),caption=$("span","",label),out=$("output","",Math.round(initial*100)+"%"),v=initial,y=null,v0=0;const set=x=>{v=Math.max(0,Math.min(1,x));k.firstChild.style.transform="rotate("+(-135+270*v)+"deg)";out.textContent=Math.round(v*100)+"%";onValue(v)};k.addEventListener("pointerdown",e=>{y=e.clientY;v0=v;k.setPointerCapture(e.pointerId)});k.addEventListener("pointermove",e=>{if(y!==null)set(v0+(y-e.clientY)/150)});["pointerup","pointercancel"].forEach(ev=>k.addEventListener(ev,()=>y=null));wrap.append(caption,k,out);return {wrap,set,get:()=>v,output:out};}
+function drawValueWheel(el,label,initial,onValue,extraClass=""){let wrap=$("div","sp-dial value-encoder-wrap"),k=$("div","kb value-wheel"+(extraClass?" "+extraClass:""),"<i></i><b></b>"),caption=$("span","",label),out=$("output","",Math.round(initial*100)+"%"),v=initial,lastAngle=null;const set=x=>{v=Math.max(0,Math.min(1,x));k.firstChild.style.transform="rotate("+(-135+270*v)+"deg)";out.textContent=Math.round(v*100)+"%";onValue(v)};const angle=e=>{let r=k.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);return Math.atan2(dy,dx)*180/Math.PI};k.addEventListener("pointerdown",e=>{e.preventDefault();k.setPointerCapture(e.pointerId);lastAngle=angle(e)});k.addEventListener("pointermove",e=>{if(lastAngle===null)return;let a=angle(e),d=a-lastAngle;if(d>180)d-=360;if(d< -180)d+=360;lastAngle=a;set(v+d/270)});["pointerup","pointercancel","lostpointercapture"].forEach(ev=>k.addEventListener(ev,()=>lastAngle=null));wrap.append(caption,k,out);return {wrap,set,get:()=>v,output:out};}
 function setKnobValues(){if(knobSetters.length){knobSetters[1].set(padLevels[activePad]??.85);knobSetters[2].set(((padPitch[activePad]??0)/24)+.5);knobSetters[3].set(((padFilter[activePad]??18000)-300)/17700)}}
 function draw(){let w=Math.max(1,Math.floor(canvas.clientWidth*2)),h=Math.max(1,Math.floor(canvas.clientHeight*2));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}let x=canvas.getContext("2d");x.clearRect(0,0,w,h);let sample=activeTab==="RECORTE"?samples[activePad]:null;if(sample){let r=ranges[activePad]||{start:0,end:1},data=sample.getChannelData(0),stride=Math.max(1,Math.floor(data.length/w));x.fillStyle="#174c12";x.fillRect(0,0,w,h);x.strokeStyle="#d8ff4f";x.lineWidth=2;x.beginPath();for(let i=0;i<w;i++){let min=1,max=-1,from=i*stride,to=Math.min(data.length,from+stride);for(let j=from;j<to;j++){min=Math.min(min,data[j]);max=Math.max(max,data[j])}let y1=h*(.5-max*.46),y2=h*(.5-min*.46);x.moveTo(i,y1);x.lineTo(i,y2)}x.stroke();let now=ctx?ctx.currentTime:0;for(let q=playbackCursors.length-1;q>=0;q--){let c=playbackCursors[q],elapsed=(now-c.at)*c.rate;if(elapsed<0)continue;if(elapsed>c.duration){playbackCursors.splice(q,1);continue}if(c.pad===activePad){let pos=Math.max(0,Math.min(1,(c.offset+elapsed)/sample.duration));let px=pos*w;x.save();x.strokeStyle="#ffffff";x.shadowColor="#d8ff4f";x.shadowBlur=14;x.lineWidth=3;x.beginPath();x.moveTo(px,0);x.lineTo(px,h);x.stroke();x.fillStyle="#fff";x.font="bold 12px monospace";x.fillText("PLAY",Math.min(w-36,px+4),12);x.restore()}}x.fillStyle="#ff252555";x.fillRect(0,0,w*r.start,h);x.fillRect(w*r.end,0,w*(1-r.end),h);x.strokeStyle="#fff";x.lineWidth=3;x.beginPath();x.moveTo(w*r.start,0);x.lineTo(w*r.start,h);x.moveTo(w*r.end,0);x.lineTo(w*r.end,h);x.stroke();x.fillStyle="#fff";x.font="bold 18px monospace";x.fillText("IN",Math.max(2,w*r.start+3),15);x.fillText("OUT",Math.min(w-38,w*r.end+3),15)}else{x.strokeStyle="#d8ff4f";x.lineWidth=2;if(analyser){let data=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(data);x.beginPath();for(let i=0;i<w;i++){let yy=h/2+(data[Math.floor(i/w*data.length)]-128)/128*h*.42;i?x.lineTo(i,yy):x.moveTo(i,yy)}x.stroke()}else{x.beginPath();for(let i=0;i<w;i++){let yy=h/2+Math.sin(i*.05)*Math.sin(i*.013)*h*.2;i?x.lineTo(i,yy):x.moveTo(i,yy)}x.stroke()}}requestAnimationFrame(draw)}
 canvas.addEventListener("pointerdown",e=>{if(activeTab!=="RECORTE"||!samples[activePad])return;canvas.setPointerCapture(e.pointerId);let rect=canvas.getBoundingClientRect(),p=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width)),r=ranges[activePad]||{start:0,end:1};trimTarget=Math.abs(p-r.start)<=Math.abs(p-r.end)?"start":"end";setTrimValue(trimTarget,p);updateScreen()});canvas.addEventListener("pointermove",e=>{if(!e.buttons||activeTab!=="RECORTE"||!samples[activePad])return;let rect=canvas.getBoundingClientRect(),p=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));setTrimValue(trimTarget,p)});
