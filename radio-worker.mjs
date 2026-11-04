@@ -187,6 +187,7 @@ async function handleAgentChat(request, env) {
   const parameterKey = cleanText(rawContext.parameterKey, 80);
   const selectedParameter = Array.isArray(registry?.parameters) ? registry.parameters.find(item => item.key === parameterKey) || null : null;
   const rawParameterValue = Number(rawContext.parameterValue);
+  const selectedControl = registry?.controls?.[cleanText(rawContext.control, 60)] || null;
   const context = {
     app: cleanText(rawContext.app, 60),
     module: cleanText(rawContext.module, 40),
@@ -196,6 +197,7 @@ async function handleAgentChat(request, env) {
     parameterKey,
     parameterValue: Number.isFinite(rawParameterValue) && selectedParameter ? Math.max(Number(selectedParameter.min ?? 0), Math.min(Number(selectedParameter.max ?? 1), rawParameterValue)) : null,
     selectedParameter,
+    selectedControl,
     padId: rawContext.padId !== null && rawContext.padId !== undefined && rawContext.padId !== "" && Number.isFinite(Number(rawContext.padId)) ? Math.max(1, Math.min(9, Number(rawContext.padId))) : null,
     bank: ["A", "B", "C", "D"].includes(rawContext.bank) ? rawContext.bank : null,
     bpm: rawContext.bpm !== null && rawContext.bpm !== undefined && rawContext.bpm !== "" && Number.isFinite(Number(rawContext.bpm)) ? Math.max(40, Math.min(240, Number(rawContext.bpm))) : null,
