@@ -489,7 +489,9 @@ runtime.register("creator.song.toggle",()=>{songMode=!songMode;songButton.classL
 runtime.register("creator.pattern.select",p=>{activeBank=p.bank;songMode=false;songButton.classList.remove("on");bankButtons.forEach(x=>x.classList.toggle("active",x.dataset.bank===activeBank));refreshSteps();publishRadioState();notify("PATRÓN "+activeBank);return {bank:activeBank}});
 runtime.register("creator.pattern.step.toggle",p=>{currentPattern()[p.step]=!currentPattern()[p.step];refreshSteps();publishRadioState();return {step:p.step,active:currentPattern()[p.step]}});
 runtime.register("creator.pattern.clear",()=>{patternData[activeBank][activePad].fill(false);refreshSteps();publishRadioState();notify("SECUENCIA DEL PAD BORRADA")});
-runtime.register("creator.sample.chop",()=>chopSample());\nruntime.register("creator.sample.transient.chop",()=>chopTransientSample());\nruntime.register("creator.sample.preview",()=>{hitPad(activePad);return {padId:activePad}});
+runtime.register("creator.sample.chop",()=>chopSample());
+runtime.register("creator.sample.transient.chop",()=>chopTransientSample());
+runtime.register("creator.sample.preview",()=>{hitPad(activePad);return {padId:activePad}});
 runtime.register("creator.sample.clear",async()=>{delete samples[activePad];delete sampleNames[activePad];delete ranges[activePad];await assetStorage.deleteProjectSample(currentProjectId,activePad);updatePadLabels();updateScreen();notify("SAMPLE ELIMINADO")});
 runtime.register("creator.pad.mute.toggle",()=>{muted[activePad]=!muted[activePad];muteButton.classList.toggle("on",!!muted[activePad]);updatePadLabels();publishRadioState();return {muted:!!muted[activePad]}});
 runtime.register("creator.pad.solo.toggle",()=>{soloed[activePad]=!soloed[activePad];soloButton.classList.toggle("on",!!soloed[activePad]);updatePadLabels();publishRadioState();return {solo:!!soloed[activePad]}});
