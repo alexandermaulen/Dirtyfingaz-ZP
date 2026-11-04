@@ -152,7 +152,14 @@ for (const command of ["creator.sample.chop", "creator.pattern.clear", "creator.
 for (const intent of ["sample.chop", "pattern.clear", "bpm.up", "bpm.down", "bank.A", "bank.B", "bank.C", "bank.D", "fx.drive"]) {
   assert.ok(agent.includes('"'+intent+'"'), "Intención del agente faltante: " + intent);
 }
-assert.doesNotMatch(agent, /\bfetch\s*\(|new\s+WebSocket\s*\(|\beval\s*\(/, "El agente local no debe realizar llamadas remotas ni ejecutar código arbitrario");
+assert.match(agent, /fetch\("\/api\/agent\/chat"/, "El agente debe usar únicamente el endpoint contextual del Worker.");
+assert.doesNotMatch(agent, /new\s+WebSocket\s*\(|\beval\s*\(/, "El cliente no debe abrir sockets propios ni ejecutar código arbitrario.");
+assert.match(radioWorker, /\/api\/agent\/chat/);
+assert.match(radioWorker, /AGENT_PREVIEW_ONLY/);
+assert.match(radioWorker, /env\.AI\.run\(AGENT_MODEL/);
+assert.equal(wrangler.vars.AI_AGENT_ENABLED, "false", "La IA debe permanecer apagada en producción.");
+assert.equal(wrangler.previews.vars.AI_AGENT_ENABLED, "true", "La IA debe habilitarse sólo en Preview.");
+assert.equal(wrangler.previews.ai.binding, "AI");
 assert.match(ui, /zp-agent\.css/);
 assert.match(ui, /zp-agent\.js/);
 assert.match(ui, /shiftControl\?\.classList\.contains\("lit"\)/, "SHIFT + PAD debe abrir configuración contextual.");
