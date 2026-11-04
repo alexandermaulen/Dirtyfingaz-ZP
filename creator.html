@@ -198,7 +198,8 @@ const button=(label,sub)=>{let b=$("button","",label+(sub?"<small>"+sub+"</small
 const BANKS=["A","B","C","D"];
 let ctx,master,analyser,filterBus,delay,delayWet,drive,noiseBuffer,compressor;
 let activePad=1,activeBank="A",activeTab="MUESTRA",bpm=96,stepIndex=0,playheadStep=-1,playing=false,recording=false,looping=true,songMode=false,songPosition=0,scheduler=null,nextStepTime=0,sequenceStartTime=0,notice="",trimTarget="start",systemMenu=false,menuIndex=0,menuPage="MAIN",valueTarget="start",fxAmount=.25;
-const samples={},sampleNames={},ranges={},padLevels={},padPitch={},padFilter={},muted={},soloed={},fxState={drive:false,delay:false,filter:false};\nconst playbackCursors=[];
+const samples={},sampleNames={},ranges={},padLevels={},padPitch={},padFilter={},muted={},soloed={},fxState={drive:false,delay:false,filter:false};
+const playbackCursors=[];
 const patternData={};
 BANKS.forEach(bank=>{patternData[bank]={};for(let n=1;n<=9;n++)patternData[bank][n]=Array(16).fill(false)});
 [0,4,8,12].forEach(i=>patternData.A[1][i]=true);
