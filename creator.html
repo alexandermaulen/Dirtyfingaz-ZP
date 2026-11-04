@@ -296,6 +296,19 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
  .mid>.fx button{font-size:6px!important}
 }
 
+
+/* GUI INSPECTOR · square component diagnostics */
+.gui-toggle{font-size:8px!important;min-width:34px!important;padding:3px 5px!important}
+.gui-inspector{display:none}
+#app.inspect-mode{height:414px!important;width:414px!important;padding:9px!important;gap:7px!important;border-radius:12px!important}
+#app.inspect-mode>.title{height:30px!important;flex:none!important}
+#app.inspect-mode>.gui-inspector{display:flex;flex:1;min-height:0;flex-direction:column;gap:8px;padding:10px;border:2px solid #041a06;border-radius:8px;background:linear-gradient(145deg,#174c12,#061b06 70%,#020802);box-shadow:inset 0 0 16px #000b,0 0 0 1px #9aff4a66;overflow:hidden}
+#app.inspect-mode>.knobs,#app.inspect-mode>.mid,#app.inspect-mode>.control-deck,#app.inspect-mode>.sequencer,#app.inspect-mode>.pads,#app.inspect-mode>.lowerDeck,#app.inspect-mode>.foot{display:none!important}
+.inspect-head{display:flex;justify-content:space-between;align-items:center;font: bold 10px monospace;border-bottom:1px solid #9aff4a66;padding-bottom:7px}.inspect-head span{font-size:7px;color:#f2ffb0}
+.inspect-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:1;min-height:0}
+.inspect-cell{display:flex;flex-direction:column;justify-content:center;gap:5px;padding:7px;border:1px solid #70b84466;background:#020d02;min-width:0;overflow:hidden}.inspect-cell small{font:6px monospace;color:#9acb76;letter-spacing:.08em}.inspect-cell strong{font:bold 11px monospace;color:#efffb2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inspect-pads{display:grid;grid-template-columns:repeat(9,1fr);gap:5px}.inspect-pad{display:grid;place-items:center;aspect-ratio:1;border:1px solid #72b94b;background:#092608;font:bold 10px monospace}.inspect-pad.selected{background:#d8ff4f;color:#041a06;box-shadow:0 0 10px #b8ff67}
+.inspect-foot{font:6px monospace;text-align:center;color:#9acb76;letter-spacing:.12em}
 </style></head><body><div id="app"></div>
 <script src="./zp-storage.js"></script>
 <script src="./zp-core.js"></script>
@@ -359,21 +372,27 @@ function updateScreen(){
 function setTrimValue(key,v){let r=ranges[activePad]||(ranges[activePad]={start:0,end:1});if(key==="start")r.start=Math.max(0,Math.min(r.end-.015,v));else r.end=Math.min(1,Math.max(r.start+.015,v));draw()}
 function loadSample(f){if(!f)return;let pad=activePad;f.arrayBuffer().then(data=>audio().decodeAudioData(data)).then(async buf=>{samples[pad]=buf;sampleNames[pad]=f.name.slice(0,18);ranges[pad]={start:0,end:1};await assetStorage.saveSample(pad,buf,sampleNames[pad],ranges[pad]);updatePadLabels();updateScreen();notify("MUESTRA GUARDADA · PAD "+pad)}).catch(e=>{console.error(e);notify("ERROR AL CARGAR/GUARDAR SAMPLE")})}
 async function chopSample(){let src=samples[activePad];if(!src){notify("CARGA UNA MUESTRA PRIMERO");return}let slots=[];for(let i=1;i<=9&&slots.length<4;i++){let n=((activePad-1+i)%9)+1;if(!samples[n])slots.push(n)}if(slots.length<4){notify("FALTAN 4 PADS VACÍOS");return}let r=ranges[activePad]||{start:0,end:1},from=Math.floor(src.length*r.start),to=Math.max(from+4,Math.floor(src.length*r.end)),span=to-from;try{for(let i=0;i<slots.length;i++){let n=slots[i],a=from+Math.floor(span*i/4),b=from+Math.floor(span*(i+1)/4),slice=audio().createBuffer(src.numberOfChannels,Math.max(1,b-a),src.sampleRate);for(let ch=0;ch<src.numberOfChannels;ch++)slice.copyToChannel(src.getChannelData(ch).slice(a,b),ch);samples[n]=slice;sampleNames[n]="CHOP "+(i+1);ranges[n]={start:0,end:1};await assetStorage.saveSample(n,slice,sampleNames[n],ranges[n])}updatePadLabels();notify("4 CORTES GUARDADOS")}catch(e){console.error(e);notify("ERROR AL GUARDAR CHOPS")}}
+let transportGeneration=0;
 function scheduleStep(){
- let beat=60/bpm/4;
- while(nextStepTime<ctx.currentTime+.15){
-  const scheduledStep=stepIndex,scheduledBank=activeBank,scheduledAt=nextStepTime;
-  for(let n=1;n<=9;n++)if(patternData[scheduledBank][n][scheduledStep])playPad(n,scheduledAt);
-  const visualDelay=Math.max(0,(scheduledAt-ctx.currentTime)*1000);
-  setTimeout(()=>{if(playing){playheadStep=scheduledStep;refreshSteps()}},visualDelay);
+ if(!playing||!ctx)return;
+ const beat=60/bpm/4,now=ctx.currentTime,horizon=now+.12;
+ // Descarta pasos vencidos tras bloqueos del hilo principal para evitar ráfagas fuera de tiempo.
+ while(nextStepTime<now-.045){
   nextStepTime+=beat;stepIndex=(stepIndex+1)%16;
   if(stepIndex===0&&songMode){songPosition=(songPosition+1)%songOrder.length;activeBank=songOrder[songPosition];bankButtons.forEach(b=>b.classList.toggle("active",b.dataset.bank===activeBank))}
-  refreshSteps();
+ }
+ while(nextStepTime<horizon){
+  const scheduledStep=stepIndex,scheduledBank=activeBank,scheduledAt=Math.max(nextStepTime,now+.003),generation=transportGeneration;
+  for(let n=1;n<=9;n++)if(patternData[scheduledBank][n][scheduledStep])playPad(n,scheduledAt);
+  const visualDelay=Math.max(0,(scheduledAt-now)*1000);
+  setTimeout(()=>{if(playing&&generation===transportGeneration){playheadStep=scheduledStep;refreshSteps()}},visualDelay);
+  nextStepTime+=beat;stepIndex=(stepIndex+1)%16;
+  if(stepIndex===0&&songMode){songPosition=(songPosition+1)%songOrder.length;activeBank=songOrder[songPosition];bankButtons.forEach(b=>b.classList.toggle("active",b.dataset.bank===activeBank))}
   if(stepIndex===0&&!looping){stopTransport();break}
  }
 }
-function startTransport(){let c=audio();if(playing)return;playing=true;stepIndex=0;playheadStep=-1;sequenceStartTime=c.currentTime+.06;nextStepTime=sequenceStartTime;scheduler=setInterval(scheduleStep,20);transport.textContent="REPRODUCIENDO";playButton.textContent="PAUSA";refreshSteps()}
-function stopTransport(){playing=false;recording=false;playheadStep=-1;if(scheduler)clearInterval(scheduler);scheduler=null;transport.textContent="DETENIDO";playButton.textContent="PLAY";recordButton.classList.remove("on");refreshSteps()}
+function startTransport(){let c=audio();if(playing)return;transportGeneration++;playing=true;stepIndex=0;playheadStep=-1;sequenceStartTime=c.currentTime+.06;nextStepTime=sequenceStartTime;scheduler=setInterval(scheduleStep,20);transport.textContent="REPRODUCIENDO";playButton.textContent="PAUSA";refreshSteps()}
+function stopTransport(){transportGeneration++;playing=false;recording=false;playheadStep=-1;if(scheduler)clearInterval(scheduler);scheduler=null;transport.textContent="DETENIDO";playButton.textContent="PLAY";recordButton.classList.remove("on");refreshSteps()}
 function toggleRecord(){audio();recording=!recording;recordButton.classList.toggle("on",recording);if(recording&&!playing)startTransport();notify(recording?"REC ARMADO · TOCA LOS PADS":"REC FINALIZADO")}
 function hitPad(n){audio();setActivePad(n);playPad(n);if(recording&&playing){let beat=60/bpm/4,step=((Math.round((ctx.currentTime-sequenceStartTime)/beat)%16)+16)%16;patternData[activeBank][n][step]=true;refreshSteps()}}
 async function saveSession(){let data={version:3,bpm,activeBank,patterns:patternData,songOrder,padLevels,padPitch,padFilter};try{await assetStorage.saveProject(data);try{localStorage.setItem("dirtyfingaz-zp-session",JSON.stringify(data))}catch(legacyError){console.warn("Copia localStorage omitida",legacyError)}notify("PROYECTO Y PATRONES GUARDADOS EN INDEXEDDB")}catch(e){console.error(e);notify("ERROR AL GUARDAR PROYECTO")}}
@@ -407,7 +426,10 @@ runtime.register("creator.project.save",()=>saveSession());
 runtime.register("creator.export.wav",()=>exportWav());
 runtime.on("command:failed",e=>notify(e.result.error.message));
 
-const title=$("div","title",'<span>DIRTYFINGAZ ZP1</span><small>BEAT LAB</small>'),back=button("← SALIR");back.className="back";back.onclick=()=>parent.postMessage({type:"zp-exit-creator"},"*");title.append(back);app.append(title);
+const title=$("div","title",'<span>DIRTYFINGAZ ZP1</span><small>BEAT LAB</small>'),back=button("← SALIR"),guiToggle=button("GUI");back.className="back";guiToggle.className="back gui-toggle";guiToggle.title="Vista cuadrada de componentes y parámetros";back.onclick=()=>parent.postMessage({type:"zp-exit-creator"},"*");title.append(guiToggle,back);app.append(title);
+const guiInspector=$("div","gui-inspector");guiInspector.innerHTML='<div class="inspect-head"><b>GUI / COMPONENT MATRIX</b><span>LIVE CONFIG</span></div><div class="inspect-grid"></div><div class="inspect-pads"></div><div class="inspect-foot">DIRTYFINGAZ ZP1 · HARDWARE PROFILE · 414 × 896</div>';app.append(guiInspector);
+function refreshGuiInspector(){const grid=guiInspector.querySelector(".inspect-grid"),padMap=guiInspector.querySelector(".inspect-pads");grid.innerHTML="";const data=[["PAD ACTIVO",String(activePad).padStart(2,"0")],["MUESTRA",sampleNames[activePad]||"SINTETIZADOR"],["PAD VOL",Math.round((padLevels[activePad]??.85)*100)+"%"],["PITCH",((padPitch[activePad]??0)>0?"+":"")+Math.round(padPitch[activePad]??0)+" ST"],["FILTER",Math.round(padFilter[activePad]??18000)+" HZ"],["BPM",bpm],["PATRÓN",activeBank],["PASOS","16 / 4×4"],["AUDIO",ctx?ctx.state.toUpperCase():"SUSPENDIDO"]];data.forEach(([k,v])=>{let el=$("div","inspect-cell");el.innerHTML="<small>"+k+"</small><strong></strong>";el.querySelector("strong").textContent=v;grid.append(el)});padMap.innerHTML="";for(let n=1;n<=9;n++){let p=$("span","inspect-pad"+(n===activePad?" selected":""));p.textContent=String(n).padStart(2,"0");padMap.append(p)}}
+guiToggle.onclick=()=>{const active=!app.classList.contains("inspect-mode");app.classList.toggle("inspect-mode",active);guiToggle.textContent=active?"FULL":"GUI";if(active)refreshGuiInspector();fit()};
 const knobDefs=[["MASTER",.58],["PAD VOL",.85],["PITCH",.5],["FILTER",1]],knobSetters=[];
 let knobs=$("div","knobs");
 knobDefs.forEach(([label,initial],idx)=>{let w=$("div","knob","<span>"+label+"</span>"),k=$("div","kb","<i></i>"),v=initial,y0=null,v0=0;const set=x=>{v=Math.max(0,Math.min(1,x));k.firstChild.style.transform="rotate("+(-135+270*v)+"deg)";if(idx===0&&master)master.gain.setTargetAtTime(v,ctx.currentTime,.02);if(idx===1){padLevels[activePad]=v}else if(idx===2){padPitch[activePad]=(v-.5)*24}else if(idx===3){padFilter[activePad]=300+v*17700}};knobSetters.push({set,get:()=>v});set(v);k.addEventListener("pointerdown",e=>{k.setPointerCapture(e.pointerId);y0=e.clientY;v0=v;audio()});k.addEventListener("pointermove",e=>{if(y0!==null)set(v0+(y0-e.clientY)/130)});["pointerup","pointercancel"].forEach(ev=>k.addEventListener(ev,()=>y0=null));w.append(k);knobs.append(w)});app.append(knobs);
