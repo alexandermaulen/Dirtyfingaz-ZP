@@ -26,6 +26,7 @@ for (const path of sources) {
   }
 }
 
+const agent = read("zp-agent.js");
 const ui = read("creator.html");
 const engine = read("creator-engine.html");
 const shell = read("index.html");
@@ -184,7 +185,7 @@ assert.ok(agentRegistry.parameters.some(item => item.key === "trim.end" && item.
 assert.match(agentCss, /opacity:\.2/, "El agente debe quedar al 20% de opacidad en reposo.");
 assert.match(agentCss, /zpAgentTargetPulse/, "El control seleccionado debe tener brillo contextual.");
 assert.match(agentCss, /touch-action:none/, "Arrastre y resize deben usar gestos táctiles dedicados.");
-const agent = read("zp-agent.js");
+
 assert.match(agent, /window\.__zpAgentLoaded/);
 assert.match(agent, /transport\.stop/);
 assert.match(agent, /project\.save/);
@@ -286,3 +287,14 @@ assert.equal(agentRegistry.trimControl.phases["1"].touch,"single-target");
 assert.equal(agentRegistry.trimControl.phases["2"].touch,"dual-independent");
 assert.equal(agentRegistry.trimControl.phases["3"].encoder.Lx,"trim.start");
 assert.equal(agentRegistry.trimControl.phases["3"].encoder.Rx,"trim.end");
+
+ 
+// Contextual IN encoder: independent START control, Sample-only visibility and engine bridge.
+assert.match(ui, /knob in-encoder/);
+assert.match(ui, /mid\\.sample-context:not\\(\\.piano-open\\)>\\.in-encoder/);
+assert.match(ui, /creator\\.sample\\.trim\\.set.*target:"start"/);
+assert.match(ui, /sample-context',!window\\.__zpPianoEncoderMode/);
+assert.equal(agentRegistry.controls.IN.role, "sample-start-encoder");
+assert.equal(agentRegistry.controls.IN.command, "creator.sample.trim.set");
+assert.equal(agentRegistry.controls.IN.payload.target, "start");
+assert.equal(agentRegistry.controls.IN.visibility.hideWhen, "piano-open");
