@@ -188,6 +188,19 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
  .sp-dial .kb{width:44px!important;height:44px!important}
  .sp-commands button{min-height:31px!important}
 }
+
+/* Physical lower command strip: SP-606 thumb ergonomics */
+.lowerDeck{order:6!important;width:100%!important;flex:none!important}
+.lowerDeck>.sp-bottom{grid-template-columns:1fr 1fr!important;min-height:88px!important;padding:3px 16px!important}
+.lowerDeck .sp-dial{gap:3px!important}
+.lowerDeck .sp-dial .kb{width:58px!important;height:58px!important}
+.lowerDeck .sp-commands{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+.foot{order:7!important}
+@media(max-height:760px){
+ .lowerDeck>.sp-bottom{min-height:70px!important;padding:2px 10px!important}
+ .lowerDeck .sp-dial .kb{width:46px!important;height:46px!important}
+ .lowerDeck .sp-commands button{min-height:29px!important}
+}
 </style></head><body><div id="app"></div>
 <script src="./zp-core.js"></script>
 <script>
