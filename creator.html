@@ -125,8 +125,7 @@ h1{color:var(--tx);text-shadow:1px 1px 0 var(--bd2),2px 2px 0 var(--bd2),3px 3px
 .col .b:nth-child(2){--cp:polygon(5% 0,95% 0,100% 15%,100% 85%,95% 100%,5% 100%,0 85%,0 15%)}
 .v1{gap:7px}.l1{gap:11px}.l2{gap:5px;align-items:center}.mn{padding:0 4px}
 canvas{width:168px;height:46px}
-.mk{position:absolute;top:calc(50% + 10px);width:12px;height:12px;border:2px solid var(--lcd);font-size:9px;line-height:8px;font-style:normal;text-align:center;text-shadow:none}
-.mk.l{left:14px}.mk.l::after{content:"";position:absolute;inset:2px;background:var(--lcd)}.mk.r{right:14px}
+.mk{position:absolute;top:calc(50% + 10px);width:18px;height:14px;border:1px solid var(--lcd);font-size:8px;line-height:12px;font-style:normal;text-align:center;text-shadow:none;cursor:pointer;z-index:3;pointer-events:auto}.mk.l{left:10px}.mk.r{right:10px}.trim-marker.active{background:var(--lcd);color:var(--scr);box-shadow:0 0 8px var(--lcd)}
 .tg{filter:drop-shadow(2px 0 0 #000) drop-shadow(-2px 0 0 #000) drop-shadow(0 -2px 0 #000)}
 .tg span{border:0;border-radius:0;background:color-mix(in srgb,var(--pn) 55%,#000)}
 .tg .tr{clip-path:polygon(0 0,calc(100% - 9px) 0,100% 100%,0 100%)}
@@ -257,7 +256,7 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
    <div class="v1">
     <div class="l1"><span>C4:START</span><span>C2:OFF</span><span>C3:END</span></div>
     <canvas id="wv" width="168" height="46"></canvas>
-    <div class="l2"><span>ENC:ZOOM:1X1</span><span>A-3</span><span>M:ISO</span><span class="lcd-action" id="browse">BROWSE</span><span class="lcd-action" id="transientChop">TRNS</span><span class="mn" id="menu">MENU</span></div><i class="mk l"></i><i class="mk r">R</i>
+    <div class="l2"><span>ENC:ZOOM:1X1</span><span>A-3</span><span>M:ISO</span><span class="lcd-action" id="browse">BROWSE</span><span class="lcd-action" id="transientChop">TRNS</span><span class="mn" id="menu">MENU</span></div><i class="mk l trim-marker" data-trim-target="start" role="button" tabindex="0" aria-label="Seleccionar IN">IN</i><i class="mk r trim-marker" data-trim-target="end" role="button" tabindex="0" aria-label="Seleccionar OUT">OUT</i>
    </div>
    <div class="v2">
     <div class="ph"><span id="play">&#9654; PLAY</span><span id="bpmWheel" class="bpm-wheel">BPM:120</span><span id="len">LEN:1/16</span></div>
@@ -330,7 +329,10 @@ waveCanvas.addEventListener("pointermove",e=>{if(trimPointer)sendTrim(e,false)})
 ["pointerup","pointercancel","lostpointercapture"].forEach(type=>waveCanvas.addEventListener(type,e=>{if(trimPointer){trimPointer=false;sendTrim(e,true)}}));
 window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-trim-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;trimState=d;window.__zpTrimRotor.range=d.range||{start:0,end:1};wave()});
  window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-radio-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;window.dispatchEvent(new CustomEvent("zp-agent-runtime-context",{detail:{...d.state,projectId:d.project?.id||null,projectName:d.project?.name||null}}))});
-window.addEventListener("zp-engine-result",e=>{const d=e.detail?.result?.data;if(d?.target==="start"||d?.target==="end")activeTrimTarget=d.target});
+window.addEventListener("zp-engine-result",e=>{const d=e.detail?.result?.data;if(d?.target==="start"||d?.target==="end"){activeTrimTarget=d.target;window.__zpTrimRotor.target=d.target;if(d.range)window.__zpTrimRotor.range=d.range;document.querySelectorAll("[data-trim-target]").forEach(el=>el.classList.toggle("active",el.dataset.trimTarget===d.target))}});
+const selectTrimTarget=marker=>{activeTrimTarget=marker.dataset.trimTarget;const state=window.__zpTrimRotor;state.active=true;state.target=activeTrimTarget;state.range={...(trimState?.range||state.range||{start:0,end:1})};state.lastAngle=null;document.querySelectorAll("[data-trim-target]").forEach(el=>el.classList.toggle("active",el===marker));};
+document.querySelectorAll("[data-trim-target]").forEach(marker=>{marker.addEventListener("click",()=>selectTrimTarget(marker));marker.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectTrimTarget(marker)}})});
+document.querySelector("[data-trim-target=\"start\"]")?.classList.add("active");
 
 requestAnimationFrame(()=>requestAnimationFrame(fit));
 /* temas: toca MENU */
