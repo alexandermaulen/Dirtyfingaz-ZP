@@ -135,6 +135,17 @@ assert.match(engine, /options\.pitch/);
 assert.match(engine, /options\.velocity/);
 assert.match(engine, /options\.length/);
 assert.match(engine, /publishPianoState\(\)/);
+assert.match(ui, /piano-zoom/, "Los controles +/- del Piano Roll deben estar agrupados.");
+assert.match(ui, /zpNudge/, "Debe existir el modo de movimiento MIDI con rotor.");
+assert.match(ui, /e\.shiftKey\|\|freeMove/, "SHIFT debe habilitar movimiento MIDI sin cuantización.");
+assert.match(ui, /zpLongVelocity/, "La pulsación larga debe abrir herramientas MIDI.");
+assert.match(ui, /},2000\)\);/, "Las herramientas MIDI deben abrirse tras dos segundos.");
+assert.match(ui, /step%2===0/, "El barrido táctil de patrones debe marcar pasos alternos.");
+assert.match(ui, /animatePianoPlayhead/, "El playhead debe interpolarse entre pasos.");
+assert.match(ui, /zp-engine-piano-state/);
+assert.match(engine, /micro:Math\.max\(0,Math\.min\(\.999,Number\(input\.micro\)\|\|0\)\)/, "El motor debe persistir microtiming.");
+assert.match(engine, /scheduledAt\+\(Math\.max\(0,Math\.min\(\.999,Number\(note\.micro\)\|\|0\)\)\*beat\)/, "El scheduler debe respetar el microtiming.");
+
 
 const agent = read("zp-agent.js");
 assert.match(agent, /window\.__zpAgentLoaded/);
