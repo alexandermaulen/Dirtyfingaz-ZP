@@ -427,3 +427,20 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - No se modifican `creator-engine.html`, el protocolo GUI-engine v1, los comandos de motor ni la persistencia. El cambio de Rx es una interacción de GUI que sólo desplaza contenedores.
 
 **Verificación pendiente:** ejecutar `node scripts/validate.mjs`, probar drag/rotación y scroll contextual en Safari iPhone 11 y revisar que trim/MIDI sigan teniendo prioridad sobre el fallback de scroll. No declarar validación funcional hasta completar esas pruebas.
+
+## 19. Paneles adaptativos laterales L3x / R3x
+
+**Decisión de interacción:** presentación `hybrid`, activación `hold`, dock `side`.
+
+- El panel izquierdo se divide en `L1x`, `L2x` y `L3x`; el derecho en `R1x`, `R2x` y `R3x`.
+- Cada lateral conserva su propio espacio dentro de las columnas `#cl` y `#cr`; los encoders Lx/Rx permanecen montados al pie de cada panel.
+- La presentación híbrida mantiene dos opciones principales visibles. Mantener pulsado un grupo durante 420 ms despliega opciones secundarias; tocar un grupo lo selecciona.
+- Los paneles cargan sus definiciones desde `zp-agent-registry.json`; se incluye fallback local para disponibilidad inicial.
+- El contexto cambia según el elemento seleccionado por Lx: Sample, Piano Roll, Pattern y FX. Las opciones se actualizan sin modificar el estado autoritativo del motor.
+- Seleccionar una opción emite `zp-panel-option-select` con `mode: selection-only`. Es una selección de interfaz/contexto para el agente, no una orden de audio ni una escritura al motor.
+- `zp-agent.js` recibe la selección y actualiza el inspector contextual.
+- El registro documenta presentación, activación, dock, opciones por grupo, contextos y política de ejecución.
+- Se actualiza la caché PWA a `dirtyfingaz-zp-shell-v11`.
+- No se modifican `creator-engine.html`, el protocolo GUI-engine v1, las allowlists de comandos ni la persistencia.
+
+**Pruebas pendientes:** ejecutar `node scripts/validate.mjs`; probar hold de 420 ms y toque corto en Safari iPhone 11; verificar que el panel secundario no tape controles críticos en pantallas estrechas; comprobar cambio de contexto real y confirmar que la selección no dispara comandos de motor. Las opciones son actualmente selectores contextuales, no efectos de audio implementados.
