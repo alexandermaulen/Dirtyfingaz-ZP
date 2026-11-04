@@ -448,6 +448,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  });
  const valueEncoder=document.querySelector(".pe");
  if(valueEncoder)valueEncoder.addEventListener("pointermove",()=>{
+  if(window.__zpMidiRotorActive)return;
   const angle=parseFloat(getComputedStyle(valueEncoder).getPropertyValue("--r"))||0;
   zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
  });
@@ -502,12 +503,19 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  $('#zpClear').onclick=()=>{if(pianoMode){noteCommand('creator.piano.notes.clear');activeNotes=[];selectedNoteId=null;renderNotes()}else noteCommand('creator.pattern.clear')};
  stepModeButton.onclick=()=>setPianoMode(!pianoMode);
  buildPiano();setPianoMode(true);
+ const animatePianoPlayhead=()=>{const state=window.__zpPlayheadState,head=$('#zpPianoPlayhead');if(state&&head&&!pianoViewport.hidden){const stepDuration=60000/Math.max(40,Math.min(240,state.bpm||120))/4,progress=Math.min(.999,Math.max(0,(performance.now()-state.at)/stepDuration)),fraction=(state.step+progress)/16*100;head.style.transform='translateX('+fraction+'%)';}requestAnimationFrame(animatePianoPlayhead)};requestAnimationFrame(animatePianoPlayhead);
  pianoGrid.addEventListener('click',e=>{const cell=e.target.closest('.piano-cell');if(!cell||!drawMode)return;const step=clamp(Math.round(Number(cell.dataset.step)/snapSize)*snapSize,0,16-snapSize),pitch=Number(cell.dataset.pitch),existing=activeNotes.find(n=>n.step===step&&n.pitch===pitch);if(existing){setSelected(existing);return}upsertNote({id:'ui-midi-'+Date.now()+'-'+(++noteSequence),step,pitch,length:Math.min(defaultLength,16-step),velocity:Number(velocityInput.value)||100})});
  const swipePattern={active:false,last:-1,pad:1};
  gr.addEventListener('pointerdown',e=>{const cell=e.target.closest('.c');if(!cell)return;swipePattern.active=true;swipePattern.last=-1;swipePattern.pad=Number(cell.parentElement?.dataset.padId||1);gr.setPointerCapture?.(e.pointerId);const step=Number(cell.dataset.s);if(step%2===0){cell.classList.add('pattern-swipe-active');noteCommand('creator.pattern.step.toggle',{step});swipePattern.last=step}});
  gr.addEventListener('pointermove',e=>{if(!swipePattern.active)return;const cell=document.elementFromPoint(e.clientX,e.clientY)?.closest?.('#gr .c');if(!cell)return;const step=Number(cell.dataset.s);if(step%2===0&&step!==swipePattern.last){cell.classList.add('pattern-swipe-active');noteCommand('creator.pattern.step.toggle',{step});swipePattern.last=step}});
  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>gr.addEventListener(t,()=>{swipePattern.active=false;gr.querySelectorAll('.pattern-swipe-active').forEach(el=>el.classList.remove('pattern-swipe-active'))}));
  nudgeButton.addEventListener('click',()=>{freeMove=!freeMove;nudgeButton.classList.toggle('selected',freeMove);nudgeButton.textContent=freeMove?'✥':'↕';pianoGrid.classList.toggle('free-drag',freeMove)});
+ let rotorAngle=null,rotorRemainder=0;
+ const midiRotor=document.querySelector('.pe');
+ nudgeButton.addEventListener('click',()=>{window.__zpMidiRotorActive=freeMove;rotorAngle=null;rotorRemainder=0});
+ midiRotor?.addEventListener('pointerdown',()=>{if(freeMove){rotorAngle=parseFloat(getComputedStyle(midiRotor).getPropertyValue('--r'))||0;rotorRemainder=0}});
+ midiRotor?.addEventListener('pointermove',()=>{if(!freeMove)return;const angle=parseFloat(getComputedStyle(midiRotor).getPropertyValue('--r'))||0;if(rotorAngle===null){rotorAngle=angle;return}rotorRemainder+=angle-rotorAngle;rotorAngle=angle;const delta=Math.trunc(rotorRemainder/12);if(!delta)return;rotorRemainder-=delta*12;const n=selectedNote();if(n)upsertNote({...n,pitch:clamp(n.pitch+delta,36,96)});else{octaveShift=clamp(octaveShift+delta/12,-8,8);buildPiano()}});
+ midiRotor?.addEventListener('pointerup',()=>{rotorAngle=null});midiRotor?.addEventListener('pointercancel',()=>{rotorAngle=null});
  pianoGrid.addEventListener('pointerdown',e=>{const el=e.target.closest('.piano-note');if(!el)return;longPressFired=false;clearTimeout(longPressTimer);longPressTimer=setTimeout(()=>{longPressFired=true;const n=activeNotes.find(x=>x.id===el.dataset.id);if(n){selectedNoteId=n.id;showNoteTools();renderNotes()}},2000)});
  ['pointerup','pointercancel','pointerleave'].forEach(t=>pianoGrid.addEventListener(t,()=>clearTimeout(longPressTimer)));
  
@@ -531,7 +539,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  layer.addEventListener('click',e=>{const b=e.target.closest('[data-zpmenu]');if(!b)return;const key=b.dataset.zpmenu,hint=$('#zpMenuHint');if(key==='theme'){const skins=['verde','ambar','cian','rojo'];unit.dataset.skin=skins[(skins.indexOf(unit.dataset.skin)+1)%skins.length];hint.textContent='COLOR ACTUAL: '+unit.dataset.skin.toUpperCase();if(typeof wave==='function')wave()}else if(key==='display')hint.textContent='LCD · SAMPLE / PIANO ROLL';else if(key==='audio')hint.textContent='WEB AUDIO · MASTER BUS · 16 STEP';else hint.textContent='DIRTYFINGAZ ZP · CREATOR OS'});
  window.addEventListener('message',e=>{
   if(e.source!==document.getElementById('zp-engine')?.contentWindow||e.origin!==location.origin||!e.data)return;const d=e.data;if(d.source!=='creator.engine')return;
-  if(d.type==='zp-engine-playhead'&&d.protocolVersion===1&&d.source==='creator.engine'){fill.style.width=((d.step+1)/16*100)+'%'}if(d.type==='zp-engine-piano-state'&&d.protocolVersion===1&&d.source==='creator.engine'){activeNotes=Array.isArray(d.notes)?d.notes.map(n=>({...n})):[];selectedNoteId=activeNotes.some(n=>n.id===selectedNoteId)?selectedNoteId:null;renderNotes();paintPadMidi()}if(d.type==='zp-engine-playhead'&&d.protocolVersion===1&&d.source==='creator.engine'){const play=$('#zpPianoPlayhead');if(play)play.style.gridColumn=String(d.step+2)}
+  if(d.type==='zp-engine-playhead'&&d.protocolVersion===1&&d.source==='creator.engine'){fill.style.width=((d.step+1)/16*100)+'%';window.__zpPlayheadState={step:d.step,at:performance.now(),bpm:bpmValue||120}}if(d.type==='zp-engine-piano-state'&&d.protocolVersion===1&&d.source==='creator.engine'){activeNotes=Array.isArray(d.notes)?d.notes.map(n=>({...n})):[];selectedNoteId=activeNotes.some(n=>n.id===selectedNoteId)?selectedNoteId:null;renderNotes();paintPadMidi()}if(d.type==='zp-engine-playhead'&&d.protocolVersion===1&&d.source==='creator.engine'){const play=$('#zpPianoPlayhead');if(play)play.style.gridColumn=String(d.step+2)}
   if(d.type==='zp-engine-bpm-state'&&d.protocolVersion===1&&d.source==='creator.engine'){bpmValue=d.bpm;bpm.textContent='BPM:'+bpmValue}
   if(d.type==='zp-engine-meter'&&d.protocolVersion===1&&d.source==='creator.engine'){line.classList.toggle('peak',d.peak>.82)}
   if(d.type==='zp-engine-trim-state'&&d.protocolVersion===1&&d.source==='creator.engine'){const c=$('#wv');if(c&&d.transients){const x=c.getContext('2d'),w=c.width,h=c.height;x.save();x.strokeStyle='#ffb34b';x.lineWidth=1.5;d.transients.forEach(p=>{const px=p*w;x.beginPath();x.moveTo(px,2);x.lineTo(px,h-2);x.stroke()});x.restore()}}
