@@ -8,10 +8,19 @@ let inlineScripts = 0;
 for (const path of sources) {
   const source = read(path);
   if (path.endsWith(".html")) {
-    for (const match of source.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
-      if (/\bsrc\s*=/.test(match[1])) continue;
-      new Function(match[2]);
-      inlineScripts++;
+    let cursor = 0;
+    while ((cursor = source.indexOf("<script", cursor)) !== -1) {
+      const tagEnd = source.indexOf(">", cursor);
+      const close = source.indexOf("</script>", tagEnd + 1);
+      if (tagEnd < 0 || close < 0) throw new Error("Etiqueta script incompleta en " + path);
+      const attributes = source.slice(cursor, tagEnd);
+      const code = source.slice(tagEnd + 1, close);
+      if (!attributes.includes("src=")) {
+        new Function(code);
+        inlineScripts++;
+      }
+      cursor = close + 9;
+    }
     }
   } else {
     new Function(source);
