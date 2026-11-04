@@ -193,7 +193,14 @@ canvas{width:168px;height:46px}
 .piano-free-cursor{position:absolute;z-index:8;pointer-events:none;width:18px;height:18px;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 3px #9dff4a,0 0 14px #fff;transform:translate(-50%,-50%);display:none}
 .piano-note-tools{position:absolute;z-index:10;display:flex;align-items:center;gap:5px;padding:6px;background:#071707f2;border:1px solid var(--lcd);border-radius:7px;box-shadow:0 5px 18px #000c;font:11px VT323,monospace;color:var(--lcd)}
 .piano-note-tools[hidden]{display:none}
+.piano-note-tools{position:absolute;left:8px;top:8px;flex-wrap:wrap;max-width:calc(100% - 16px)}
 .piano-note-tools input{width:90px;accent-color:var(--lcd)}
+.piano-note-tools #zpNoteInfo{display:block;width:100%;font-size:12px;color:#efffc4}
+.midi-targets{display:flex;gap:3px;width:100%}
+.midi-targets button{border:1px solid var(--lcd);border-radius:4px;background:#10270b;color:var(--lcd);padding:4px 7px;font:11px VT323,monospace}
+.midi-targets button.selected{background:var(--lcd);color:#061606}
+.piano-viewport{position:relative}
+.gr .c{touch-action:none;user-select:none}
 .pattern-swipe-active{background:var(--lcd)!important;box-shadow:0 0 8px var(--lcd)!important}
 .pattern-transport-line{will-change:transform;transform-origin:left center}
 @media(max-width:430px){.piano-tools{gap:3px}.piano-tools button{min-width:28px;padding:0 5px}.piano-tools .piano-zoom button{min-width:35px}}
@@ -478,12 +485,16 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  const noteName=m=>['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'][((m%12)+12)%12]+(Math.floor(m/12)-1);
  const noteCommand=(command,payload={})=>window.zpBridgeSend?.(command,payload);
 
- const nudgeButton=$('#zpNudge'),freeCursor=mk('div','piano-free-cursor'),noteTools=mk('div','piano-note-tools');freeCursor.setAttribute('aria-hidden','true');noteTools.hidden=true;noteTools.innerHTML='<b>MIDI TOOLS</b><label>VEL <input id="zpLongVelocity" type="range" min="1" max="127" value="100"></label><button type="button" id="zpLongDelete">DEL</button><button type="button" id="zpLongClose">×</button>';pianoViewport.append(freeCursor,noteTools);
+ const nudgeButton=$('#zpNudge'),freeCursor=mk('div','piano-free-cursor'),noteTools=mk('div','piano-note-tools');freeCursor.setAttribute('aria-hidden','true');noteTools.hidden=true;noteTools.innerHTML='<b>MIDI TOOLS</b><span id="zpNoteInfo"></span><div class="midi-targets"><button type="button" data-midi-target="step">STEP</button><button type="button" data-midi-target="pitch" class="selected">PITCH</button><button type="button" data-midi-target="length">LEN</button><button type="button" data-midi-target="velocity">VEL</button></div><label>VELOCITY <input id="zpLongVelocity" type="range" min="1" max="127" value="100"></label><button type="button" id="zpLongDelete">DEL</button><button type="button" id="zpLongClose">×</button>';pianoViewport.append(freeCursor,noteTools);
  let freeMove=false,longPressTimer=null,longPressFired=false,menuVelocity=$('#zpLongVelocity');
  const selectedNote=()=>activeNotes.find(n=>n.id===selectedNoteId);
- const showNoteTools=()=>{const n=selectedNote();if(!n)return;menuVelocity.value=String(n.velocity);noteTools.hidden=false;noteTools.style.left='8px';noteTools.style.top='8px'};
+ const showNoteTools=()=>{const n=selectedNote();if(!n)return;menuVelocity.value=String(n.velocity);$('#zpNoteInfo').textContent='STEP '+(n.step+1)+' · '+noteName(n.pitch)+' · LEN '+n.length+' · VEL '+n.velocity;noteTools.querySelectorAll('[data-midi-target]').forEach(b=>b.classList.toggle('selected',b.dataset.midiTarget===rotorTarget));noteTools.hidden=false;noteTools.style.left='8px';noteTools.style.top='8px'};
  menuVelocity.addEventListener('input',()=>{const n=selectedNote();if(n)upsertNote({...n,velocity:Number(menuVelocity.value)})});
  $('#zpLongDelete').onclick=()=>{$('#zpDelete').click();noteTools.hidden=true};$('#zpLongClose').onclick=()=>noteTools.hidden=true;
+ noteTools.addEventListener('click',e=>{const b=e.target.closest('[data-midi-target]');if(!b)return;rotorTarget=b.dataset.midiTarget;noteTools.querySelectorAll('[data-midi-target]').forEach(x=>x.classList.toggle('selected',x===b))});
+ pianoGrid.addEventListener('pointermove',e=>{if(!freeMove)return;const r=pianoViewport.getBoundingClientRect();freeCursor.style.display='block';freeCursor.style.left=(e.clientX-r.left)+'px';freeCursor.style.top=(e.clientY-r.top)+'px'});
+ pianoGrid.addEventListener('pointerleave',()=>{freeCursor.style.display='none'});
+
  const pitchAt=y=>{const cells=[...pianoGrid.querySelectorAll('.piano-cell')],r=pianoGrid.getBoundingClientRect(),row=Math.floor((y-r.top)/(cells[0]?.getBoundingClientRect().height||13));return clamp(topMidi-row,36,96)};
  const stepAt=x=>{const cells=[...pianoGrid.querySelectorAll('.piano-cell[data-pitch="'+topMidi+'"]')],r=cells[0]?.getBoundingClientRect(),w=r?.width||18;return clamp(Math.floor((x-(r?.left||0))/w),0,15)};
  const paintPadMidi=()=>{pianoGrid.querySelectorAll('.pad-midi-origin').forEach(el=>el.classList.remove('pad-midi-origin'));activeNotes.forEach(note=>{pianoGrid.querySelector('.piano-cell[data-step="'+note.step+'"][data-pitch="'+note.pitch+'"]')?.classList.add('pad-midi-origin');pianoGrid.querySelector('.piano-note[data-id="'+note.id+'"]')?.classList.add('pad-midi-origin')})};
@@ -510,11 +521,11 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  gr.addEventListener('pointermove',e=>{if(!swipePattern.active)return;const cell=document.elementFromPoint(e.clientX,e.clientY)?.closest?.('#gr .c');if(!cell)return;const step=Number(cell.dataset.s);if(step%2===0&&step!==swipePattern.last){cell.classList.add('pattern-swipe-active');noteCommand('creator.pattern.step.toggle',{step});swipePattern.last=step}});
  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>gr.addEventListener(t,()=>{swipePattern.active=false;gr.querySelectorAll('.pattern-swipe-active').forEach(el=>el.classList.remove('pattern-swipe-active'))}));
  nudgeButton.addEventListener('click',()=>{freeMove=!freeMove;nudgeButton.classList.toggle('selected',freeMove);nudgeButton.textContent=freeMove?'✥':'↕';pianoGrid.classList.toggle('free-drag',freeMove)});
- let rotorAngle=null,rotorRemainder=0;
+ let rotorAngle=null,rotorRemainder=0,rotorTarget="pitch";
  const midiRotor=document.querySelector('.pe');
  nudgeButton.addEventListener('click',()=>{window.__zpMidiRotorActive=freeMove;rotorAngle=null;rotorRemainder=0});
  midiRotor?.addEventListener('pointerdown',()=>{if(freeMove){rotorAngle=parseFloat(getComputedStyle(midiRotor).getPropertyValue('--r'))||0;rotorRemainder=0}});
- midiRotor?.addEventListener('pointermove',()=>{if(!freeMove)return;const angle=parseFloat(getComputedStyle(midiRotor).getPropertyValue('--r'))||0;if(rotorAngle===null){rotorAngle=angle;return}rotorRemainder+=angle-rotorAngle;rotorAngle=angle;const delta=Math.trunc(rotorRemainder/12);if(!delta)return;rotorRemainder-=delta*12;const n=selectedNote();if(n)upsertNote({...n,pitch:clamp(n.pitch+delta,36,96)});else{octaveShift=clamp(octaveShift+delta/12,-8,8);buildPiano()}});
+ midiRotor?.addEventListener('pointermove',()=>{if(!freeMove)return;const angle=parseFloat(getComputedStyle(midiRotor).getPropertyValue('--r'))||0;if(rotorAngle===null){rotorAngle=angle;return}rotorRemainder+=angle-rotorAngle;rotorAngle=angle;const delta=Math.trunc(rotorRemainder/12);if(!delta)return;rotorRemainder-=delta*12;const n=selectedNote();if(n){if(rotorTarget==="pitch")upsertNote({...n,pitch:clamp(n.pitch+delta,36,96)});else if(rotorTarget==="step")upsertNote({...n,step:clamp(n.step+delta,0,15)});else if(rotorTarget==="length")upsertNote({...n,length:clamp(n.length+delta,1,16-n.step)});else upsertNote({...n,velocity:clamp(n.velocity+delta,1,127)});if(!noteTools.hidden)$('#zpNoteInfo').textContent='STEP '+(selectedNote().step+1)+' · '+noteName(selectedNote().pitch)+' · LEN '+selectedNote().length+' · VEL '+selectedNote().velocity}else{octaveShift=clamp(octaveShift+delta/12,-8,8);buildPiano()}});
  midiRotor?.addEventListener('pointerup',()=>{rotorAngle=null});midiRotor?.addEventListener('pointercancel',()=>{rotorAngle=null});
  pianoGrid.addEventListener('pointerdown',e=>{const el=e.target.closest('.piano-note');if(!el)return;longPressFired=false;clearTimeout(longPressTimer);longPressTimer=setTimeout(()=>{longPressFired=true;const n=activeNotes.find(x=>x.id===el.dataset.id);if(n){selectedNoteId=n.id;showNoteTools();renderNotes()}},2000)});
  ['pointerup','pointercancel','pointerleave'].forEach(t=>pianoGrid.addEventListener(t,()=>clearTimeout(longPressTimer)));
