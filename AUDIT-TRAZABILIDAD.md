@@ -388,3 +388,17 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - La edición MIDI sigue entrando por `creator.piano.note.upsert` y conserva persistencia de proyecto; no se modifica el contrato del bridge.
 - CI: run `41887880916` completó `validate` en SUCCESS para SHA `965e5bfcd9a903b0dca7f4541b9876c9594ca8d1`, incluyendo controles de información MIDI, selector de destino del rotor, cursor libre y nuevas aserciones.
 - Pruebas de dispositivo aún pendientes: gesto táctil continuo, rotor, SHIFT con teclado externo y reproducción de microtiming en Safari iOS.
+
+
+## 16. Agente contextual · Inspector JSON y herramientas de desarrollo · 2026-11-04
+
+- Se amplió el agente a v0.3 con selección contextual del control tocado, resaltado visual del objetivo y ficha de parámetro.
+- El cliente lee `zp-agent-registry.json`; ese registro define módulo, owner, tipo, min/max/step/default, comando y payload. La misma fuente JSON es consultada por el Worker para enriquecer el contexto de IA.
+- El inspector permite aplicar en vivo sólo parámetros con comando registrado. El payload se construye desde el JSON, sustituyendo `$value`, y la confirmación depende del ACK del motor. Parámetros MIDI aún sin comando dedicado quedan en modo informativo/desarrollo.
+- Se añadieron herramientas de composición por botón: JSON, GUI, BRIDGE, ENGINE y TEST. Los snippets son borradores revisables, copiables y consultables con la IA; no se ejecutan automáticamente ni escriben código en el repositorio.
+- El registro incluye contexto de arquitectura, responsabilidades de archivos, separación GUI/motor, reglas de rama, enlaces del proyecto y estado de handoff para retomar sesiones.
+- Ventana flotante: opacidad de reposo 20%, opacidad completa durante interacción/foco, drag desde cabecera, resize desde esquina, controles táctiles y sin autofocus al abrir para evitar zoom de Safari. El temporizador cierra el agente tras 10 segundos de inactividad y cancela confirmaciones pendientes.
+- Service Worker actualizado a caché v9 e incluye el registro JSON para disponibilidad offline.
+- Worker consulta el JSON del asset y entrega al modelo la definición del parámetro y el contexto de arquitectura. La IA permanece habilitada sólo en Preview.
+- Validación estática añadida para registro, inspector, snippets y carga PWA. Pendiente ejecutar CI en el SHA final y QA real en Safari iPhone 11.
+- Sin cambios en `main`, sin merge, sin cambios de esquema Supabase.
