@@ -231,5 +231,42 @@
     "Validar allowlist y precondiciones.",
     "Aplicar sólo parámetros live con comando explícito y ACK del motor.",
     "Para código, copiar/exportar el snippet y preparar cambios separados GUI/engine/validator."
-  ]
+  ],
+  "project": {
+    "name": "DIRTYFINGAZ ZP",
+    "repository": "https://github.com/alexandermaulen/Dirtyfingaz-ZP",
+    "developmentBranch": "feat/hybrid-hardware-ui-system",
+    "pullRequest": "https://github.com/alexandermaulen/Dirtyfingaz-ZP/pull/3",
+    "preview": "https://feat-hybrid-hardware-ui-system-dirtyfingaz-zp.alexandermaulen.workers.dev",
+    "architecture": {
+      "gui": "creator.html: controls, interaction, visual state and context.",
+      "engine": "creator-engine.html: Web Audio, buffers, scheduler, FX, MIDI and authoritative state.",
+      "bridge": "Versioned GUI-engine messages with protocolVersion, requestId, ACK/error and timeout.",
+      "storage": "zp-storage.js: IndexedDB and per-project sample isolation.",
+      "worker": "radio-worker.mjs: agent API and Radio Grid.",
+      "agent": "zp-agent.js: contextual inspector, allowlisted parameter application and code snippet composer.",
+      "registry": "zp-agent-registry.json: parameter schemas, ranges, commands and ownership.",
+      "validator": "scripts/validate.mjs: static syntax and integration contracts."
+    },
+    "handoff": {
+      "branchPolicy": "Work only on feature branch. Do not modify main or merge without explicit authorization.",
+      "parallelTracks": "Keep GUI and engine work coordinated. Define bridge contract before cross-layer changes.",
+      "knownFeatures": [
+        "9 pads x 16 steps sequencer",
+        "Piano Roll with MIDI editing and microtiming",
+        "IN/OUT trim with fine PUSH ENTER and persistence",
+        "Multi-project IndexedDB storage",
+        "WAV/MP3 export components",
+        "Cloudflare Radio Grid"
+      ],
+      "supabase": "Connected project exists; do not create tables or alter infrastructure without authorization.",
+      "currentFeature": "Agent v0.3: selected-control glow, parameter inspector, shared JSON registry, live allowlisted apply, and JSON/GUI/BRIDGE/ENGINE/TEST snippet buttons.",
+      "pending": [
+        "Run CI on current SHA",
+        "Test drag/resize, 20% idle opacity, 10-second close and no Safari zoom",
+        "Test parameter apply and engine ACK on iPhone 11",
+        "Verify PWA offline cache"
+      ]
+    }
+  }
 }
