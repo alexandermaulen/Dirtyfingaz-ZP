@@ -659,7 +659,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  const selectedNote=()=>activeNotes.find(n=>n.id===selectedNoteId);
 
  // Lx/Rx: posicionamiento contextual de un solo objeto en Piano Roll.
- const encoderEdit={lx:{angle:null,dirty:false},rx:{angle:null,dirty:false}};
+ const encoderEdit={lx:{angle:null,remainder:0,dirty:false,midiDirty:false,midiId:null},rx:{angle:null,remainder:0,dirty:false,midiDirty:false,midiId:null}};
  let encoderTrimRange={start:0,end:1};
  const encoderTrimDirty={start:false,end:false};
  const encoderAngle=el=>parseFloat(getComputedStyle(el).getPropertyValue('--r'))||0;
@@ -668,26 +668,29 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
   encoderTrimDirty[target]=false;
   noteCommand('creator.sample.trim.set',{target,position:encoderTrimRange[target],commit:true});
  };
- const moveSelectedMidi=(axis,delta,shift)=>{
+ const moveSelectedMidi=(axis,delta,shift,state)=>{
   const n=selectedNote();if(!n||!delta)return false;
+  let next={...n};
   if(axis==='x'){
    if(shift){
     const position=clamp(n.step+(Number(n.micro)||0)+delta*.0005,0,15.999);
     const step=Math.floor(position);
-    upsertNote({...n,step,micro:position-step});
+    next={...n,step,micro:position-step};
    }else{
     const amount=Math.trunc(delta/12);if(!amount)return true;
-    upsertNote({...n,step:clamp(n.step+amount*snapSize,0,15),micro:0});
+    next={...n,step:clamp(n.step+amount*snapSize,0,15),micro:0};
    }
   }else{
    const amount=Math.trunc(delta/18);if(!amount)return true;
-   upsertNote({...n,pitch:clamp(n.pitch+amount,36,96)});
+   next={...n,pitch:clamp(n.pitch+amount,36,96)};
   }
+  const index=activeNotes.findIndex(item=>item.id===n.id);
+  if(index>=0){activeNotes[index]=next;state.midiDirty=true;state.midiId=n.id;renderNotes()}
   return true;
  };
  const moveSelectedSample=(target,delta,shift)=>{
   if(!window.__zpSelectedSampleAvailable||!delta)return false;
-  const rate=shift?.00015:.0015;
+  const rate=shift ? .00015 : .0015;
   const next=target==='start'
    ?clamp(encoderTrimRange.start+delta*rate,0,encoderTrimRange.end-.015)
    :clamp(encoderTrimRange.end+delta*rate,encoderTrimRange.start+.015,1);
@@ -701,7 +704,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  const bindPianoEncoder=(encoder,side)=>{
   if(!encoder)return;
   const state=encoderEdit[side],axis=side==='rx'?'x':'y',trimTarget=side==='lx'?'start':'end';
-  encoder.addEventListener('pointerdown',()=>{state.angle=encoderAngle(encoder);state.dirty=false;});
+  encoder.addEventListener('pointerdown',()=>{state.angle=encoderAngle(encoder);state.remainder=0;state.dirty=false;state.midiDirty=false;state.midiId=null;});
   encoder.addEventListener('pointermove',e=>{
    if(!window.__zpPianoEncoderMode)return;
    const angle=encoderAngle(encoder);
@@ -710,14 +713,19 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
    if(delta>180)delta-=360;if(delta<-180)delta+=360;
    if(Math.abs(delta)<.01)return;
    const note=selectedNote();
-   const changed=note?moveSelectedMidi(axis,delta,!!e.shiftKey):moveSelectedSample(trimTarget,delta,!!e.shiftKey);
+   let changed=false;
+   if(note&&axis==='x'&&!e.shiftKey){state.remainder+=delta;const units=Math.trunc(state.remainder/12);if(units){state.remainder-=units*12;changed=moveSelectedMidi(axis,units*12,false,state)}}
+   else if(note&&axis==='y'&&!e.shiftKey){state.remainder+=delta;const units=Math.trunc(state.remainder/18);if(units){state.remainder-=units*18;changed=moveSelectedMidi(axis,units*18,false,state)}}
+   else if(note){changed=moveSelectedMidi(axis,delta,!!e.shiftKey,state);if(e.shiftKey)state.remainder=0}
+   else changed=moveSelectedSample(trimTarget,delta,!!e.shiftKey);
    if(changed)state.dirty=true;
    encoder.dataset.editTarget=note?(axis==='x'?'MIDI STEP':'MIDI PITCH'):(trimTarget==='start'?'SAMPLE IN':'SAMPLE OUT');
   });
   const finish=()=>{
-   state.angle=null;
-   if(state.dirty&&!selectedNote())commitEncoderTrim(trimTarget);
-   state.dirty=false;
+   state.angle=null;state.remainder=0;
+   if(state.midiDirty){const note=activeNotes.find(item=>item.id===state.midiId);if(note)upsertNote({...note});}
+   else if(state.dirty)commitEncoderTrim(trimTarget);
+   state.dirty=false;state.midiDirty=false;state.midiId=null;
   };
   ['pointerup','pointercancel','lostpointercapture'].forEach(type=>encoder.addEventListener(type,finish));
  };
