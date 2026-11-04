@@ -201,6 +201,32 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
  .lowerDeck .sp-dial .kb{width:46px!important;height:46px!important}
  .lowerDeck .sp-commands button{min-height:29px!important}
 }
+
+/* VALUE DISPLAY UPDATE · large readout beside the main screen */
+.mid{display:flex!important;align-items:stretch!important;justify-content:center!important;gap:7px!important;height:246px!important;min-height:0!important}
+.disp{width:232px!important;height:246px!important;min-width:0!important;flex:1 1 auto!important;padding:11px!important}
+.value-panel{width:112px;min-width:112px;flex:0 0 112px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:9px;padding:8px 7px;border:2px solid #041a06;border-radius:10px;background:linear-gradient(155deg,#174c12,#082707 60%,#020b02);box-shadow:inset 0 0 12px #000b,0 0 0 2px #50c82888,0 0 15px #78dc2833;text-align:center}
+.value-head{display:flex;flex-direction:column;gap:3px;border-bottom:1px solid #aaff4b55;padding-bottom:6px}
+.value-head span{font: bold 13px monospace;letter-spacing:.12em;text-shadow:0 0 9px #d8ff4f}
+.value-head small{font:6px monospace;opacity:.75}
+.value-big{min-height:65px;display:flex;align-items:center;justify-content:center;background:#020d02;border:1px solid #9aff4a99;box-shadow:inset 0 0 14px #000,0 0 12px #9aff4a22}
+.value-big output{font:bold 36px/1 monospace!important;color:#eaff9a;text-shadow:0 0 7px #d8ff4f,0 0 18px #9aff4a;letter-spacing:-.06em}
+.value-target{font:7px monospace;line-height:1.4;min-height:20px;color:#d8ff4f;overflow-wrap:anywhere}
+.value-buttons{display:flex;gap:6px}
+.value-buttons button{height:38px;min-height:38px!important;font-size:19px!important;flex:1;border-radius:5px!important}
+.fx-readout{font:7px monospace;border-top:1px solid #aaff4b55;padding-top:7px;color:#baff80}
+.fx-readout strong{display:block;font:bold 15px monospace;color:#f2ffb0;margin-top:3px;text-shadow:0 0 8px #c6ff4f}
+.lowerDeck>.sp-bottom{display:none!important}
+.lowerDeck{gap:0!important}
+@media(max-height:760px){
+ .mid{height:218px!important}
+ .disp{height:218px!important}
+ .value-panel{gap:6px;padding:6px}
+ .value-big{min-height:52px}
+ .value-big output{font-size:29px!important}
+ .value-buttons button{height:32px;min-height:32px!important}
+}
+
 </style></head><body><div id="app"></div>
 <script src="./zp-core.js"></script>
 <script>
@@ -339,22 +365,30 @@ const bottomControls=$("div","sp-bottom");
 const valueWheel=drawValueWheel(null,"VALUE",0,v=>{if(systemMenu){let max=Math.max(0,menuItems().length-1);menuIndex=Math.round(v*max);updateScreen()}else if(activeTab==="RECORTE"){let r=ranges[activePad]||{start:0,end:1};setTrimValue(valueTarget,v);updateValueReadout()}else if(activeTab==="EFECTOS"){fxAmount=v;applyFxAmount()}});
 const fxWheel=drawValueWheel(null,"FX CTRL",.25,v=>{fxAmount=v;applyFxAmount()});
 const valueOutput=valueWheel.output,fxValueOutput=fxWheel.output;
-const fxLabel=$("span","","FX");
-const valueGroup=$("div","sp-dial");valueGroup.append($("span","","VALUE"),valueWheel.wrap.querySelector(".kb"),valueOutput);
-const fxGroup=$("div","sp-dial");fxGroup.append($("span","","FX AMOUNT"),fxWheel.wrap.querySelector(".kb"),fxValueOutput);
-bottomControls.append(valueGroup,fxGroup);
-const lowerDeck=$("div","control-deck");lowerDeck.append(commandRow,bottomControls);
+const valueGroup=$("div","value-panel");
+const valueHead=$("div","value-head","<span>VALUE</span><small>PARAMETER CONTROL</small>");
+const valueBig=$("div","value-big");valueBig.append(valueOutput);
+const valueTargetLabel=$("div","value-target","RECORTE · IN");
+const valueButtons=$("div","value-buttons");
+const valueMinus=button("−"),valuePlus=button("+");
+valueMinus.onclick=()=>{if(systemMenu){changeValue(-1);return}if(activeTab==="RECORTE"){changeValue(-4);updateValueReadout()}else if(activeTab==="EFECTOS"){changeValue(-4)}};
+valuePlus.onclick=()=>{if(systemMenu){changeValue(1);return}if(activeTab==="RECORTE"){changeValue(4);updateValueReadout()}else if(activeTab==="EFECTOS"){changeValue(4)}};
+valueButtons.append(valueMinus,valuePlus);
+const fxReadout=$("div","fx-readout","FX AMOUNT <strong>25%</strong>");
+valueGroup.append(valueHead,valueBig,valueTargetLabel,valueButtons,fxReadout);
+mid.append(valueGroup);
+const lowerDeck=$("div","control-deck lowerDeck");lowerDeck.append(commandRow);
 app.append(lowerDeck);
 const footer=$("div","foot","<span>SP-606 HYBRID OS</span><span>9 PADS</span><span>WAV</span>");app.append(footer);
 
 
-function updateValueReadout(){if(valueOutput){let r=ranges[activePad]||{start:0,end:1};valueOutput.textContent=Math.round(r[valueTarget]*100)+"%";}}
+function updateValueReadout(){if(valueOutput){let r=ranges[activePad]||{start:0,end:1};valueOutput.textContent=Math.round(r[valueTarget]*100)+"%";if(valueTargetLabel)valueTargetLabel.textContent=(activeTab==="RECORTE"?"RECORTE · "+(valueTarget==="start"?"IN":"OUT"):systemMenu?"SYSTEM MENU":"FX CONTROL");}}
 function changeValue(delta){
  if(systemMenu){let max=(menuPage==="MAIN"?5:4)-1;menuIndex=(menuIndex+delta+max+1)%(max+1);updateScreen();return}
  if(activeTab==="RECORTE"&&samples[activePad]){let r=ranges[activePad]||{start:0,end:1};setTrimValue(valueTarget,r[valueTarget]+delta*.0025);updateValueReadout();return}
  if(activeTab==="EFECTOS"){fxAmount=Math.max(0,Math.min(1,fxAmount+delta*.01));applyFxAmount();return}
 }
-function applyFxAmount(){if(!ctx){fxValueOutput.textContent=Math.round(fxAmount*100)+"%";return}if(fxState.drive)driveAmount(fxAmount*35);if(fxState.delay)delayWet.gain.setTargetAtTime(fxAmount*.65,ctx.currentTime,.025);fxValueOutput.textContent=Math.round(fxAmount*100)+"%";}
+function applyFxAmount(){if(!ctx){fxValueOutput.textContent=Math.round(fxAmount*100)+"%";if(fxReadout)fxReadout.innerHTML="FX AMOUNT <strong>"+Math.round(fxAmount*100)+"%</strong>";return}if(fxState.drive)driveAmount(fxAmount*35);if(fxState.delay)delayWet.gain.setTargetAtTime(fxAmount*.65,ctx.currentTime,.025);fxValueOutput.textContent=Math.round(fxAmount*100)+"%";if(fxReadout)fxReadout.innerHTML="FX AMOUNT <strong>"+Math.round(fxAmount*100)+"%</strong>";}
 function menuItems(){
  const menus={
  MAIN:["1:SYSTEM","2:D BEAM SETTING","3:MIDI UTILITY","4:USB AUDIO/MIDI","5:USB MASS STORAGE","6:MASTER LEVEL"],
