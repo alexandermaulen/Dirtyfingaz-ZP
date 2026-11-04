@@ -291,9 +291,19 @@ function row(cols,tags,btns,cls){const w=mk('div');const tg=mk('div','row tg');t
  tags.forEach(([t,n])=>{const s=mk('span','',t);s.style.gridColumn='span '+n;tg.append(s)});
  const r=mk('div','row '+(cls||''));r.style.gridTemplateColumns=cols;
  btns.forEach(b=>{if(typeof b==='string'){const x=B(b);r.append(x)}else r.append(b)});w.append(tg,r);$('#rows').append(w);return r}
-const pe=mk('div','knob pe','<i></i>');bindKnob(pe,1);
-row('repeat(6,1fr) 70px',[['PATTERN SEQUENCER',3],['SAMPLE EDIT',3],['PUSH ENTER',1]],
- ['PATTERN<br>SELECT','PATTERN<br>EDIT','RECORD<br>SETTING','START/<br>END','PITCH<br>SPEED','MARK',pe],'big ra');
+const lx=mk('div','knob lx','<i></i>');lx.dataset.rotor='Lx';lx.setAttribute('role','button');lx.setAttribute('aria-label','Lx: desplazamiento de herramientas');lx.tabIndex=0;bindKnob(lx,1);
+const pe=mk('div','knob pe rx','<i></i>');pe.dataset.rotor='Rx';pe.setAttribute('role','button');pe.setAttribute('aria-label','Rx: control contextual PUSH ENTER');pe.tabIndex=0;bindKnob(pe,1);
+row('repeat(6,1fr) 70px 70px',[['PATTERN SEQUENCER',3],['SAMPLE EDIT',3],['Lx / Rx',2]],
+ ['PATTERN<br>SELECT','PATTERN<br>EDIT','RECORD<br>SETTING','START/<br>END','PITCH<br>SPEED','MARK',lx,pe],'big ra');
+/* Lx recorre herramientas y funciones sin ejecutarlas; Rx conserva PUSH ENTER. */
+(()=>{let angle=null,remainder=0,index=-1,active=null;const selector='.b,.piano-tools button,.trim-marker,[data-midi-target],.lcd-action,#play,#bpmWheel';
+ const targets=()=>[...document.querySelectorAll(selector)].filter(el=>!el.closest('#zp-agent-window')&&!el.disabled&&el.getAttribute('aria-hidden')!=='true'&&el.getClientRects().length);
+ const choose=direction=>{const list=targets();if(!list.length)return;index=(index+direction+list.length)%list.length;const el=list[index];if(active)active.classList.remove('lx-active');active=el;active.classList.add('lx-active');if(!el.hasAttribute('tabindex'))el.tabIndex=-1;el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});window.__zpLx={index,total:list.length,direction,target:el.dataset.agentContext||el.dataset.trimTarget||el.dataset.midiTarget||el.textContent.trim().replace(/\s+/g,' ').slice(0,48)};};
+ lx.addEventListener('pointerdown',()=>{angle=parseFloat(getComputedStyle(lx).getPropertyValue('--r'))||0;remainder=0});
+ lx.addEventListener('pointermove',()=>{const next=parseFloat(getComputedStyle(lx).getPropertyValue('--r'))||0;if(angle===null){angle=next;return}remainder+=next-angle;angle=next;let steps=Math.trunc(remainder/14);if(!steps)return;remainder-=steps*14;const direction=Math.sign(steps);for(let n=0;n<Math.min(Math.abs(steps),24);n++)choose(direction)});
+ ['pointerup','pointercancel'].forEach(type=>lx.addEventListener(type,()=>{angle=null}));
+ lx.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();choose(1)}else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();choose(-1)}});
+})();
 row('repeat(8,1fr)',[['UNDO',1],['SAMPLING',2],['CHOP',1],['ENVELOPE',2],['SAMPLE MODE',2]],
  ['DEL','REC','RESAMPLE','BPM<br>SYNC','GATE','LOOP','REVERSE','ROLL'],'big');
 row('repeat(9,1fr)',[['',6],['BANK',2],['ROLL SET',1]],
