@@ -63,7 +63,7 @@
   if(el.dataset.zpParam)return el.dataset.zpParam;
   if(el.dataset.trimTarget)return "trim."+el.dataset.trimTarget;
   if(el.dataset.midiTarget)return "midi."+el.dataset.midiTarget;
-  if(el.matches(".pe"))return window.__zpTrimRotor?.active?"trim."+((window.__zpTrimRotor.target)||"start"):"fx-amount";
+  if(el.closest(".pe"))return window.__zpTrimRotor?.active?"trim."+((window.__zpTrimRotor.target)||"start"):"fx-amount";
   const knob=el.closest("#kn .knob");
   if(knob){const i=[...document.querySelectorAll("#kn .knob")].indexOf(knob);return ["master","cutoff","resonance","drive"][i]||null}
   return null;
@@ -85,8 +85,9 @@ function renderInspector(){
   range.value=String(Math.max(entry.min,Math.min(entry.max,Number(context.parameterValue??entry.default))));
   output.value=range.value;apply.disabled=false;
 }
+registryPromise.then(()=>renderInspector());
 function inspectTarget(target){
-  const el=target?.closest?.("button,[role=button],input,select,textarea,.knob,.kb,.p,.b,.c,.piano-note,.piano-cell,#wv,[data-agent-context],[data-trim-target],[data-midi-target]");
+  const el=target?.closest?.("button,[role=button],input,select,textarea,.knob,.kb,.pe,.p,.b,.c,.piano-note,.piano-cell,#wv,[data-agent-context],[data-trim-target],[data-midi-target]");
   if(!el||root.contains(el)||el===launcher||el.closest("#zp-agent-window"))return;
   if(selectedElement&&selectedElement!==el)selectedElement.classList.remove("zp-agent-target-active");
   selectedElement=el;selectedElement.classList.add("zp-agent-target-active");
