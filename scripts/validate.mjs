@@ -142,6 +142,14 @@ assert.match(ui, /zpLongVelocity/, "La pulsación larga debe abrir herramientas 
 assert.match(ui, /longPressTimer=setTimeout[\s\S]{0,250},2000\)/, "Las herramientas MIDI deben abrirse tras dos segundos.");
 assert.match(ui, /step%2===0/, "El barrido táctil de patrones debe marcar pasos alternos.");
 assert.match(ui, /animatePianoPlayhead/, "El playhead debe interpolarse entre pasos.");
+assert.match(ui, /data-midi-target="step"/, "El rotor debe permitir mover la nota por pasos.");
+assert.match(ui, /data-midi-target="pitch"/, "El rotor debe permitir mover la nota por tono.");
+assert.match(ui, /data-midi-target="length"/, "El rotor debe permitir cambiar la duración.");
+assert.match(ui, /piano-free-cursor/, "El modo libre debe mostrar un cursor táctil.");
+assert.match(ui, /zpNoteInfo/, "Las herramientas deben exponer información MIDI contextual.");
+assert.match(ui, /paintPadMidi/, "La selección de pad debe resaltar sus notas MIDI.");
+assert.match(ui, /__zpMidiRotorActive/, "El rotor maestro debe cambiar de FX a edición MIDI en modo libre.");
+
 assert.match(ui, /zp-engine-piano-state/);
 assert.match(engine, /micro:Math\.max\(0,Math\.min\(\.999,Number\(input\.micro\)\|\|0\)\)/, "El motor debe persistir microtiming.");
 assert.match(engine, /scheduledAt\+\(Math\.max\(0,Math\.min\(\.999,Number\(note\.micro\)\|\|0\)\)\*beat\)/, "El scheduler debe respetar el microtiming.");
