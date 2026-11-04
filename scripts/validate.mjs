@@ -54,13 +54,13 @@ assert.match(ui, /data-trim-target="start"/, "IN debe poder seleccionarse direct
 assert.match(ui, /data-trim-target="end"/, "OUT debe poder seleccionarse directamente.");
 assert.match(ui, /const selectTrimTarget=marker/, "La selección IN/OUT debe activar el rotor maestro.");
 assert.match(ui, /state\.active=window\.__zpTrimPhase===1;state\.target=activeTrimTarget/, "La selección de IN/OUT debe activar el rotor en fase 1.");
-assert.match(ui, /fineStep=0\.00005/, "El rotor debe conservar el ajuste fino incremental.");
+assert.match(ui, /fineStep=\.00005/, "El rotor debe conservar el ajuste fino incremental.");
 assert.match(ui, /commit:true/, "El trim debe persistirse al soltar el rotor.");
 
 assert.match(ui, /creator\.sample\.trim\.set/);
 assert.match(ui, /trimPointer/);
 assert.match(ui, /__zpTrimRotor/, "El estado del rotor de recorte debe existir.");
-assert.match(ui, /fineStep=0\.00005/, "Push Enter debe ajustar IN/OUT con resolución fina.");
+assert.match(ui, /fineStep=\.00005/, "Push Enter debe ajustar IN/OUT con resolución fina.");
 assert.match(ui, /data-rotor='Lx'/, "Lx debe identificarse como encoder de navegación.");
 assert.match(ui, /data-rotor='Rx'/, "Rx debe conservar su identidad como encoder contextual.");
 assert.match(ui, /const selector='\.b,\.piano-tools button,\.trim-marker/, "Lx debe recorrer herramientas y funciones visibles.");
