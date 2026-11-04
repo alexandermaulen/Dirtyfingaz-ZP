@@ -214,7 +214,7 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
    <div class="v1">
     <div class="l1"><span>C4:START</span><span>C2:OFF</span><span>C3:END</span></div>
     <canvas id="wv" width="168" height="46"></canvas>
-    <div class="l2"><span>ENC:ZOOM:1X1</span><span>A-3</span><span>M:ISO</span><span class="lcd-action" id="browse">BROWSE</span><span class="mn" id="menu">MENU</span></div><i class="mk l"></i><i class="mk r">R</i>
+    <div class="l2"><span>ENC:ZOOM:1X1</span><span>A-3</span><span>M:ISO</span><span class="lcd-action" id="browse">BROWSE</span><span class="lcd-action" id="transientChop">TRNS</span><span class="mn" id="menu">MENU</span></div><i class="mk l"></i><i class="mk r">R</i>
    </div>
    <div class="v2">
     <div class="ph"><span id="play">&#9654; PLAY</span><span id="bpmWheel" class="bpm-wheel">BPM:120</span><span id="len">LEN:1/16</span></div>
@@ -430,7 +430,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  bpm.addEventListener('pointermove',e=>{if(lastY===null)return;remainder+=lastY-e.clientY;lastY=e.clientY;const delta=Math.trunc(remainder/5);if(delta){remainder-=delta*5;adjustTempo(delta)}});
  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>bpm.addEventListener(t,()=>lastY=null));
  bpm.addEventListener('wheel',e=>{e.preventDefault();adjustTempo(e.deltaY<0?1:-1)},{passive:false});
- browse.addEventListener('click',()=>window.zpBridgeSend?.('creator.sample.load.request',{}));
+ browse.addEventListener('click',()=>window.zpBridgeSend?.('creator.sample.load.request',{}));$('#transientChop').addEventListener('click',()=>window.zpBridgeSend?.('creator.sample.transient.chop',{}));
  const audition=mk('span','lcd-action','▶');audition.title='Escuchar muestra del pad';browse.parentNode.insertBefore(audition,browse);audition.addEventListener('click',()=>window.zpBridgeSend?.('creator.sample.preview',{}));
  const layer=mk('div','lcd-menu');layer.hidden=true;layer.innerHTML='<header><b>DIRTYFINGAZ OS</b><span>LCD / MENU</span></header><div class="menu-grid"><button data-zpmenu="theme">THEME / COLOR</button><button data-zpmenu="display">DISPLAY MODE</button><button data-zpmenu="audio">AUDIO SYSTEM</button><button data-zpmenu="about">SYSTEM INFO</button></div><small id="zpMenuHint">ELIGE UNA OPCIÓN · MENU PARA CERRAR</small>';scr.append(layer);
  menu.addEventListener('click',()=>{layer.hidden=!layer.hidden});
