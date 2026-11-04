@@ -262,7 +262,7 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
 .scr.pr{width:min(400px,calc(100% - 18px));height:220px;margin:-110px 0 0;left:50%;transform:translateX(-50%);border-radius:16px}
 .mid>.lx,.mid>.rx{position:absolute;top:auto;bottom:10px;z-index:5;width:54px;height:54px;min-width:54px;min-height:54px;margin:0;flex:none}
 .mid>.lx{left:10px}.mid>.rx{right:10px}
-.mid>.in-encoder{display:none;position:absolute;left:70px;bottom:10px;z-index:5;width:46px;height:46px;min-width:46px;min-height:46px;margin:0;touch-action:none}
+.mid>.lx{left:10px;right:auto;opacity:.18;pointer-events:none;transition:opacity .16s ease,filter .16s ease}.mid>.lx.context-active{opacity:1;pointer-events:auto;filter:drop-shadow(0 0 5px var(--accent));}\n.mid>.in-encoder{display:none;position:absolute;left:70px;bottom:10px;z-index:5;width:46px;height:46px;min-width:46px;min-height:46px;margin:0;touch-action:none}
 .mid.sample-context:not(.piano-open)>.in-encoder{display:block}
 .mid>.in-encoder i{inset:6px}
 .mid>.in-encoder::before{top:-10px;font-size:9px}
@@ -292,7 +292,7 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
  .scr.pr{height:210px;margin:-105px 0 0}
  .mid>.lx,.mid>.rx{width:50px;height:50px;min-width:50px;min-height:50px;bottom:8px}
  .mid>.lx{left:7px}.mid>.rx{right:7px}
-  .mid>.in-encoder{left:62px;bottom:8px;width:42px;height:42px;min-width:42px;min-height:42px}
+  .mid>.lx{left:7px}.mid>.in-encoder{left:62px;bottom:8px;width:42px;height:42px;min-width:42px;min-height:42px}
  .kn{margin-top:10px;padding:4px 1px 2px}
  .kn .knob{width:50px;height:50px}
  .kn .knob i{inset:6px}
@@ -310,7 +310,7 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
  .scr{width:202px;height:202px;margin:-101px 0 0 -101px}
  .scr.pr{height:194px;margin:-97px 0 0}
  .mid>.lx,.mid>.rx{width:46px;height:46px;min-width:46px;min-height:46px}
-  .mid>.in-encoder{left:60px;width:40px;height:40px;min-width:40px;min-height:40px}
+  .mid>.lx{left:7px}.mid>.in-encoder{left:60px;width:40px;height:40px;min-width:40px;min-height:40px}
  .kn .knob{width:46px;height:46px}
  .kn .knob i{inset:6px}
  .p{height:58px}
@@ -322,7 +322,7 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
  .scr{width:184px;height:184px;margin:-92px 0 0 -92px}
  .scr.pr{height:176px;margin:-88px 0 0}
  .mid>.lx,.mid>.rx{width:42px;height:42px;min-width:42px;min-height:42px;bottom:6px}
-  .mid>.in-encoder{left:55px;width:36px;height:36px;min-width:36px;min-height:36px;bottom:6px}
+  .mid>.lx{left:6px}.mid>.in-encoder{left:55px;width:36px;height:36px;min-width:36px;min-height:36px;bottom:6px}
  .kn .knob{width:42px;height:42px}
  .p{height:52px}
 }
@@ -397,6 +397,7 @@ function row(cols,tags,btns,cls){const w=mk('div');const tg=mk('div','row tg');t
 const lx=mk('div','knob lx','<i></i>');lx.dataset.rotor='Lx';lx.setAttribute('role','button');lx.setAttribute('aria-label','Lx: navegación de controles del GUI');lx.tabIndex=0;bindKnob(lx,1);$('.mid').append(lx);
 const pe=mk('div','knob pe rx','<i></i>');pe.dataset.rotor='Rx';pe.setAttribute('role','button');pe.setAttribute('aria-label','Rx: ajuste contextual del área de trabajo');pe.tabIndex=0;bindKnob(pe,1);$('.mid').append(pe);
 const inEncoder=mk('div','knob in-encoder','<i></i>');inEncoder.dataset.rotor='IN';inEncoder.setAttribute('role','button');inEncoder.setAttribute('aria-label','IN: posición inicial del sample');inEncoder.tabIndex=0;bindKnob(inEncoder,1);$('.mid').append(inEncoder);
+const setLxContext=active=>{lx.classList.toggle('context-active',!!active);lx.setAttribute('aria-hidden',active?'false':'true');lx.tabIndex=active?0:-1;};setLxContext(false);
 row('repeat(6,1fr)',[['PATTERN SEQUENCER',3],['SAMPLE EDIT',3]],
  ['PATTERN<br>SELECT','PATTERN<br>EDIT','RECORD<br>SETTING','START/<br>END','PITCH<br>SPEED','MARK'],'big ra');
 const trimPhaseButton=[...document.querySelectorAll("#rows .b")].find(b=>b.textContent.replace(/\s/g,"")==="START/END");
@@ -773,7 +774,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  const stepAt=x=>{const cells=[...pianoGrid.querySelectorAll('.piano-cell[data-pitch="'+topMidi+'"]')],r=cells[0]?.getBoundingClientRect(),w=r?.width||18;return clamp(Math.floor((x-(r?.left||0))/w),0,15)};
  const paintPadMidi=()=>{pianoGrid.querySelectorAll('.pad-midi-origin').forEach(el=>el.classList.remove('pad-midi-origin'));activeNotes.forEach(note=>{pianoGrid.querySelector('.piano-cell[data-step="'+note.step+'"][data-pitch="'+note.pitch+'"]')?.classList.add('pad-midi-origin');pianoGrid.querySelector('.piano-note[data-id="'+note.id+'"]')?.classList.add('pad-midi-origin')})};
  
- const setPianoMode=on=>{pianoMode=on;pianoViewport.hidden=!on;viewport.hidden=on;stepModeButton.textContent=on?'STEP':'PIANO';$('#zpClear').textContent=on?'CLR':'CLR';window.__zpPianoEncoderMode=!!(on&&scr.classList.contains('pr'));midContainer.classList.toggle('piano-open',window.__zpPianoEncoderMode);midContainer.classList.toggle('sample-context',!window.__zpPianoEncoderMode);if(window.__zpPianoEncoderMode){encoderDock.append(leftEncoder,shiftButton,rightEncoder)}else{midContainer.append(leftEncoder,rightEncoder);if(shiftButton&&shiftHome?.parent){if(shiftHome.next&&shiftHome.next.parentNode===shiftHome.parent)shiftHome.parent.insertBefore(shiftButton,shiftHome.next);else shiftHome.parent.append(shiftButton)}}};
+ const setPianoMode=on=>{setLxContext(!!(on&&scr.classList.contains('pr')));pianoMode=on;pianoViewport.hidden=!on;viewport.hidden=on;stepModeButton.textContent=on?'STEP':'PIANO';$('#zpClear').textContent=on?'CLR':'CLR';window.__zpPianoEncoderMode=!!(on&&scr.classList.contains('pr'));midContainer.classList.toggle('piano-open',window.__zpPianoEncoderMode);midContainer.classList.toggle('sample-context',!window.__zpPianoEncoderMode);setLxContext(!!window.__zpPianoEncoderMode);if(window.__zpPianoEncoderMode){encoderDock.append(leftEncoder,shiftButton,rightEncoder)}else{midContainer.append(leftEncoder,rightEncoder);if(shiftButton&&shiftHome?.parent){if(shiftHome.next&&shiftHome.next.parentNode===shiftHome.parent)shiftHome.parent.insertBefore(shiftButton,shiftHome.next);else shiftHome.parent.append(shiftButton)}}};
  const buildPiano=()=>{pianoGrid.replaceChildren();topMidi=71+octaveShift*12;const corner=mk('div','piano-ruler-key','♪');corner.style.gridColumn='1';corner.style.gridRow='1';pianoGrid.append(corner);for(let step=0;step<16;step++){const tick=mk('div','piano-ruler',String(step+1));tick.style.gridColumn=String(step+2);tick.style.gridRow='1';pianoGrid.append(tick)}for(let row=0;row<24;row++){const midi=topMidi-row,label=mk('div','piano-key '+([1,3,6,8,10].includes(midi%12)?'black':'white'),noteName(midi));label.style.gridColumn='1';label.style.gridRow=String(row+2);pianoGrid.append(label);for(let step=0;step<16;step++){const cell=mk('div','piano-cell '+([1,3,6,8,10].includes(midi%12)?'black-key':'white-key'));cell.dataset.step=String(step);cell.dataset.pitch=String(midi);cell.style.gridColumn=String(step+2);cell.style.gridRow=String(row+2);pianoGrid.append(cell)}}const play=mk('div','piano-playhead');play.id='zpPianoPlayhead';play.style.gridColumn='2';play.style.gridRow='2 / 26';pianoGrid.append(play);renderNotes()};
  const renderNotes=()=>{pianoGrid.querySelectorAll('.piano-note').forEach(n=>n.remove());activeNotes.forEach(note=>{const row=topMidi-note.pitch;if(row<0||row>=24)return;const el=mk('div','piano-note'+(note.id===selectedNoteId?' selected':''),'<span>'+noteName(note.pitch)+'</span><i></i>');el.dataset.id=note.id;el.style.gridColumn=(note.step+2)+' / span '+note.length;el.style.gridRow=String(row+2);el.style.transform=note.micro?'translateX('+(note.micro*100)+'%)':'none';el.style.opacity=String(.35+.65*note.velocity/127);pianoGrid.append(el)});const selected=activeNotes.find(n=>n.id===selectedNoteId);if(selected)velocityInput.value=String(selected.velocity)};
  const upsertNote=note=>{const step=clamp(Math.round(note.step),0,15),normalized={...note,step,pitch:clamp(Math.round(note.pitch),36,96),length:clamp(Math.round(note.length),1,16-step),velocity:clamp(Math.round(note.velocity),1,127)};const existing=activeNotes.findIndex(n=>n.id===normalized.id);if(existing>=0)activeNotes[existing]=normalized;else activeNotes.push(normalized);activeNotes.sort((a,b)=>a.step-b.step||a.pitch-b.pitch);selectedNoteId=normalized.id;renderNotes();noteCommand('creator.piano.note.upsert',{note:normalized})};
