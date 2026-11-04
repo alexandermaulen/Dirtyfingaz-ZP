@@ -274,3 +274,45 @@ html[data-zp-ui="hardware"] #app.inspect-mode>.gui-inspector{
     scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;
   }
 }
+
+/* RESPONSIVE MID DECK GRID FIX · 9-PAD HARDWARE LAYOUT */
+html[data-zp-ui="hardware"] #app .mid{
+  display:grid!important;
+  grid-template-columns:42px minmax(0,1fr) 42px 72px!important;
+  align-items:center!important;
+  gap:6px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+html[data-zp-ui="hardware"] #app .mid>.fx{
+  width:auto!important;
+  min-width:0!important;
+  gap:5px!important;
+}
+html[data-zp-ui="hardware"] #app .mid>.disp{
+  width:min(100%,198px)!important;
+  height:198px!important;
+  min-width:0!important;
+  justify-self:center!important;
+}
+html[data-zp-ui="hardware"] #app .mid>.value-panel{
+  width:72px!important;
+  min-width:72px!important;
+  max-width:72px!important;
+  flex:none!important;
+}
+@media(max-width:390px){
+  html[data-zp-ui="hardware"] #app .mid{
+    grid-template-columns:34px minmax(0,1fr) 34px 60px!important;
+    gap:4px!important;
+  }
+  html[data-zp-ui="hardware"] #app .mid>.disp{
+    width:min(100%,calc(100vw - 168px))!important;
+    height:min(180px,calc(100vw - 168px))!important;
+  }
+  html[data-zp-ui="hardware"] #app .mid>.value-panel{
+    width:60px!important;
+    min-width:60px!important;
+    max-width:60px!important;
+  }
+}
