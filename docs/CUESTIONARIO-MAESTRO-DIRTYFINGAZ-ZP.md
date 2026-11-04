@@ -1,4 +1,6 @@
 # CUESTIONARIO MAESTRO · DIRTYFINGAZ ZP
+
+> **Actualización V3 vigente:** el diseño aprobado del copiloto, sus contratos y el orden de ejecución están consolidados en [MASTER-QUESTIONNAIRE-V3-AGENT.md](./MASTER-QUESTIONNAIRE-V3-AGENT.md). Este documento conserva la base original y sus preguntas abiertas.
 Versión: 1.0 · Estado: base de arquitectura para completar en pruebas
 Rama de trabajo: `feat/hybrid-hardware-ui-system`
 
@@ -139,8 +141,10 @@ Marcar cada función como: `Implementada`, `Parcial`, `Pendiente`, `QA real pend
 - [x] Ventana flotante de desarrollo como primera capa de UI.
 - [x] Captura contextual local de módulo, control y foco.
 - [x] Diccionario inicial y acciones deterministas registradas.
-- [ ] Modelo IA remoto detrás del Worker.
-- [ ] Recuperación de conocimiento por versión de app y módulo.
+- [x] Endpoint de IA remota detrás del Worker, limitado a Preview; falta despliegue y QA real.
+- [ ] Function calling con acciones tipadas, RAG y memoria persistente.
+- [ ] Integración GitHub para propuestas de diff y PR desde rama feature.
+- [ ] Recuperación de conocimiento por versión de app y módulo (RAG pendiente).
 - [ ] Memoria por proyecto con consentimiento y límites.
 - [ ] Generación de planes de cambio y diff antes de escribir código.
 - [ ] Integración GitHub en rama de trabajo con PR, nunca merge automático.
@@ -210,3 +214,15 @@ Una función sólo pasa a `VERIFICADA` cuando:
 - no introduce regresiones en los módulos dependientes.
 
 **Regla de cierre:** ningún indicador visual, mock, demo o respuesta de IA equivale a una operación real completada.
+
+
+## Actualización V3 · Copiloto y coordinación de servicios
+
+- El cliente local del agente ya tiene ventana flotante, diccionario y allowlist de acciones. SHIFT + PAD abre configuración rápida del pad.
+- El contexto del motor ahora informa pad activo, banco, BPM e identidad del proyecto.
+- Cloudflare Worker implementa POST /api/agent/chat con Workers AI (@cf/openai/gpt-oss-20b), disponible sólo en Preview. Producción permanece desactivada.
+- El agente usa el modelo para responder y orientar; las acciones de app siguen siendo deterministas y pasan por allowlist + bridge. Function calling y ejecución de propuestas generadas por IA quedan pendientes.
+- No se ha desplegado ni probado el endpoint en Cloudflare Preview.
+- Supabase dirtyfingaz-os sigue sin tablas/migraciones/Edge Functions y no está confirmado como backend de ZP. No se modificó.
+- No se migra a Java; TypeScript se incorpora gradualmente para contratos/servicios.
+- Fuente canónica y plan por fases: [MASTER-QUESTIONNAIRE-V3-AGENT.md](./MASTER-QUESTIONNAIRE-V3-AGENT.md).
