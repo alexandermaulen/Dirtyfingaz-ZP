@@ -135,3 +135,15 @@ Esta auditoría es estática. No declara éxito de reproducción, rendimiento, c
 - Comandos enviados por GUI comparados con handlers registrados y rutas especiales; no se encontraron comandos sin handler.
 - Encoder MP3 instanciado y probado con un bloque PCM de silencio; generó bytes de cierre MP3.
 - No verificado: ejecución real de OfflineAudioContext en Safari, export WAV/MP3 completo, audio P2P entre dos dispositivos, migración/deploy Durable Object en Cloudflare, ni prueba táctil iPhone 11.
+
+
+## 8. Integración funcional adicional · 2026-11-04
+
+- Secuenciador GUI de 16 pasos conectado al motor; mapeo de las 9 filas de pads corregido usando el índice real de celdas del grid. La GUI refleja el patrón y playhead publicados por el motor, sin depender de un temporizador visual autónomo.
+- Recorte IN/OUT táctil conectado al motor. La GUI recibe la forma de onda del sample activo y el motor persiste el rango al confirmar el gesto.
+- Render offline con selección WAV PCM 16/24-bit o MP3 128/192/256 kbps, 44.1/48 kHz, 1/2/4/8 barras y banco actual o secuencia A-D. El render respeta master gain, filtro, samples, pitch, niveles, mute/solo y FX habilitados.
+- Project Manager incluye crear, guardar, cargar, eliminar, importar y exportar proyectos; los samples se incluyen en el paquete JSON del proyecto.
+- Radio Grid ahora muestra roster de sala y chat, expone controles de audio para reproducción remota en Safari/iOS y conecta el estado de patrones/BPM/controles del Creator al canal room-state entre colaboradores.
+- Verificación estática adicional ejecutada desde el repositorio: sintaxis de 4 scripts inline, core, storage, service worker, encoder y Worker; binding/export SQLite; comandos GUI con handlers; integración de render, proyectos, recorte y Radio Grid. Resultado: PASS.
+
+**Pendiente de prueba real:** Actions para el último SHA sigue en cola; no se ha verificado el despliegue de esta revisión en Cloudflare, la exportación completa desde Safari iOS, la conexión P2P entre dos dispositivos ni el comportamiento táctil en iPhone 11. La identidad de Radio Grid sigue siendo temporal y el audio colaborativo transmite micrófono, no el bus interno del Creator.
