@@ -2,7 +2,7 @@ import fs from "node:fs";
 import assert from "node:assert/strict";
 
 const read = (path) => fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");
-const sources = ["index.html", "creator.html", "creator-engine.html", "sw.js", "zp-core.js", "zp-storage.js"];
+const sources = ["index.html", "creator.html", "creator-engine.html", "sw.js", "zp-core.js", "zp-storage.js", "vendor/lame.min.js"];
 let inlineScripts = 0;
 
 for (const path of sources) {
@@ -46,6 +46,14 @@ assert.match(ui, /creator\.sample\.trim\.set/);
 assert.match(ui, /trimPointer/);
 assert.match(engine, /function publishTrimState\(/);
 assert.match(engine, /payload\.commit&&samples\[activePad\]/);
+assert.match(engine, /new window\.lamejs\.Mp3Encoder/);
+assert.match(engine, /function makeWavBlob/);
+assert.match(engine, /function renderAudio/);
+assert.match(engine, /creator\.export\.render/);
+assert.match(engine, /createConvolver\(\)/);
+assert.match(engine, /fxState=\{drive:false,delay:false,filter:false,reverb:false\}/);
+assert.match(read("sw.js"), /\.\/vendor\/lame\.min\.js/);
+
 
 assert.match(ui, /protocolVersion:1/);
 assert.match(ui, /requestId/);
