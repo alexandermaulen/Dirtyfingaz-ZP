@@ -101,6 +101,8 @@ assert.match(engine, /async function exportProjectFile\(/);
 assert.match(engine, /async function importProjectFile\(/);
 assert.match(engine, /saveProjectSample\(id,item\.pad,buffer,item\.name/);
 assert.match(engine, /async function createProject\(name\)\{await saveSession\(true\)/);
+assert.match(engine, /fxAmount=\.25;Object\.keys\(fxState\)\.forEach/);
+assert.match(engine, /publishTrimState\(\);publishRadioState\(\)/);
 
 
 assert.match(storage, /DB_VERSION = 2/);
