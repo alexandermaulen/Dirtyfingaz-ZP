@@ -154,3 +154,24 @@ Esta auditoría es estática. No declara éxito de reproducción, rendimiento, c
 - El motor expone su bus master mediante MediaStreamDestination para que un colaborador pueda transmitir el audio del Creator por WebRTC P2P.
 - Si no existe un bus activo, la conexión colaboradora usa el micrófono como alternativa.
 - El stream del motor no se detiene al salir de una sala; los tracks de micrófono sí se detienen. La validación entre dos dispositivos sigue pendiente.
+
+
+## 9. Corte de estado y sincronización · 2026-11-04 13:22 CLT
+
+### Evidencia GitHub
+- Rama de desarrollo inspeccionada: `feat/hybrid-hardware-ui-system`.
+- HEAD verificado: `841e8c0493ee509ca8dcc6402168c91b24a7aec9`.
+- Pull Request #3 continúa abierto y apunta a `main`; no se ha fusionado.
+- Los workflows de validación observados para HEAD están en cola. No declarar CI aprobado hasta consultar una ejecución terminada para este SHA.
+- El árbol del repositorio contiene Creator GUI y motor, core, storage, UI CSS, Worker Radio Grid, configuración Wrangler, encoder MP3 y scripts de validación.
+- La auditoría de código no sustituye QA Safari/iPhone, prueba de audio renderizado ni conectividad Radio Grid entre dispositivos.
+
+### Evidencia Supabase
+- Proyecto conectado: `dirtyfingaz-os`, región `sa-east-1`, estado `ACTIVE_HEALTHY`, PostgreSQL 17.
+- La inspección de esquema `public` no devolvió tablas.
+- No se aplicaron migraciones ni cambios de base de datos en este corte.
+- Próximo paso: definir modelo de identidad, proyectos, assets y salas; revisar RLS y permisos antes de crear tablas o exponer datos.
+
+### Regla de actualización
+- Este corte es una fotografía verificable, no una declaración de que todas las funciones estén terminadas.
+- En cada nuevo hito actualizar SHA, CI, despliegue, pruebas de dispositivo y estado de Supabase por separado.
