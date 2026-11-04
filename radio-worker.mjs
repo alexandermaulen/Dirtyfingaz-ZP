@@ -45,7 +45,8 @@ export class RadioRoom {
       .map(socket => socket.deserializeAttachment())
       .filter(Boolean);
 
-    server.send(JSON.stringify({ type: "welcome", roomId: url.pathname.split("/").pop(), self: meta, peers }));
+    const roomState = await this.state.storage.get("roomState");
+    server.send(JSON.stringify({ type: "welcome", roomId: url.pathname.split("/").pop(), self: meta, peers, roomState: roomState || null }));
     this.broadcast({ type: "peer-joined", peer: meta }, server);
     this.broadcastPresence();
 
@@ -75,7 +76,7 @@ export class RadioRoom {
     });
   }
 
-  webSocketMessage(socket, rawMessage) {
+  async webSocketMessage(socket, rawMessage) {
     if (typeof rawMessage !== "string" || rawMessage.length > 65536) return;
     let message;
     try { message = JSON.parse(rawMessage); } catch { return; }
@@ -103,7 +104,9 @@ export class RadioRoom {
     }
 
     if (message.type === "room-state" && self.role === "collaborator") {
-      this.broadcast({ type: "room-state", from: self.clientId, state: message.state || {}, at: Date.now() }, socket);
+      const state = message.state && typeof message.state === "object" ? message.state : {};
+      await this.state.storage.put("roomState", state);
+      this.broadcast({ type: "room-state", from: self.clientId, state, at: Date.now() }, socket);
     }
   }
 
