@@ -460,7 +460,7 @@ async function renderAudio(options={}){
  const banks=scope==="song"?(songOrder.length?songOrder:["A","B","C","D"]):[activeBank],duration=banks.length*bars*4*60/bpm+2,Offline=window.OfflineAudioContext||window.webkitOfflineAudioContext;
  if(!Offline)throw new Error("OFFLINE_AUDIO_NOT_SUPPORTED");
  const offline=new Offline(2,Math.ceil(duration*sr),sr),input=offline.createGain(),filter=offline.createBiquadFilter(),shaper=offline.createWaveShaper(),compressor=offline.createDynamicsCompressor(),masterOut=offline.createGain(),delayNode=offline.createDelay(2),delayWetNode=offline.createGain(),feedback=offline.createGain(),convolver=offline.createConvolver(),reverbWetNode=offline.createGain();
- filter.type="lowpass";filter.frequency.value=Math.max(80,Math.min(20000,filterBus?.frequency?.value||18000));filter.Q.value=Math.max(.1,Math.min(18,filterBus?.Q?.value||.7));masterOut.gain.value=Math.max(0,Math.min(1,master?.gain?.value??1));
+ filter.type="lowpass";filter.frequency.value=Math.max(80,Math.min(20000,filterBus?.frequency?.value??(fxState.filter?1200:18000)));filter.Q.value=Math.max(.1,Math.min(18,filterBus?.Q?.value??.7));masterOut.gain.value=Math.max(0,Math.min(1,master?.gain?.value??masterLevel));
  if(fxState.drive){const curve=new Float32Array(2048);for(let i=0;i<curve.length;i++){const x=i*2/(curve.length-1)-1,amount=Math.max(1,fxAmount*35);curve[i]=(1+amount)*x/(1+amount*Math.abs(x))}shaper.curve=curve}else shaper.curve=null;
  compressor.threshold.value=-14;compressor.knee.value=18;compressor.ratio.value=8;compressor.attack.value=.003;compressor.release.value=.14;
  delayNode.delayTime.value=.24;delayWetNode.gain.value=fxState.delay?fxAmount*.65:0;feedback.gain.value=.2;
