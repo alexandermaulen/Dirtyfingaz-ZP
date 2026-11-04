@@ -378,6 +378,81 @@ body{display:flex!important;align-items:flex-start!important;justify-content:cen
  #app{width:min(430px,calc(100vw - 16px))!important}
 }
 
+
+/* DIRTYFINGAZ ZP1 · PHOSPHOR RADIO DESIGN SYSTEM */
+:root{
+ --zp-bg:#020702;--zp-glass:#061407;--zp-panel:#0b220b;--zp-line:#4c9e2b;
+ --zp-line-soft:#1e4c1b;--zp-phosphor:#8cff35;--zp-bright:#c5ff70;
+ --zp-dim:#4d9f28;--zp-text:#baff75;--zp-muted:#70a85c;
+ --zp-glow:0 0 7px #8cff3580;--zp-panel-glow:0 0 18px #55ff2826;
+}
+html,body{background:var(--zp-bg)!important;color:var(--zp-text)!important;font-family:"Courier New",monospace!important;letter-spacing:.035em!important}
+#app{
+ background:
+  repeating-linear-gradient(0deg,transparent 0 2px,rgba(100,255,60,.025) 2px 4px),
+  radial-gradient(ellipse at 50% 0%,#16440f 0%,transparent 62%),
+  linear-gradient(180deg,#071707,#020702 78%)!important;
+ border:2px solid var(--zp-line)!important;border-radius:12px!important;
+ box-shadow:inset 0 0 0 5px #020702,inset 0 0 0 7px var(--zp-line),inset 0 0 30px #000d,0 0 26px #55ff2833!important;
+}
+#app:after{opacity:.12!important;mix-blend-mode:screen!important}
+.title{font-family:"Courier New",monospace!important;color:var(--zp-phosphor)!important;letter-spacing:.045em!important;text-shadow:var(--zp-glow)!important}
+button{
+ font-family:"Courier New",monospace!important;font-weight:700!important;letter-spacing:.035em!important;
+ color:var(--zp-text)!important;background:linear-gradient(180deg,#123411,#071707 75%)!important;
+ border:1px solid var(--zp-line)!important;border-radius:5px!important;
+ box-shadow:inset 0 0 0 1px #8cff3520,inset 0 0 12px #000b,0 0 8px #55ff2820!important;
+ text-shadow:var(--zp-glow)!important;
+}
+button.on,button.active,button:active{
+ background:linear-gradient(180deg,#c5ff70,#8cff35)!important;color:#061006!important;
+ border-color:#d7ff9c!important;text-shadow:none!important;
+ box-shadow:0 0 0 1px #8cff35,0 0 14px #8cff35a6!important;
+}
+.knobs,.sequencer,.disp,.value-panel,.control-deck,.pads,.sp-commands,.mid,.fx,.foot{
+ border-color:var(--zp-line)!important;
+}
+.knobs,.sequencer,.value-panel,.control-deck{
+ background:linear-gradient(180deg,#0b220b,#041004)!important;
+ box-shadow:inset 0 0 18px #000b,0 0 18px #55ff2826!important;
+}
+.disp{background:linear-gradient(145deg,#071b08,#010601)!important;border:2px solid var(--zp-line)!important;box-shadow:inset 0 0 22px #000,0 0 0 4px #020702,0 0 0 5px var(--zp-line),0 0 22px #55ff2840!important}
+.disp canvas,.wave-editor canvas{background:#010801!important;border-color:#65c936!important;box-shadow:inset 0 0 14px #000,0 0 8px #55ff2826!important}
+.kb{box-shadow:inset 0 0 0 2px #020702,0 0 0 1px var(--zp-line),0 0 12px #55ff2833!important}
+.kb i{background:var(--zp-bright)!important;box-shadow:0 0 9px var(--zp-phosphor)!important}
+.pad{background:linear-gradient(180deg,#123411,#071707 78%)!important;border:1px solid var(--zp-line)!important;box-shadow:inset 0 0 12px #000b,0 0 8px #55ff2820!important}
+.pad.on{background:linear-gradient(180deg,#c5ff70,#8cff35)!important;color:#061006!important}
+.pad.on b{color:#061006!important;text-shadow:none!important}
+.pc>em,.foot,.screen-head,.screen-name,.seq-top,.value-head,.value-target,.fx-readout{font-family:"Courier New",monospace!important;color:var(--zp-phosphor)!important;text-shadow:var(--zp-glow)!important}
+.step-grid button.active{background:#c5ff70!important;color:#061006!important;box-shadow:0 0 12px #8cff35a6!important}
+.step-grid button.playing{outline:2px solid #fff!important;outline-offset:1px!important}
+.sp-commands button{min-height:29px!important}
+#zp-gui-inspect-trigger{
+ position:fixed;z-index:99990;right:max(9px,env(safe-area-inset-right));top:max(9px,env(safe-area-inset-top));
+ width:28px;height:24px;min-height:24px;padding:0!important;border:1px solid var(--zp-phosphor)!important;
+ border-radius:4px!important;background:#020702eF!important;color:var(--zp-phosphor)!important;
+ font:700 9px "Courier New",monospace!important;box-shadow:0 0 10px #8cff3560!important;
+}
+#zp-gui-inspect{position:fixed;z-index:99989;inset:0;display:none;place-items:center;padding:12px;background:#000d;backdrop-filter:blur(4px)}
+#zp-gui-inspect.open{display:grid}
+#zp-gui-inspect .zp-square{
+ width:min(92vw,76vh,560px);aspect-ratio:1/1;max-height:92dvh;display:flex;flex-direction:column;gap:7px;
+ padding:10px;background:repeating-linear-gradient(0deg,transparent 0 2px,#8cff3508 2px 4px),linear-gradient(145deg,#0a2209,#010601);
+ border:2px solid var(--zp-phosphor);outline:4px solid #020702;box-shadow:0 0 0 5px #4c9e2b,0 0 35px #8cff3566,inset 0 0 24px #000;
+ color:var(--zp-text);font:700 10px/1.35 "Courier New",monospace;overflow:hidden
+}
+#zp-gui-inspect .zp-head{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--zp-line);padding-bottom:6px;color:var(--zp-phosphor);font-size:12px}
+#zp-gui-inspect .zp-close{width:26px;min-height:24px;flex:none}
+#zp-gui-inspect .zp-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+#zp-gui-inspect .zp-tabs button{min-height:26px;font-size:9px}
+#zp-gui-inspect .zp-body{min-height:0;overflow:auto;display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:6px;padding:2px}
+#zp-gui-inspect .zp-card{border:1px solid var(--zp-line);background:#020a02d9;padding:7px;min-width:0;box-shadow:inset 0 0 10px #000}
+#zp-gui-inspect .zp-card strong{display:block;color:var(--zp-phosphor);font-size:10px;margin-bottom:4px}
+#zp-gui-inspect .zp-card small{display:block;color:var(--zp-muted);font-size:8px;overflow-wrap:anywhere}
+#zp-gui-inspect .zp-swatch{height:14px;border:1px solid #baff75;margin:4px 0}
+#zp-gui-inspect .zp-foot{font-size:8px;color:var(--zp-muted);border-top:1px solid var(--zp-line);padding-top:5px}
+@media(max-height:560px){#zp-gui-inspect .zp-square{width:min(92vw,90dvh);font-size:9px}}
+
 </style></head><body><div id="app"></div>
 <script src="./zp-storage.js"></script>
 <script src="./zp-core.js"></script>
@@ -571,4 +646,29 @@ function draw(){let w=Math.max(1,Math.floor(canvas.clientWidth*2)),h=Math.max(1,
 canvas.addEventListener("pointerdown",e=>{if(activeTab!=="RECORTE"||!samples[activePad])return;canvas.setPointerCapture(e.pointerId);let rect=canvas.getBoundingClientRect(),p=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width)),r=ranges[activePad]||{start:0,end:1};trimTarget=Math.abs(p-r.start)<=Math.abs(p-r.end)?"start":"end";setTrimValue(trimTarget,p);updateScreen()});canvas.addEventListener("pointermove",e=>{if(!e.buttons||activeTab!=="RECORTE"||!samples[activePad])return;let rect=canvas.getBoundingClientRect(),p=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));setTrimValue(trimTarget,p)});
 function fit(){let scale=Math.min(innerWidth/414,innerHeight/896);app.style.transform="scale("+scale+") translate(-50%,-50%)";app.style.left=innerWidth/2+"px";app.style.top=innerHeight/2+"px"}
 loadSession();bpmText.textContent=bpm+" BPM";bankButtons.forEach(b=>b.classList.toggle("active",b.dataset.bank===activeBank));updatePadLabels();updateScreen();setKnobValues();refreshSteps();requestAnimationFrame(draw);fit();addEventListener("resize",fit);addEventListener("orientationchange",fit);document.addEventListener("gesturestart",e=>e.preventDefault());document.addEventListener("touchmove",e=>{if(!e.target.closest(".kb,.trim-mini,.sp-dial"))e.preventDefault()},{passive:false});document.addEventListener("pointerdown",()=>{try{navigator.wakeLock?.request("screen")}catch(e){}},{once:true});
+
+/* GUI INSPECTOR · square component diagnostics */
+(()=>{
+ const trigger=document.createElement("button");trigger.id="zp-gui-inspect-trigger";trigger.type="button";trigger.textContent="GUI";trigger.title="Inspección visual y técnica";document.body.append(trigger);
+ const overlay=document.createElement("section");overlay.id="zp-gui-inspect";overlay.setAttribute("aria-label","Inspector de interfaz");
+ overlay.innerHTML='<div class="zp-square"><div class="zp-head"><span>DIRTYFINGAZ · GUI INSPECTOR</span><button class="zp-close" type="button" aria-label="Cerrar">×</button></div><div class="zp-tabs"><button data-tab="components" class="active">COMPONENTES</button><button data-tab="tokens">TOKENS</button><button data-tab="states">ESTADOS</button></div><div class="zp-body"></div><div class="zp-foot">VISTA CUADRADA · DIAGNÓSTICO EN TIEMPO REAL</div></div>';
+ document.body.append(overlay);
+ const body=overlay.querySelector(".zp-body"),tabs=[...overlay.querySelectorAll("[data-tab]")];
+ const components=[["Marco principal","#app"],["Cabecera",".title"],["Knobs superiores",".knobs"],["Knob individual",".kb"],["Pantalla LCD",".disp"],["Canvas / forma de onda",".disp canvas"],["Controles laterales",".fx"],["VALUE encoder",".value-panel"],["Transporte",".control-deck"],["Secuenciador",".sequencer"],["Pasos",".step-grid"],["Pads",".pads"],["Pad individual",".pad"],["Comandos inferiores",".sp-commands"],["Pie de estado",".foot"]];
+ const tokenRows=[["background","#020702"],["surface","#061407"],["surfaceRaised","#0b220b"],["phosphor","#8cff35"],["phosphorBright","#c5ff70"],["phosphorDim","#4d9f28"],["text","#baff75"],["textMuted","#70a85c"],["line","#4c9e2b"],["lineSoft","#1e4c1b"],["activeBackground","#a8ff35"],["activeText","#061006"],["warning","#ff6969"]];
+ function card(title,lines,swatch){let el=document.createElement("div");el.className="zp-card";let strong=document.createElement("strong");strong.textContent=title;el.append(strong);if(swatch){let s=document.createElement("div");s.className="zp-swatch";s.style.background=swatch;el.append(s)}lines.forEach(line=>{let x=document.createElement("small");x.textContent=line;el.append(x)});return el}
+ function render(tab){
+  body.replaceChildren();
+  if(tab==="components"){components.forEach(([name,selector])=>{let el=document.querySelector(selector);if(!el){body.append(card(name,["No presente en el DOM actual"]));return}let cs=getComputedStyle(el),r=el.getBoundingClientRect();body.append(card(name,[selector,"Tamaño: "+Math.round(r.width)+" × "+Math.round(r.height)+" px","Display: "+cs.display,"Borde: "+cs.borderWidth+" "+cs.borderStyle+" "+cs.borderColor,"Radio: "+cs.borderRadius,"Fondo: "+cs.backgroundColor],cs.backgroundColor))})}
+  if(tab==="tokens"){tokenRows.forEach(([name,value])=>body.append(card(name.replace(/[A-Z]/g,m=>" "+m).toUpperCase(),[value],value)));Object.entries({"typography":{"family":"'Courier New', monospace","weight":700,"tracking":"0.035em","uppercase":true,"pixelRendering":"crisp edges, no smoothing where supported"},"effects":{"textGlow":"0 0 7px #8cff3580","panelGlow":"0 0 18px #55ff2826","activeGlow":"0 0 14px #8cff35a6","scanlines":"linear repeating 2px transparent / 2px rgba(100,255,60,.025)","noise":"subtle monochrome grain","shadow":"inset 0 0 18px #000b"},"shape":{"panelRadius":"10px","controlRadius":"5px","outerFrame":"double 2px phosphor border with 5px dark gap","buttonRadius":"5px","padRadius":"7px"},"layout":{"grid":"12-column modular dashboard logic","panelGap":"8px","panelPadding":"10px","density":"compact but legible","inspectionMode":"square 1:1 overlay"}}).forEach(([k,v])=>body.append(card(k.toUpperCase(),Object.entries(v).map(([a,b])=>a+": "+b))))}
+  if(tab==="states"){[["NORMAL","Texto verde fósforo, superficie oscura"],["ACTIVO","Relleno verde brillante, texto negro"],["REPRODUCIENDO","Contorno blanco y halo verde"],["DESHABILITADO","Opacidad reducida"],["SELECCIONADO","Borde reforzado y contraste alto"]].forEach(([a,b],i)=>body.append(card(a,[b],i===1?"#8cff35":"#061407")))}
+ }
+ function select(tab){tabs.forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));render(tab)}
+ tabs.forEach(b=>b.addEventListener("click",()=>select(b.dataset.tab)));
+ trigger.addEventListener("click",()=>{overlay.classList.add("open");select("components")});
+ overlay.querySelector(".zp-close").addEventListener("click",()=>overlay.classList.remove("open"));
+ overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("open")});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape")overlay.classList.remove("open")});
+})();
+
 </script></body></html>
