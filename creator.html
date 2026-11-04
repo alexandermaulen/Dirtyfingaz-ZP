@@ -253,12 +253,78 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
 }
 </style>
 <link rel="stylesheet" href="./zp-agent.css">
+<style id="zp-expanded-workspace">
+/* Composición Z: laterales limpios y área central ampliada. */
+.unit{width:min(430px,100vw);padding:9px 10px 8px}
+.hd{height:42px}
+.mid{position:relative;display:block;width:100%;height:254px;margin-top:9px;padding:0;border-radius:34px;overflow:visible;background:linear-gradient(180deg,#031b04aa,#02090288)}
+.scr{left:50%;top:50%;width:232px;height:232px;margin:-116px 0 0 -116px;border-radius:50%}
+.scr.pr{width:min(400px,calc(100% - 18px));height:220px;margin:-110px 0 0;left:50%;transform:translateX(-50%);border-radius:16px}
+.mid>.lx,.mid>.rx{position:absolute;top:auto;bottom:10px;z-index:5;width:54px;height:54px;min-width:54px;min-height:54px;margin:0;flex:none}
+.mid>.lx{left:10px}.mid>.rx{right:10px}
+.mid>.lx i,.mid>.rx i{inset:7px}
+.mid>.lx::before,.mid>.rx::before{top:-12px}
+.kn{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;width:100%;margin-top:12px;padding:5px 3px 3px;align-items:end;border-radius:18px}
+.kn .k{min-width:0;gap:2px}
+.kn .k label{font-size:13px;line-height:15px;white-space:nowrap}
+.kn .knob{width:54px;height:54px;margin:2px 0}
+.kn .knob i{inset:7px}
+.kn .sub{height:14px;gap:5px;font-size:10px;line-height:12px;white-space:nowrap}
+#rows{display:grid;gap:11px;margin-top:14px}
+#rows>div{min-width:0}
+#rows .tg{margin-top:0;height:15px;font-size:12px;line-height:14px}
+#rows .row{gap:5px}
+#rows .b{min-height:38px;font-size:13px}
+#rows .big .b{min-height:40px}
+.pads{margin-top:13px;gap:9px;padding:7px 3px}
+.p{height:70px}
+.bt{margin-top:13px;gap:5px}
+.bt .b{min-height:30px;font-size:12px}
+.ft{margin-top:9px;padding:4px;font-size:14px}
+@media(max-width:500px){
+ .unit{padding:7px 8px 6px}
+ .mid{height:244px;margin-top:8px}
+ .scr{width:220px;height:220px;margin:-110px 0 0 -110px}
+ .scr.pr{height:210px;margin:-105px 0 0}
+ .mid>.lx,.mid>.rx{width:50px;height:50px;min-width:50px;min-height:50px;bottom:8px}
+ .mid>.lx{left:7px}.mid>.rx{right:7px}
+ .kn{margin-top:10px;padding:4px 1px 2px}
+ .kn .knob{width:50px;height:50px}
+ .kn .knob i{inset:6px}
+ .kn .k label{font-size:12px}
+ .kn .sub{font-size:9px;gap:3px}
+ #rows{gap:9px;margin-top:12px}
+ #rows .b,#rows .big .b{min-height:36px;font-size:12px}
+ .pads{margin-top:11px;gap:7px;padding:6px 2px}
+ .p{height:64px}
+ .bt{margin-top:11px}
+ .ft{font-size:12px;margin-top:7px}
+}
+@media(max-height:760px){
+ .mid{height:218px}
+ .scr{width:202px;height:202px;margin:-101px 0 0 -101px}
+ .scr.pr{height:194px;margin:-97px 0 0}
+ .mid>.lx,.mid>.rx{width:46px;height:46px;min-width:46px;min-height:46px}
+ .kn .knob{width:46px;height:46px}
+ .kn .knob i{inset:6px}
+ .p{height:58px}
+ #rows{gap:7px}
+ .bt{margin-top:8px}
+}
+@media(max-height:700px){
+ .mid{height:198px}
+ .scr{width:184px;height:184px;margin:-92px 0 0 -92px}
+ .scr.pr{height:176px;margin:-88px 0 0}
+ .mid>.lx,.mid>.rx{width:42px;height:42px;min-width:42px;min-height:42px;bottom:6px}
+ .kn .knob{width:42px;height:42px}
+ .p{height:52px}
+}
+</style>
 </head>
 <body>
 
 <div class="unit" id="unit" data-skin="verde">
  <div class="hd"><button id="creator-home" class="home-arrow" type="button" aria-label="Volver a la página principal" title="Volver al inicio">←</button><h1>DIRTYFINGAZ <b>Z</b></h1><span class="by">BY TAPES CROMO</span><i class="screw"></i></div>
- <div class="kn" id="kn"></div>
  <div class="mid">
    <div class="scr" id="scr">
    <div class="v1">
@@ -273,6 +339,7 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
    </div>
   </div>
  </div>
+ <div class="kn" id="kn"></div>
  <div id="rows"></div>
  <div class="pads" id="pads"></div>
  <div class="bt" id="bt"></div>
