@@ -76,7 +76,7 @@ assert.match(radioWorker, /storage\.put\("roomState", state\)/);
 assert.match(radioWorker, /roomState: roomState \|\| null/);
 assert.match(shell, /applyRadioRoomState\(message\.roomState\)/);
 assert.match(shell, /radio-roster/);
-assert.match(shell, /type:\\?["\x27]chat/);
+assert.match(shell, /type:"chat"/);
 assert.equal(wrangler.main, "./radio-worker.mjs");
 assert.ok(wrangler.durable_objects.bindings.some(binding => binding.name === "RADIO_ROOMS" && binding.class_name === "RadioRoom"));
 assert.equal(wrangler.exports.RadioRoom.type, "durable-object");
