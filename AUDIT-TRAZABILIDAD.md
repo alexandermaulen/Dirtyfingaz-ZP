@@ -147,3 +147,10 @@ Esta auditoría es estática. No declara éxito de reproducción, rendimiento, c
 - Verificación estática adicional ejecutada desde el repositorio: sintaxis de 4 scripts inline, core, storage, service worker, encoder y Worker; binding/export SQLite; comandos GUI con handlers; integración de render, proyectos, recorte y Radio Grid. Resultado: PASS.
 
 **Pendiente de prueba real:** Actions para el último SHA sigue en cola; no se ha verificado el despliegue de esta revisión en Cloudflare, la exportación completa desde Safari iOS, la conexión P2P entre dos dispositivos ni el comportamiento táctil en iPhone 11. La identidad de Radio Grid sigue siendo temporal y el audio colaborativo transmite micrófono, no el bus interno del Creator.
+
+
+### Radio Grid · salida de audio del Creator
+
+- El motor expone su bus master mediante MediaStreamDestination para que un colaborador pueda transmitir el audio del Creator por WebRTC P2P.
+- Si no existe un bus activo, la conexión colaboradora usa el micrófono como alternativa.
+- El stream del motor no se detiene al salir de una sala; los tracks de micrófono sí se detienen. La validación entre dos dispositivos sigue pendiente.
