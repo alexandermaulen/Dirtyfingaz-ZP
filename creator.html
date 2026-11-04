@@ -618,7 +618,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
    if(encoder===valueEncoder&&phase!==3&&!window.__zpMidiRotorActive)zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
   });
   ["pointerup","pointercancel"].forEach(type=>encoder.addEventListener(type,()=>{
-   previous=null;const phase=window.__zpTrimPhase,state=window.__zpTrimRotor;
+   previous=null;if(window.__zpPianoEncoderMode)return;const phase=window.__zpTrimPhase,state=window.__zpTrimRotor;
    if(phase===3||(phase===1&&encoder===valueEncoder&&state?.active)){
     const target=phase===3?trimTarget:(state.target||activeTrimTarget),range=state.range||{start:0,end:1};
     zpBridgeSend("creator.sample.trim.set",{target,position:target==="start"?range.start:range.end,commit:true});
