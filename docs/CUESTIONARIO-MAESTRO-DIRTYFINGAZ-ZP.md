@@ -1,6 +1,6 @@
 # CUESTIONARIO MAESTRO · DIRTYFINGAZ ZP
 
-> **Actualización V3 vigente:** el diseño aprobado del copiloto, sus contratos y el orden de ejecución están consolidados en [MASTER-QUESTIONNAIRE-V3-AGENT.md](./MASTER-QUESTIONNAIRE-V3-AGENT.md). Este documento conserva la base original y sus preguntas abiertas.
+> **Actualización V3 vigente:** el diseño aprobado del copiloto, sus contratos y el orden de ejecución están consolidados en [MASTER-QUESTIONNAIRE-V3-AGENT.md](../MASTER-QUESTIONNAIRE-V3-AGENT.md). Este documento conserva la base original y sus preguntas abiertas.
 Versión: 1.0 · Estado: base de arquitectura para completar en pruebas
 Rama de trabajo: `feat/hybrid-hardware-ui-system`
 
@@ -225,4 +225,4 @@ Una función sólo pasa a `VERIFICADA` cuando:
 - No se ha desplegado ni probado el endpoint en Cloudflare Preview.
 - Supabase dirtyfingaz-os sigue sin tablas/migraciones/Edge Functions y no está confirmado como backend de ZP. No se modificó.
 - No se migra a Java; TypeScript se incorpora gradualmente para contratos/servicios.
-- Fuente canónica y plan por fases: [MASTER-QUESTIONNAIRE-V3-AGENT.md](./MASTER-QUESTIONNAIRE-V3-AGENT.md).
+- Fuente canónica y plan por fases: [MASTER-QUESTIONNAIRE-V3-AGENT.md](../MASTER-QUESTIONNAIRE-V3-AGENT.md).
