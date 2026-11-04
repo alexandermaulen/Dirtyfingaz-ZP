@@ -153,7 +153,7 @@ Evolucionar Pattern Edit desde la grilla de pads/pasos a un editor MIDI de notas
 ### Evidencia
 - Rama: feat/hybrid-hardware-ui-system.
 - HEAD de código: b7363a6ef234c823de3194ccda5e22f444ff3c0a.
-- CI del último commit de GUI: [run 41878092266 · QUEUED](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41877908234).
+- CI del último commit de GUI: [run 41878177445 · QUEUED](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41877908234).
 - Archivos: creator.html, creator-engine.html, scripts/validate.mjs.
 - Validador ampliado con contratos MIDI, scheduling, comandos y persistencia.
 - QA real en Safari iOS/iPhone y audio con samples todavía pendiente.
