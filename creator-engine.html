@@ -356,7 +356,7 @@ function playPad(n,when){
  }
 }
 function currentPattern(n=activePad){return patternData[activeBank][n]}
-function refreshSteps(){stepGrid.querySelectorAll("button").forEach((b,i)=>{b.classList.toggle("active",!!currentPattern()[i]);b.classList.toggle("playing",playing&&i===playheadStep)})}
+function refreshSteps(){stepGrid.querySelectorAll("button").forEach((b,i)=>{b.classList.toggle("active",!!currentPattern()[i]);b.classList.toggle("playing",playing&&i===playheadStep)});parent.postMessage({type:"zp-engine-pattern-state",protocolVersion:1,source:"creator.engine",bank:activeBank,activePad:activePad,patterns:patternData[activeBank]},location.origin)}
 function updatePadLabels(){padButtons.forEach((b,i)=>{let n=i+1;b.querySelector("b").textContent=String(n).padStart(2,"0");b.querySelector("small").textContent=sampleNames[n]||"VACÍO";b.classList.toggle("on",n===activePad);b.classList.toggle("muted",!!muted[n]);b.classList.toggle("solo",!!soloed[n])})}
 function setActivePad(n){activePad=n;notice="";if(systemMenu)systemMenu=false;updatePadLabels();updateScreen();refreshSteps();setKnobValues();publishTrimState();muteButton?.classList.toggle("on",!!muted[n]);soloButton?.classList.toggle("on",!!soloed[n])}
 function notify(t){notice=t;screenName.textContent=t;setTimeout(()=>{if(notice===t){notice="";updateScreen()}},1800)}
