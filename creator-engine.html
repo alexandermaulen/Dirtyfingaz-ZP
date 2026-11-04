@@ -392,7 +392,7 @@ function scheduleStep(){
  }
  while(nextStepTime<horizon){
   const scheduledStep=stepIndex,scheduledBank=activeBank,scheduledAt=Math.max(nextStepTime,now+.003),generation=transportGeneration;
-  for(let n=1;n<=9;n++){const notes=pianoData[scheduledBank]?.[n]||[];if(notes.length){notes.filter(note=>note.step===scheduledStep).forEach(note=>playPad(n,scheduledAt,{pitch:note.pitch,velocity:note.velocity,length:note.length}))}else if(patternData[scheduledBank][n][scheduledStep])playPad(n,scheduledAt)}
+  for(let n=1;n<=9;n++){const notes=pianoData[scheduledBank]?.[n]||[],atStep=notes.filter(note=>note.step===scheduledStep);if(atStep.length)atStep.forEach(note=>playPad(n,scheduledAt,{pitch:note.pitch,velocity:note.velocity,length:note.length}));else if(patternData[scheduledBank][n][scheduledStep])playPad(n,scheduledAt)}
   const visualDelay=Math.max(0,(scheduledAt-now)*1000);
   setTimeout(()=>{if(playing&&generation===transportGeneration){playheadStep=scheduledStep;refreshSteps();parent.postMessage({type:"zp-engine-playhead",protocolVersion:1,source:"creator.engine",step:scheduledStep,bank:scheduledBank,activePad:activePad},location.origin)}},visualDelay);
   nextStepTime+=beat;stepIndex=(stepIndex+1)%16;
