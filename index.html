@@ -31,13 +31,117 @@ html,body{width:100%;height:100%;overflow:hidden}
 main{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:8px;scrollbar-width:none}
 main::-webkit-scrollbar{display:none}
 body.creator-mode main{overflow:hidden}
+
+
+/* =========================================================
+   DIRTYFINGAZ ZP1 · STREAMING SHELL / PHOSPHOR RADIO
+   La app de streaming y Music Creator comparten identidad.
+========================================================= */
+:root{
+ --zp-bg:#020702;--zp-surface:#061407;--zp-raised:#0b220b;
+ --zp-phosphor:#8cff35;--zp-bright:#c5ff70;--zp-text:#baff75;
+ --zp-muted:#70a85c;--zp-line:#4c9e2b;--zp-line-soft:#1e4c1b;
+ --zp-glow:0 0 8px #8cff3580;
+}
+body:not(.creator-mode){
+ background:
+  repeating-linear-gradient(0deg,transparent 0 2px,#8cff3506 2px 4px),
+  radial-gradient(ellipse at 50% -15%,#123b0d 0%,transparent 54%),
+  var(--zp-bg)!important;
+ color:var(--zp-text)!important;
+ font-family:"Courier New",monospace!important;
+ letter-spacing:.025em;
+}
+body:not(.creator-mode) .app{max-width:1180px}
+body:not(.creator-mode) header{
+ border-bottom:1px solid var(--zp-line)!important;
+ box-shadow:0 1px 0 #8cff3515;
+}
+.brand{color:var(--zp-bright)!important;text-shadow:var(--zp-glow);font-family:"Courier New",monospace!important}
+.brand span,.eyebrow,.kicker{color:var(--zp-phosphor)!important;text-shadow:var(--zp-glow)}
+.status,.pill{
+ color:var(--zp-phosphor)!important;border:1px solid var(--zp-line)!important;
+ background:#041004!important;border-radius:4px!important;font-family:"Courier New",monospace!important;
+}
+.hero{border-bottom:1px solid var(--zp-line-soft)}
+.hero h1{font-family:"Courier New",monospace!important;letter-spacing:-.06em;text-shadow:0 0 16px #8cff3528}
+.hero p,.card p{color:var(--zp-muted)!important}
+.hero-mark{
+ border:2px solid var(--zp-line)!important;border-radius:8px!important;
+ background:repeating-linear-gradient(0deg,transparent 0 2px,#8cff3508 2px 4px),#020902!important;
+ box-shadow:inset 0 0 20px #000,0 0 18px #8cff3525!important;
+}
+.hero-mark span{color:var(--zp-phosphor)!important;text-shadow:var(--zp-glow)}
+.tabs{padding-bottom:14px!important}
+.tabs button{
+ border:1px solid var(--zp-line)!important;border-radius:4px!important;
+ background:#041004!important;color:var(--zp-muted)!important;
+ font-family:"Courier New",monospace!important;font-size:10px!important;
+}
+.tabs button.active{
+ background:var(--zp-phosphor)!important;color:#061006!important;
+ border-color:var(--zp-bright)!important;box-shadow:0 0 12px #8cff3570!important;
+}
+.card{
+ background:repeating-linear-gradient(0deg,transparent 0 2px,#8cff3505 2px 4px),linear-gradient(145deg,#0b220b,#030903 78%)!important;
+ border:1px solid var(--zp-line)!important;border-radius:8px!important;
+ box-shadow:inset 0 0 18px #000b,0 0 15px #8cff3510!important;
+}
+.card h2,.card h3,.section-head h2{color:var(--zp-bright)!important;font-family:"Courier New",monospace!important}
+.hero-card{background:linear-gradient(145deg,#10310c,#030903 80%)!important}
+.btn{
+ background:linear-gradient(180deg,#c5ff70,#8cff35)!important;color:#061006!important;
+ border:1px solid #d8ff9b!important;border-radius:4px!important;
+ font-family:"Courier New",monospace!important;font-weight:800!important;
+ box-shadow:0 0 10px #8cff3528!important;
+}
+.btn.ghost{background:#041004!important;color:var(--zp-phosphor)!important;border:1px solid var(--zp-line)!important}
+.hero-actions{display:flex;flex-wrap:wrap;gap:8px}
+.cover{
+ border:1px solid var(--zp-line)!important;border-radius:4px!important;
+ background:repeating-linear-gradient(0deg,transparent 0 2px,#8cff3508 2px 4px),linear-gradient(145deg,#12380d,#020702 75%)!important;
+ color:var(--zp-phosphor)!important;text-shadow:var(--zp-glow);
+}
+.track,.station{border-color:var(--zp-line-soft)!important}
+.track strong,.station strong{color:var(--zp-bright)!important;font-family:"Courier New",monospace!important}
+.track small,.station small,.notice,.empty{color:var(--zp-muted)!important}
+.channel,.room-console{
+ background:#030b03!important;border:1px solid var(--zp-line)!important;border-radius:5px!important;
+}
+.channel strong,.room-console strong{color:var(--zp-bright)!important}
+.channel input{accent-color:var(--zp-phosphor)!important}
+.meter{background:#10210e!important;border-radius:2px!important}
+.meter i{background:var(--zp-phosphor)!important;box-shadow:0 0 8px var(--zp-phosphor)}
+.station-top,.user-strip,.room{border-color:var(--zp-line-soft)!important}
+.user-strip strong{color:var(--zp-bright)!important;font-family:"Courier New",monospace!important}
+.room-icon{border-color:var(--zp-line)!important;background:#020902!important;color:var(--zp-phosphor)!important}
+.room-info strong{color:var(--zp-bright)!important}
+.live-dot{color:var(--zp-phosphor)!important;text-shadow:var(--zp-glow)}
+.player{
+ background:#020902f2!important;border-top:1px solid var(--zp-line)!important;
+ box-shadow:0 -8px 25px #000a!important;
+ font-family:"Courier New",monospace!important;
+}
+.player-info strong{color:var(--zp-bright)!important}
+.player-info small{color:var(--zp-muted)!important}
+.player .cover{border-radius:4px!important}
+.play{background:var(--zp-phosphor)!important;color:#061006!important;border-radius:4px!important;box-shadow:0 0 12px #8cff3560!important}
+.empty{border-color:var(--zp-line)!important}
+body.creator-mode .app{background:#020702!important}
+body.creator-mode #creator{background:#020702!important}
+body.creator-mode #creator iframe{display:block;width:100%;height:100%;height:100dvh;border:0;background:#020702}
+@media(max-width:680px){
+ .hero-actions{display:grid;grid-template-columns:1fr 1fr}
+ .hero-actions .btn{padding:10px 7px;font-size:9px}
+}
+
 </style></head><body><div class="app">
 <header><div class="brand">📟 DIRTYFINGAZ <span>ZP 1</span></div><div class="status">● LED ONLINE</div></header>
-<section class="hero"><div><div class="eyebrow">📡 RED DE AUDIO · 8-BIT MODE</div><h1>RADIO<br><span style="color:var(--lime)">GRID</span> 📻</h1><p>Conecta estaciones. Escucha sesiones. Crea en frecuencia compartida.</p></div><div class="hero-mark"><span>▥</span></div></section>
+<section class="hero"><div><div class="eyebrow">📡 RED DE AUDIO · 8-BIT MODE</div><h1>RADIO<br><span style="color:var(--lime)">GRID</span> 📻</h1><p>Crea música, publica tus mezclas y escucha las sesiones de la comunidad sin salir de DIRTYFINGAZ ZP 1.</p></div><div class="hero-mark"><span>▥</span></div></section>
 <nav class="tabs"><button class="active" data-view="home">⌂ Inicio</button><button data-view="creator">🎛 Creator</button><button data-view="mixer">🎚 3 Canales</button><button data-view="streaming">♫ Música</button><button data-view="radio">📻 Estaciones</button><button data-view="community">◉ Comunidad</button></nav>
 <main>
 <section id="home" class="view active"><div class="grid">
-<div class="card hero-card s8"><div><div class="kicker">📻 ESTACIONES · RADIO GRID</div><h2>Conecta a una<br>frecuencia.</h2><p>Entra a una room como espectador o colaborador. Descubre sesiones abiertas.</p></div><button class="btn" data-go="radio">EXPLORAR ESTACIONES ↗</button></div>
+<div class="card hero-card s8"><div><div class="kicker">📻 ESTACIONES · RADIO GRID</div><h2>Conecta a una<br>frecuencia.</h2><p>Entra a una room como espectador o colaborador. Descubre sesiones abiertas.</p></div><div class="hero-actions"><button class="btn" data-go="creator">ABRIR MUSIC CREATOR ↗</button><button class="btn ghost" data-go="radio">EXPLORAR ESTACIONES</button></div></div>
 <div class="card s4"><div class="kicker">🎚 MEZCLA RÁPIDA</div><h3>Tres canales.<br>Un sonido propio.</h3><p>Controla tres fuentes de audio en una consola compacta.</p><button class="btn ghost" data-go="mixer">ABRIR MEZCLADOR</button></div>
 <div class="card s6"><div class="section-head"><h2>Novedades sonoras</h2><small>CATÁLOGO DE DEMOSTRACIÓN</small></div>
 <div class="track"><div class="cover">01</div><div><strong>Sueños de cromo</strong><small>Dirtyfingaz Studio · Electrónica</small></div><button class="btn ghost" data-play="Sueños de cromo">▶</button></div>
@@ -46,7 +150,7 @@ body.creator-mode main{overflow:hidden}
 <div class="card s6"><div class="section-head"><h2>Estaciones de radio</h2><small>CONCEPTO DE DEMOSTRACIÓN</small></div>
 <div class="station"><div class="cover">FM</div><div><strong>BAJA FRECUENCIA</strong><small>Ritmos pausados · 80–100 BPM</small></div><button class="btn ghost" data-play="BAJA FRECUENCIA RADIO">▶</button></div>
 <div class="station"><div class="cover">XP</div><div><strong>TRASNOCHADO</strong><small>House · Techno · 120–130 BPM</small></div><button class="btn ghost" data-play="TRASNOCHADO RADIO">▶</button></div></div></div></section>
-<section id="creator" class="view creator-shell"><iframe src="creator.html" title="Laboratorio de muestras DIRTYFINGAZ" allow="autoplay"></iframe></section>
+<section id="creator" class="view creator-shell" aria-label="Music Creator integrado en Radio Grid"><iframe src="creator.html" title="DIRTYFINGAZ ZP 1 · Music Creator" allow="autoplay; clipboard-write"></iframe></section>
 <section id="mixer" class="view"><div class="section-head"><div><div class="eyebrow">MÓDULO 02</div><h2>Mezclador simple</h2></div><small>3 CANALES INDEPENDIENTES</small></div><div class="card"><div class="mixer">
 <div class="channel"><div class="kicker">CANAL 01</div><strong>GRAVES</strong><input type="range" min="0" max="100" value="72" data-channel="0"><div class="meter"><i></i></div><small class="value">72%</small></div>
 <div class="channel"><div class="kicker">CANAL 02</div><strong>MEDIOS</strong><input type="range" min="0" max="100" value="68" data-channel="1"><div class="meter"><i></i></div><small class="value">68%</small></div>

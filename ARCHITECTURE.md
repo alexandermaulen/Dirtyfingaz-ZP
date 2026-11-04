@@ -95,7 +95,7 @@ La implementación local puede sustituir temporalmente servicios remotos, pero d
 - Presencia, transporte colaborativo y señales en vivo: canales realtime; no generar un archivo por cada evento.
 - Backend futuro: Supabase detrás de adaptadores. El Core no importa SDK de Supabase.
 
-**Estado actual:** Creator conserva BPM, patrones y orden de canción en localStorage; las muestras aún viven en memoria durante la sesión. La persistencia de audio en IndexedDB sigue pendiente. Radio Grid conserva salas de demostración locales; aún no hay presencia, identidad remota ni colaboración sincronizada.
+**Estado actual:** Creator conserva BPM, patrones y orden de canción en localStorage. `zp-storage.js` implementa AssetStorage local con IndexedDB para muestras por pad y el proyecto actual; `creator.html` carga este adaptador. Radio Grid conserva salas de demostración locales; aún no hay presencia, identidad remota ni colaboración sincronizada.
 
 ## 6. Reglas de implementación
 
@@ -142,3 +142,59 @@ Códigos sugeridos: INVALID_INPUT, NOT_FOUND, NOT_READY, PERMISSION_DENIED, PERS
 Una capa está separada cuando puede probarse sin cargar la interfaz; un servicio puede sustituirse sin reescribir el Core; cada control ejecuta un caso de uso identificable; y los estados de error y éxito llegan a la UI de forma explícita.
 
 **Principio rector:** compartir arquitectura, contratos, criterios de calidad y método de trabajo; mantener independientes los productos, sus motores, datos e infraestructura.
+
+
+## 10. Publicación, preview y entornos
+
+### Fuente de verdad del código
+
+- Repositorio: `alexandermaulen/Dirtyfingaz-ZP`.
+- Rama estable: `main`.
+- Rama de trabajo visual: `creator-layout-master-reference`.
+- PR de integración: https://github.com/alexandermaulen/Dirtyfingaz-ZP/pull/1.
+- La rama de trabajo no se considera producción hasta completar pruebas y aprobar el merge.
+
+### Modelo de hosting detectado
+
+El repositorio es un sitio estático compuesto por HTML, CSS, JavaScript y JSON. No se detectaron `package.json`, `wrangler.toml` ni `wrangler.jsonc` en la raíz de la rama inspeccionada. El workflow `.github/workflows/deploy-pages.yml` publica el contenido de la raíz en GitHub Pages únicamente cuando hay push a `main`.
+
+Por tanto, el modelo de despliegue previsto para este repositorio es **Cloudflare Pages (sitio estático)** o GitHub Pages. No debe tratarse como Worker sin incorporar deliberadamente un entrypoint y configuración Worker.
+
+### Incidencia Cloudflare observada · 2026-11-04
+
+La integración de Cloudflare reportó fallos de Workers Builds para los commits `25a41a5` y `d06b53a`. En la configuración visible:
+- Build command: vacío / ninguno.
+- Deploy command: `npx wrangler preview`.
+- Root directory: `/`.
+- La fase Initialize y Clone terminó correctamente; Installing también terminó correctamente; Deploying falló.
+- El log visible en la captura muestra que no detectó artefactos ni dependencias para cache. La captura no contiene el mensaje final completo, por lo que la causa terminal exacta sigue sin confirmarse.
+
+**Diagnóstico operativo:** hay una posible discordancia entre un sitio estático y una integración Workers Builds configurada para ejecutar Wrangler. No se debe cambiar el comando a ciegas ni desplegar este PR a producción desde esa integración.
+
+### Configuración objetivo de preview
+
+Configurar un proyecto Cloudflare Pages conectado al repositorio:
+- Framework preset: None.
+- Production branch: `main`.
+- Build command: vacío (no requiere compilación).
+- Build output directory: `/` (raíz del repositorio).
+- Preview deployments: habilitados para ramas de trabajo / Pull Requests.
+- Mantener secretos y variables fuera del repositorio; no hay variables de build requeridas por el sitio estático en el estado actual.
+
+Si el proyecto Cloudflare actual es un Worker, mantenerlo separado o desconectar su trigger del repositorio ZP1; no convertir el sitio estático en Worker solo para satisfacer ese pipeline.
+
+### Supabase
+
+El único proyecto accesible detectado se llama `dirtyfingaz-os` (región `sa-east-1`), está activo, pero no tiene tablas públicas ni Edge Functions. No se asume que sea el backend de ZP1: el nombre indica otro producto y la arquitectura exige separar datos y credenciales por aplicación.
+
+ZP1 no debe inicializar tablas, Auth, Storage ni Realtime en ese proyecto hasta confirmar que el backend será compartido de forma deliberada o provisionar un proyecto independiente. No se almacenan claves privadas en el frontend.
+
+### Secuencia de validación
+
+1. Corregir el tipo de proyecto Cloudflare y obtener una URL de preview por commit.
+2. Verificar que el preview sirve `index.html`, `creator.html`, `zp-core.js`, `zp-storage.js` y el JSON de diseño.
+3. Probar GUI, audio, pads, secuenciador, IndexedDB y exportación en Safari/iPhone.
+4. Aprobar PR y mergear a `main` solo con evidencia.
+5. Diseñar el contrato de datos de ZP1 antes de crear tablas o activar servicios Supabase.
+
+**Regla de release:** un commit solo se marca como publicado cuando el hosting confirma el deployment y se comprueba la URL desplegada. Un build fallido o un PR abierto no equivalen a una publicación.

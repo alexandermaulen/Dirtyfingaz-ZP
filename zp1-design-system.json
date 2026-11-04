@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "DIRTYFINGAZ ZP 1 · PHOSPHOR RADIO",
+  "version": "1.0.0",
+  "lineage": "CRT monochrome phosphor / 1990s digital radio interface",
+  "principles": [
+    "modular instrument panels",
+    "high-contrast information hierarchy",
+    "pixel typography",
+    "double-line enclosure",
+    "phosphor glow with restrained bloom",
+    "black glass surfaces with green emission"
+  ],
+  "color": {
+    "background": "#020702",
+    "surface": "#061407",
+    "surfaceRaised": "#0b220b",
+    "phosphor": "#8cff35",
+    "phosphorBright": "#c5ff70",
+    "phosphorDim": "#4d9f28",
+    "text": "#baff75",
+    "textMuted": "#70a85c",
+    "line": "#4c9e2b",
+    "lineSoft": "#1e4c1b",
+    "activeBackground": "#a8ff35",
+    "activeText": "#061006",
+    "warning": "#ff6969"
+  },
+  "typography": {
+    "family": "'Courier New', monospace",
+    "weight": 700,
+    "tracking": "0.035em",
+    "uppercase": true,
+    "pixelRendering": "crisp edges, no smoothing where supported"
+  },
+  "effects": {
+    "textGlow": "0 0 7px #8cff3580",
+    "panelGlow": "0 0 18px #55ff2826",
+    "activeGlow": "0 0 14px #8cff35a6",
+    "scanlines": "linear repeating 2px transparent / 2px rgba(100,255,60,.025)",
+    "noise": "subtle monochrome grain",
+    "shadow": "inset 0 0 18px #000b"
+  },
+  "shape": {
+    "panelRadius": "10px",
+    "controlRadius": "5px",
+    "outerFrame": "double 2px phosphor border with 5px dark gap",
+    "buttonRadius": "5px",
+    "padRadius": "7px"
+  },
+  "layout": {
+    "grid": "12-column modular dashboard logic",
+    "panelGap": "8px",
+    "panelPadding": "10px",
+    "density": "compact but legible",
+    "inspectionMode": "square 1:1 overlay"
+  },
+  "components": {
+    "frame": "double phosphor outline",
+    "panel": "dark glass with green border and inset shadow",
+    "button": "raised phosphor key with bright active state",
+    "knob": "dark circular encoder with phosphor index",
+    "display": "black glass waveform/LCD panel",
+    "pad": "raised square trigger with active flash",
+    "sequencer": "compact step matrix with distinct playhead",
+    "streamingShell": "dark phosphor radio dashboard, shared navigation, station cards, catalog, bottom player and embedded Music Creator"
+  },
+  "states": {
+    "default": "dim phosphor text on black glass",
+    "hover": "slightly brighter border and glow",
+    "active": "phosphor fill with dark text",
+    "playing": "white/bright outline plus glow",
+    "disabled": "35% opacity",
+    "remotePresence": "not connected until ZP1 backend is approved and provisioned"
+  },
+  "responsive": {
+    "creator": "preserve existing sampler control geometry",
+    "inspection": "square overlay, viewport constrained, internal scroll"
+  },
+  "platformShell": {
+    "purpose": "Aplicación de streaming que integra Music Creator, catálogo, estaciones y comunidad dentro de una sola navegación",
+    "visualInheritance": "Comparte la misma identidad PHOSPHOR RADIO del sampler Creator",
+    "navigation": [
+      "home",
+      "creator",
+      "mixer",
+      "streaming",
+      "radio",
+      "community"
+    ],
+    "creatorIntegration": {
+      "mode": "embedded-iframe",
+      "src": "creator.html",
+      "sameProduct": true,
+      "exitMessage": "zp-exit-creator"
+    },
+    "streaming": {
+      "features": [
+        "music creator",
+        "publish mixes",
+        "listen to community creations",
+        "radio stations",
+        "three-channel mixer"
+      ],
+      "currentStatus": "UI integrada; streaming remoto y presencia de usuarios pendientes de backend"
+    },
+    "identity": {
+      "displayPattern": "USER NR/{sequence}",
+      "currentScope": "local placeholder until a dedicated ZP1 identity backend is configured",
+      "globalUniquenessRequires": "server-side identity sequence"
+    },
+    "release": {
+      "workingBranch": "creator-layout-master-reference",
+      "productionBranch": "main",
+      "previewRequired": true
+    }
+  }
+}
