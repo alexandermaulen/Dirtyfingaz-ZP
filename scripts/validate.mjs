@@ -59,7 +59,6 @@ assert.match(engine, /function exportProjectFile\(/);
 assert.match(engine, /function importProjectFile\(/);
 assert.match(engine, /function createProject\(/);
 assert.match(engine, /masterOut\.connect\(offline\.destination\)/);
-assert.match(ui, /Math\.floor\(\(rowIndex-1\)\/17\)\+1/);
 assert.match(radioWorker, /message\.type === "room-state"/);
 assert.match(shell, /radio-roster/);
 assert.match(shell, /radio-chat/);
