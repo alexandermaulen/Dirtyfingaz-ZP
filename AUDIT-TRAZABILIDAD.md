@@ -411,3 +411,19 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - Ambos encoders quedan identificados en `zp-agent-registry.json`. El agente distingue Lx como navegación y Rx como control contextual; el Worker adjunta la definición del encoder seleccionado al contexto de IA.
 - Lx usa pasos de navegación de 14 grados y permite avanzar/retroceder mediante flechas de teclado cuando está enfocado.
 - Validación estática de sintaxis inline de Creator: PASS (3 scripts). JSON del registro válido. Pendiente CI en el SHA final y prueba real en Safari iPhone 11, incluyendo foco, scroll, tacto y ACK/error/persistencia de un parámetro.
+
+## 18. Ergonomía lateral adaptativa Lx/Rx
+
+**Decisión de diseño:** ubicación `sides`, comportamiento `adaptive`, separación `compact`.
+
+- **Lx** queda montado dentro del raíl lateral izquierdo `#cl`; conserva `data-rotor="Lx"`, su navegación secuencial, foco y desplazamiento al destino sin ejecutarlo.
+- **Rx** queda montado dentro del raíl lateral derecho `#cr`; conserva la clase `.pe`, `data-rotor="Rx"` y las rutas existentes de trim, MIDI y FX.
+- La fila principal libera las dos celdas de encoder y queda en seis columnas.
+- Rx incorpora desplazamiento contextual del contenedor del elemento seleccionado por Lx cuando no hay edición trim/MIDI activa. Prioriza eje vertical y utiliza horizontal cuando es el único desplazamiento disponible.
+- Los encoders se dimensionan en CSS a 50 px, 46 px en pantallas estrechas y 42 px en ventanas de poca altura.
+- `zp-agent-registry.json` documenta montaje, comportamiento adaptativo, fallback de scroll y exclusiones de edición.
+- El agente identifica Lx/Rx como navegación adaptativa lateral e información/PUSH ENTER lateral.
+- Se actualiza la caché PWA a `dirtyfingaz-zp-shell-v10`.
+- No se modifican `creator-engine.html`, el protocolo GUI-engine v1, los comandos de motor ni la persistencia. El cambio de Rx es una interacción de GUI que sólo desplaza contenedores.
+
+**Verificación pendiente:** ejecutar `node scripts/validate.mjs`, probar drag/rotación y scroll contextual en Safari iPhone 11 y revisar que trim/MIDI sigan teniendo prioridad sobre el fallback de scroll. No declarar validación funcional hasta completar esas pruebas.
