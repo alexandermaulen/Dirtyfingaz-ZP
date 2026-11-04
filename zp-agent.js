@@ -8,6 +8,7 @@
  const launcher=document.createElement("button");launcher.id="zp-agent-launcher";launcher.type="button";launcher.textContent="◈ AGENTE";launcher.setAttribute("aria-label","Abrir agente contextual");
  document.body.append(root,launcher);
  const log=$("#zp-agent-log"),input=$("#zp-agent-input"),head=$("#zp-agent-head"),contextLabel=$("#zp-agent-context"),status=$("#zp-agent-status");
+ const pendingRequests=new Map();
  let context={app:"DIRTYFINGAZ ZP",surface:"creator",module:"Creator",control:null,label:null,projectId:null,padId:null,bank:null},pending=null,drag=null,restoreRect=null;
  const actions={
   "transport.stop":{label:"Detener transporte",risk:"low",run:()=>send("creator.transport.stop",{})},
@@ -28,7 +29,10 @@
   {terms:["bpm","tempo"],title:"Tempo",body:"El motor administra BPM y publica su estado. La GUI debe reflejar la respuesta del motor, no asumir que el cambio se aplicó."}
  ];
  function addMessage(text,role="assistant",extra){const el=document.createElement("div");el.className="zp-agent-msg "+role;el.textContent=text;if(extra)el.append(extra);log.append(el);log.scrollTop=log.scrollHeight;return el}
- function send(command,payload){if(typeof window.zpBridgeSend!=="function"){addMessage("No se pudo ejecutar: el bridge GUI↔motor todavía no está disponible.","system");return false}try{window.zpBridgeSend(command,payload);status.textContent="Comando enviado · esperando respuesta del motor";return true}catch(error){addMessage("Error al enviar el comando: "+error.message,"system");return false}}
+ function send(command,payload){if(typeof window.zpBridgeSend!=="function"){addMessage("No se pudo ejecutar: el bridge GUI↔motor todavía no está disponible.","system");return false}try{const requestId=window.zpBridgeSend(command,payload);pendingRequests.set(requestId,command);status.textContent="Comando enviado · esperando ACK del motor";return requestId}catch(error){addMessage("Error al enviar el comando: "+error.message,"system");return false}}
+ window.addEventListener("zp-engine-result",e=>{const d=e.detail||{},command=pendingRequests.get(d.requestId);if(!command)return;pendingRequests.delete(d.requestId);status.textContent="ACK recibido · "+command;addMessage("Motor confirmó la acción: "+command+".","system")});
+ window.addEventListener("zp-engine-error",e=>{const d=e.detail||{},command=pendingRequests.get(d.requestId);if(!command)return;pendingRequests.delete(d.requestId);status.textContent="Error del motor · "+command;addMessage("El motor rechazó "+command+": "+(d.error?.message||d.message||"error sin detalle"),"system")});
+ window.addEventListener("zp-engine-timeout",e=>{const d=e.detail||{},command=pendingRequests.get(d.requestId);if(!command)return;pendingRequests.delete(d.requestId);status.textContent="Timeout · "+command;addMessage("No llegó ACK para "+command+" dentro del tiempo límite.","system")});
  function normalized(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim()}
  function inspectTarget(target){const el=target?.closest?.("button,[role=button],input,select,textarea,.knob,.p,.b,[data-agent-context]");if(!el||root.contains(el))return;const label=el.getAttribute("aria-label")||el.getAttribute("title")||el.dataset.agentContext||el.innerText||el.textContent||el.id||el.className;const txt=String(label).replace(/\s+/g," ").trim().slice(0,90);context={...context,control:el.id||el.dataset.agentContext||el.className?.toString().split(" ")[0]||el.tagName.toLowerCase(),label:txt||"Control sin etiqueta",padId:el.dataset.padId||el.dataset.pad||null,bank:el.dataset.bank||null};contextLabel.textContent=(context.module+": "+(context.label||"Creator")).slice(0,56)}
  document.addEventListener("pointerdown",e=>inspectTarget(e.target),true);document.addEventListener("focusin",e=>inspectTarget(e.target),true);
