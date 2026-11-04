@@ -321,26 +321,26 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
 }
 </style>
 <style id="zp-piano-encoder-dock">
-/* Piano Roll: LCD central y encoders laterales independientes, a altura de pulgares. */
+/* Pattern Edit: LCD despejada y rail inferior compacto para Lx / SHIFT / Rx. */
 .piano-encoder-dock{display:none}
-.mid.piano-open .scr.pr{top:6px;left:62px;right:62px;bottom:6px;width:auto;height:auto;margin:0;transform:none;border-radius:14px}
+.mid.piano-open .scr.pr{top:5px;left:7px;right:7px;bottom:59px;width:auto;height:auto;margin:0;transform:none;border-radius:14px}
 .mid.piano-open .scr.pr .v2{position:absolute;inset:0;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:3px;padding:6px 5px}
 .mid.piano-open .scr.pr .piano-viewport{width:100%;margin:0;min-height:0;flex:1;align-self:center;overflow:auto;border-radius:5px}
-.mid.piano-open .piano-encoder-dock{position:absolute;inset:0;display:block;pointer-events:none;margin:0;padding:0;border:0;background:none;box-shadow:none}
-.mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{position:absolute;top:auto;bottom:30px;z-index:6;display:block;pointer-events:auto;flex:none;width:46px;height:46px;min-width:46px;min-height:46px;margin:0;touch-action:none}
-.mid.piano-open .piano-encoder-dock>.lx{left:7px;right:auto}
-.mid.piano-open .piano-encoder-dock>.rx{left:auto;right:7px}
+.mid.piano-open .piano-encoder-dock{position:absolute;left:7px;right:7px;top:auto;bottom:3px;height:51px;display:flex;align-items:center;justify-content:space-evenly;gap:8px;pointer-events:none;margin:0;padding:0;border:0;background:none;box-shadow:none}
+.mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{position:relative;inset:auto;z-index:6;display:block;pointer-events:auto;flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;margin:0;touch-action:none}
 .mid.piano-open .piano-encoder-dock>.lx i,.mid.piano-open .piano-encoder-dock>.rx i{inset:6px}
-.mid.piano-open .piano-encoder-dock>.lx::before,.mid.piano-open .piano-encoder-dock>.rx::before{top:-10px;font-size:9px}
+.mid.piano-open .piano-encoder-dock>.lx::before,.mid.piano-open .piano-encoder-dock>.rx::before{top:-8px;font-size:9px}
 .mid.piano-open .piano-encoder-dock>.rx i::after{display:block}
+.mid.piano-open .piano-encoder-dock>#zpShiftDock{display:block;position:relative;inset:auto;z-index:7;flex:0 0 54px;width:54px;min-width:54px;height:28px;min-height:28px;margin:0;padding:0 5px;font-size:10px;line-height:1;pointer-events:auto;touch-action:manipulation}
 @media(max-width:380px){
- .mid.piano-open .scr.pr{left:54px;right:54px}
- .mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{width:40px;height:40px;min-width:40px;min-height:40px;bottom:32px}
- .mid.piano-open .piano-encoder-dock>.lx{left:5px}
- .mid.piano-open .piano-encoder-dock>.rx{right:5px}
+ .mid.piano-open .scr.pr{left:5px;right:5px;bottom:56px}
+ .mid.piano-open .piano-encoder-dock{left:4px;right:4px;gap:5px;height:49px}
+ .mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{flex-basis:40px;width:40px;height:40px;min-width:40px;min-height:40px}
+ .mid.piano-open .piano-encoder-dock>#zpShiftDock{flex-basis:50px;width:50px;min-width:50px}
 }
 @media(max-height:700px){
- .mid.piano-open .piano-encoder-dock>.lx,.mid.piano-open .piano-encoder-dock>.rx{bottom:24px}
+ .mid.piano-open .scr.pr{bottom:55px}
+ .mid.piano-open .piano-encoder-dock{height:48px;bottom:2px}
 }
 </style>
 </head>
@@ -650,7 +650,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  const tools=mk('div','piano-tools','<div class="piano-zoom"><button type="button" id="zpZoomOut" aria-label="Alejar">−</button><button type="button" id="zpZoomIn" aria-label="Acercar">+</button></div><button type="button" id="zpOctDown">OCT−</button><button type="button" id="zpDraw" class="selected">DRAW</button><button type="button" id="zpSnap">1/16</button><button type="button" id="zpLen">LEN 1</button><label class="piano-vel">VEL<input id="zpVelocity" type="range" min="1" max="127" value="100"></label><button type="button" id="zpDelete">DEL</button><button type="button" id="zpOctUp">OCT+</button><button type="button" id="zpClear">CLR</button><button type="button" id="zpStepMode">STEP</button><button type="button" id="zpNudge" title="Rotor MIDI continuo">↕</button>');
  const viewport=mk('div','grid-viewport');grid.parentNode.insertBefore(viewport,grid);viewport.append(grid);
  const pianoViewport=mk('div','piano-viewport'),pianoGrid=mk('div','piano-grid');pianoViewport.append(pianoGrid);pianoViewport.hidden=true;
-  const midContainer=document.querySelector('.mid'),encoderDock=mk('div','piano-encoder-dock'),leftEncoder=midContainer.querySelector(':scope>.lx'),rightEncoder=midContainer.querySelector(':scope>.rx');midContainer.append(encoderDock);
+  const midContainer=document.querySelector('.mid'),encoderDock=mk('div','piano-encoder-dock'),leftEncoder=midContainer.querySelector(':scope>.lx'),rightEncoder=midContainer.querySelector(':scope>.rx'),shiftButton=[...document.querySelectorAll('#rows .b')].find(b=>b.textContent.replace(/\\s/g,'')==='SHIFT');if(shiftButton){shiftButton.id='zpShiftDock';shiftButton.setAttribute('aria-label','SHIFT · ajuste fino');}const shiftHome=shiftButton?{parent:shiftButton.parentNode,next:shiftButton.nextSibling}:null;midContainer.append(encoderDock);
  const ph=v2.querySelector('.ph');v2.insertBefore(line,grid.parentNode);v2.insertBefore(tools,viewport);v2.insertBefore(pianoViewport,viewport.nextSibling);
  let zoom=1;const applyZoom=()=>{grid.style.width=(zoom*100)+'%';grid.style.minWidth=(zoom*100)+'%';pianoGrid.style.minWidth=(360*zoom)+'px';$('#zpZoomOut').disabled=zoom<=1;$('#zpZoomIn').disabled=zoom>=2.5};
  $('#zpZoomOut').onclick=()=>{zoom=Math.max(1,+(zoom-.25).toFixed(2));applyZoom()};
@@ -756,7 +756,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  const stepAt=x=>{const cells=[...pianoGrid.querySelectorAll('.piano-cell[data-pitch="'+topMidi+'"]')],r=cells[0]?.getBoundingClientRect(),w=r?.width||18;return clamp(Math.floor((x-(r?.left||0))/w),0,15)};
  const paintPadMidi=()=>{pianoGrid.querySelectorAll('.pad-midi-origin').forEach(el=>el.classList.remove('pad-midi-origin'));activeNotes.forEach(note=>{pianoGrid.querySelector('.piano-cell[data-step="'+note.step+'"][data-pitch="'+note.pitch+'"]')?.classList.add('pad-midi-origin');pianoGrid.querySelector('.piano-note[data-id="'+note.id+'"]')?.classList.add('pad-midi-origin')})};
  
- const setPianoMode=on=>{pianoMode=on;pianoViewport.hidden=!on;viewport.hidden=on;stepModeButton.textContent=on?'STEP':'PIANO';$('#zpClear').textContent=on?'CLR':'CLR';window.__zpPianoEncoderMode=!!(on&&scr.classList.contains('pr'));midContainer.classList.toggle('piano-open',window.__zpPianoEncoderMode);if(window.__zpPianoEncoderMode){encoderDock.append(leftEncoder,rightEncoder)}else{midContainer.append(leftEncoder,rightEncoder)}};
+ const setPianoMode=on=>{pianoMode=on;pianoViewport.hidden=!on;viewport.hidden=on;stepModeButton.textContent=on?'STEP':'PIANO';$('#zpClear').textContent=on?'CLR':'CLR';window.__zpPianoEncoderMode=!!(on&&scr.classList.contains('pr'));midContainer.classList.toggle('piano-open',window.__zpPianoEncoderMode);if(window.__zpPianoEncoderMode){encoderDock.append(leftEncoder,shiftButton,rightEncoder)}else{midContainer.append(leftEncoder,rightEncoder);if(shiftButton&&shiftHome?.parent){if(shiftHome.next&&shiftHome.next.parentNode===shiftHome.parent)shiftHome.parent.insertBefore(shiftButton,shiftHome.next);else shiftHome.parent.append(shiftButton)}}};
  const buildPiano=()=>{pianoGrid.replaceChildren();topMidi=71+octaveShift*12;const corner=mk('div','piano-ruler-key','♪');corner.style.gridColumn='1';corner.style.gridRow='1';pianoGrid.append(corner);for(let step=0;step<16;step++){const tick=mk('div','piano-ruler',String(step+1));tick.style.gridColumn=String(step+2);tick.style.gridRow='1';pianoGrid.append(tick)}for(let row=0;row<24;row++){const midi=topMidi-row,label=mk('div','piano-key '+([1,3,6,8,10].includes(midi%12)?'black':'white'),noteName(midi));label.style.gridColumn='1';label.style.gridRow=String(row+2);pianoGrid.append(label);for(let step=0;step<16;step++){const cell=mk('div','piano-cell '+([1,3,6,8,10].includes(midi%12)?'black-key':'white-key'));cell.dataset.step=String(step);cell.dataset.pitch=String(midi);cell.style.gridColumn=String(step+2);cell.style.gridRow=String(row+2);pianoGrid.append(cell)}}const play=mk('div','piano-playhead');play.id='zpPianoPlayhead';play.style.gridColumn='2';play.style.gridRow='2 / 26';pianoGrid.append(play);renderNotes()};
  const renderNotes=()=>{pianoGrid.querySelectorAll('.piano-note').forEach(n=>n.remove());activeNotes.forEach(note=>{const row=topMidi-note.pitch;if(row<0||row>=24)return;const el=mk('div','piano-note'+(note.id===selectedNoteId?' selected':''),'<span>'+noteName(note.pitch)+'</span><i></i>');el.dataset.id=note.id;el.style.gridColumn=(note.step+2)+' / span '+note.length;el.style.gridRow=String(row+2);el.style.transform=note.micro?'translateX('+(note.micro*100)+'%)':'none';el.style.opacity=String(.35+.65*note.velocity/127);pianoGrid.append(el)});const selected=activeNotes.find(n=>n.id===selectedNoteId);if(selected)velocityInput.value=String(selected.velocity)};
  const upsertNote=note=>{const step=clamp(Math.round(note.step),0,15),normalized={...note,step,pitch:clamp(Math.round(note.pitch),36,96),length:clamp(Math.round(note.length),1,16-step),velocity:clamp(Math.round(note.velocity),1,127)};const existing=activeNotes.findIndex(n=>n.id===normalized.id);if(existing>=0)activeNotes[existing]=normalized;else activeNotes.push(normalized);activeNotes.sort((a,b)=>a.step-b.step||a.pitch-b.pitch);selectedNoteId=normalized.id;renderNotes();noteCommand('creator.piano.note.upsert',{note:normalized})};
