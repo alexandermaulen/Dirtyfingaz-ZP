@@ -345,7 +345,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
    if(data.type==="zp-engine-error")console.error("Creator engine:",data.command,data.error||data.message);
   }
  });
- window.addEventListener("message",ev=>{const d=ev.data;if(ev.source!==frame.contentWindow||ev.origin!==location.origin||!d||d.type!=="zp-engine-playhead"||d.protocolVersion!==1||d.source!=="creator.engine")return;document.querySelectorAll("#gr .c").forEach(cell=>{const cellIndex=[...grid.children].indexOf(cell),padId=Math.max(1,Math.min(9,Math.floor((cellIndex-1)/17)+1));cell.classList.toggle("hd2",padId===d.activePad&&Number(cell.dataset.s)===d.step)});});
+ window.addEventListener("message",ev=>{const d=ev.data;if(ev.source!==frame.contentWindow||ev.origin!==location.origin||!d||d.type!=="zp-engine-playhead"||d.protocolVersion!==1||d.source!=="creator.engine")return;document.querySelectorAll("#gr .c").forEach(cell=>{const cellIndex=[...grid.children].indexOf(cell),padId=Math.max(1,Math.min(9,Math.floor((cellIndex-18)/17)+1));cell.classList.toggle("hd2",padId===d.activePad&&Number(cell.dataset.s)===d.step)});});
  window.addEventListener("message",ev=>{const d=ev.data;if(ev.source!==frame.contentWindow||ev.origin!==location.origin||!d||d.type!=="zp-engine-pattern-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;document.querySelectorAll("#gr .c").forEach(cell=>{const index=[...grid.children].indexOf(cell),padId=Math.max(1,Math.min(9,Math.ceil((index-17)/17))),step=Number(cell.dataset.s)||0;cell.classList.toggle("on",!!d.patterns?.[padId]?.[step])})});
  window.addEventListener("zp-engine-timeout",ev=>console.error("Creator engine timeout:",ev.detail.command));
  window.addEventListener("zp-engine-error",ev=>console.error("Creator engine error:",ev.detail.command,ev.detail.error||ev.detail.message));
@@ -397,7 +397,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  if(grid)grid.addEventListener("click",ev=>{
   const cell=ev.target.closest(".c");if(!cell)return;
   const children=[...grid.children],index=children.indexOf(cell);
-  const padId=Math.max(1,Math.min(9,Math.floor((index-1)/17)+1));
+  const padId=Math.max(1,Math.min(9,Math.floor((index-18)/17)+1));
   const step=Math.max(0,Math.min(15,Number(cell.dataset.s)||0));
   zpBridgeSend("creator.pad.select",{padId});
   zpBridgeSend("creator.pattern.step.toggle",{step});
