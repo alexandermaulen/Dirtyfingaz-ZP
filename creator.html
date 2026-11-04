@@ -315,6 +315,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
   }
  });
  window.addEventListener("message",ev=>{const d=ev.data;if(ev.source!==frame.contentWindow||ev.origin!==location.origin||!d||d.type!=="zp-engine-playhead"||d.protocolVersion!==1||d.source!=="creator.engine")return;document.querySelectorAll("#gr .c").forEach(cell=>{const cellIndex=[...grid.children].indexOf(cell),offset=cellIndex-18,padId=Math.max(1,Math.min(9,Math.floor(offset/17)+1));cell.classList.toggle("hd2",padId===d.activePad&&Number(cell.dataset.s)===d.step)});});
+ window.addEventListener("message",ev=>{const d=ev.data;if(ev.source!==frame.contentWindow||ev.origin!==location.origin||!d||d.type!=="zp-engine-pattern-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;document.querySelectorAll("#gr .c").forEach(cell=>{const index=[...grid.children].indexOf(cell),offset=index-18,padId=Math.max(1,Math.min(9,Math.floor(offset/17)+1)),step=Number(cell.dataset.s)||0;cell.classList.toggle("on",!!d.patterns?.[padId]?.[step])})});
  window.addEventListener("zp-engine-timeout",ev=>console.error("Creator engine timeout:",ev.detail.command));
  window.addEventListener("zp-engine-error",ev=>console.error("Creator engine error:",ev.detail.command,ev.detail.error||ev.detail.message));
  window.addEventListener("zp-engine-result",ev=>{if(ev.detail.result?.ok===false)console.error("Creator command failed:",ev.detail.command,ev.detail.result.error)});
