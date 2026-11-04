@@ -21,7 +21,6 @@ for (const path of sources) {
       }
       cursor = close + 9;
     }
-    }
   } else {
     new Function(source);
   }
