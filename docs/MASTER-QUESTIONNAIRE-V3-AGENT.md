@@ -175,3 +175,17 @@ Niveles:
 ## 10. Registro de decisiones
 
 Para cada hito registrar fecha/hora, SHA, archivos, contrato afectado, pruebas, CI, preview, QA de dispositivo, riesgos y siguiente decisión.
+
+
+## 11. Implementación del copiloto · primer corte
+
+- La rama ya contiene la ventana flotante del agente en Creator: launcher, drag, resize, minimizar, maximizar y cerrar.
+- El cliente local inspecciona controles mediante pointerdown/focusin y mantiene un diccionario de ayuda por módulo.
+- El estado actual se identifica como modo local sin IA remota. No se presenta como modelo generativo conectado.
+- Se amplió el catálogo de acciones con detener/reproducir, selector de muestras, guardar/gestionar proyecto, subir/bajar BPM, bancos A–D, Drive, chop y limpiar patrón.
+- Guardar requiere confirmación; chop y limpiar patrón requieren confirmación destructiva.
+- Las acciones pasan por zpBridgeSend y esperan ACK/error del motor. No se añadió ejecución arbitraria ni llamadas remotas desde el cliente.
+- scripts/validate.mjs incorpora aserciones del catálogo y de la confirmación de acciones destructivas.
+- Commits de esta intervención: a709efd58c69c68841b3a44c0ace9d35899eaabc (documentación), 42baeeed50717be41a1fa8ea7c4a41c9df21a808 (acciones del agente), 4e02f2c03761a87a7df159d7c865f2f3545421af (validación).
+- Estado CI del último commit: aún no confirmado por un run/check asociado; el endpoint de estado no devolvió checks.
+- Pendiente crítico: conectar proveedor IA detrás del Worker, añadir autenticación/limitación de uso, y construir modo desarrollador GitHub con diff y aprobación por acción. Esto requiere credenciales del lado servidor, nunca en el navegador.
