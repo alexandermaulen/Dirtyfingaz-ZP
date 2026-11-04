@@ -255,7 +255,7 @@ assert.equal(agentRegistry.panelSystem.activation, "hold");
 assert.equal(agentRegistry.panelSystem.dock, "side");
 assert.deepEqual(agentRegistry.panelSystem.panels.left.map(x=>x.id), ["L1x","L2x","L3x"]);
 assert.deepEqual(agentRegistry.panelSystem.panels.right.map(x=>x.id), ["R1x","R2x","R3x"]);
-assert.match(ui, /function buildAdaptivePanel\(side,groups,encoder\)/);
+assert.ok(ui.includes("function buildAdaptivePanel(side,groups,encoder)"), "FALTA IMPLEMENTAR: sistema de paneles adaptativos (buildAdaptivePanel).");
 assert.match(ui, /holdTimer=setTimeout\(\(\)=>\{held=true;expanded=true;renderOptions\(\)\},420\)/);
 assert.match(ui, /fetch\('\.\/zp-agent-registry\.json'\)/);
 assert.match(ui, /zp-panel-option-select/);
