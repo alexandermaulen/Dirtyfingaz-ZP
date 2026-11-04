@@ -140,6 +140,20 @@ button.on,button.active{background:linear-gradient(180deg,#eaff8a 0%,#b0ee2e 45%
  .kb{width:40px!important;height:40px!important}
  .trim-dial{width:62px!important;height:62px!important;min-height:62px!important;max-height:62px!important}
 }
+
+/* Compact SP-606 lower control matrix: six direct FX keys in one row */
+.control-deck{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;align-items:stretch!important}
+.control-deck>.fx{display:contents!important}
+.control-deck>.fx button{min-height:30px!important;max-height:34px!important;padding:2px!important;font-size:7px!important}
+.control-deck>.transport-row,.control-deck>.row{grid-column:1/-1!important}
+@media(max-height:760px){
+ .mid{height:230px!important}
+ .disp{width:230px!important;height:230px!important;min-width:230px!important;flex-basis:230px!important}
+ .pads{min-height:160px!important;max-height:180px!important}
+ .control-deck{gap:4px!important;padding:4px!important}
+ .control-deck>.transport-row button{min-height:30px!important}
+ .control-deck>.row button{min-height:27px!important}
+}
 </style></head><body><div id="app"></div>
 <script src="./zp-core.js"></script>
 <script>
