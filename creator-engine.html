@@ -388,7 +388,7 @@ function scheduleStep(){
  // Descarta pasos vencidos tras bloqueos del hilo principal para evitar ráfagas fuera de tiempo.
  while(nextStepTime<now-.045){
   nextStepTime+=beat;stepIndex=(stepIndex+1)%16;
-  if(stepIndex===0&&songMode){songPosition=(songPosition+1)%songOrder.length;activeBank=songOrder[songPosition];bankButtons.forEach(b=>b.classList.toggle("active",b.dataset.bank===activeBank))}
+  if(stepIndex===0&&songMode){songPosition=(songPosition+1)%songOrder.length;activeBank=songOrder[songPosition];bankButtons.forEach(b=>b.classList.toggle("active",b.dataset.bank===activeBank));publishPianoState()}
  }
  while(nextStepTime<horizon){
   const scheduledStep=stepIndex,scheduledBank=activeBank,scheduledAt=Math.max(nextStepTime,now+.003),generation=transportGeneration;
