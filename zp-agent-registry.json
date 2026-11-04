@@ -268,5 +268,30 @@
         "Verify PWA offline cache"
       ]
     }
+  },
+  "controls": {
+    "Lx": {
+      "label": "Lx",
+      "role": "navigation-encoder",
+      "owner": "creator.ui",
+      "input": "pointer-rotation",
+      "behavior": "Recorre secuencialmente herramientas y funciones visibles, enfoca y desplaza el control seleccionado sin ejecutarlo.",
+      "stepDegrees": 14,
+      "wrap": true,
+      "commands": [],
+      "contextEvent": "focusin"
+    },
+    "Rx": {
+      "label": "Rx",
+      "role": "contextual-parameter-encoder",
+      "owner": "creator.ui+creator-engine.html",
+      "input": "pointer-rotation",
+      "behavior": "Conserva PUSH ENTER contextual: trim IN/OUT, MIDI en modo libre y FX amount cuando no hay otro modo activo.",
+      "existingSelector": ".pe",
+      "commands": [
+        "creator.sample.trim.set",
+        "creator.control.set"
+      ]
+    }
   }
 }
