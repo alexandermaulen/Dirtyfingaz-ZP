@@ -146,12 +146,14 @@ Evolucionar Pattern Edit desde la grilla de pads/pasos a un editor MIDI de notas
 - Drag horizontal/vertical para mover notas; borde derecho para redimensionar duración.
 - Zoom y desplazamiento dentro del LCD.
 - El scheduler dispara las notas por paso, aplicando pitch, velocity y longitud a la reproducción del pad.
+- El estado MIDI se publica sólo al cambiar notas, pad o banco, evitando re-render en cada tick del transporte y preservando pointer capture durante la edición.
+- El bridge LCD valida que los mensajes de telemetría provengan del iframe del motor; el cambio de banco en Song Mode actualiza las notas visibles.
 - Los pasos clásicos siguen funcionando cuando no existe una nota MIDI en ese paso; una nota MIDI sustituye el disparo clásico en su mismo paso para evitar doble golpe.
 
 ### Evidencia
 - Rama: feat/hybrid-hardware-ui-system.
-- HEAD de código: 23a434ec767fee2412dc719c8a51a7022f8774cb.
-- CI del último commit de GUI: [run 41877908234 · QUEUED](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41877908234).
+- HEAD de código: b7363a6ef234c823de3194ccda5e22f444ff3c0a.
+- CI del último commit de GUI: [run 41878092266 · QUEUED](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41877908234).
 - Archivos: creator.html, creator-engine.html, scripts/validate.mjs.
 - Validador ampliado con contratos MIDI, scheduling, comandos y persistencia.
 - QA real en Safari iOS/iPhone y audio con samples todavía pendiente.
