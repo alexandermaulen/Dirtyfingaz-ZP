@@ -245,6 +245,57 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .value-panel .fx-readout strong{font-size:12px!important}
 .value-buttons,.value-big{display:none!important}
 @media(max-height:760px){.value-panel .value-encoder-wrap .kb{width:76px!important;height:76px!important;min-width:76px!important;min-height:76px!important}.value-panel .value-encoder-wrap .kb b{inset:21px}.value-panel .value-encoder-wrap .kb i{transform-origin:2px 29px!important}}
+
+/* APPROVED REFERENCE LAYOUT · iPhone 11 · 9 clean performance pads */
+#app{width:414px!important;height:896px!important;padding:9px 7px!important;gap:5px!important}
+.title{order:0!important;height:30px!important}
+.knobs{order:1!important;height:82px!important;flex:none!important}
+.mid{order:2!important;height:214px!important;min-height:214px!important;flex:none!important;display:grid!important;grid-template-columns:52px minmax(0,1fr) 52px 72px!important;gap:5px!important;align-items:center!important}
+.mid>.fx{width:auto!important;min-width:0!important;flex:none!important;display:flex!important;flex-direction:column!important;gap:6px!important;height:100%!important;justify-content:center!important}
+.mid>.fx button{width:100%!important;min-height:54px!important;max-height:62px!important;font-size:7px!important;padding:3px 1px!important;overflow-wrap:anywhere!important}
+.mid>.disp{width:100%!important;height:auto!important;aspect-ratio:1/1!important;min-width:0!important;min-height:0!important;flex:none!important;border-radius:50%!important;padding:9px!important;align-self:center!important}
+.mid>.disp canvas{min-height:65px!important;max-height:86px!important}
+.mid>.value-panel{width:72px!important;min-width:72px!important;max-width:72px!important;flex:none!important;padding:5px 3px!important;gap:5px!important;border-radius:9px!important}
+.mid .value-head span{font-size:11px!important}
+.mid .value-head small{font-size:5px!important}
+.mid .value-big{min-height:34px!important}
+.mid .value-big output{font-size:21px!important}
+.mid .value-panel .value-buttons{display:none!important}
+.mid .value-panel .sp-dial{gap:1px!important}
+.mid .value-panel .sp-dial .kb{width:48px!important;height:48px!important}
+.mid .value-target{font-size:6px!important;min-height:16px!important}
+.mid .fx-readout{font-size:5px!important;padding-top:3px!important}
+.mid .fx-readout strong{font-size:11px!important}
+.control-deck{order:3!important;display:flex!important;flex-direction:column!important;gap:4px!important;padding:5px!important}
+.control-deck>.transport-row{order:0!important}
+.control-deck>.row:not(.transport-row){order:1!important}
+.sequencer{order:4!important;max-height:74px!important;overflow:hidden!important}
+.seq-top{height:17px!important}
+.step-grid{grid-template-columns:repeat(16,minmax(0,1fr))!important;gap:2px!important}
+.step-grid button{height:20px!important;min-height:20px!important;font-size:6px!important}
+.pads{order:5!important;flex:1 1 auto!important;min-height:190px!important;max-height:none!important;width:100%!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:7px!important;padding:3px!important}
+.pads .pc{gap:0!important}
+.pads .pc>em{display:none!important}
+.pads .pad{width:100%!important;height:100%!important;min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;border-radius:9px!important}
+.pads .pad b,.pads .pad small{display:none!important}
+.pads .pad:after{content:"";width:9px;height:9px;border-radius:50%;background:#b8ff67;opacity:.18;box-shadow:0 0 8px #9aff4a}
+.pads .pad.on:after{opacity:1;background:#f2ffb0;box-shadow:0 0 10px #fff,0 0 22px #9aff4a}
+.lowerDeck{order:6!important}
+.foot{order:7!important}
+@media(max-height:760px){
+ #app{height:896px!important}
+ .mid{height:190px!important;min-height:190px!important}
+ .mid>.fx button{min-height:46px!important}
+ .pads{min-height:165px!important}
+ .control-deck>.transport-row button{min-height:28px!important}
+ .sequencer{max-height:65px!important}
+}
+@media(max-width:390px){
+ .mid{grid-template-columns:45px minmax(0,1fr) 45px 64px!important;gap:4px!important}
+ .mid>.value-panel{width:64px!important;min-width:64px!important;max-width:64px!important}
+ .mid>.fx button{font-size:6px!important}
+}
+
 </style></head><body><div id="app"></div>
 <script src="./zp-storage.js"></script>
 <script src="./zp-core.js"></script>
@@ -364,15 +415,15 @@ const mid=$("div","mid"),left=$("div","fx"),right=$("div","fx"),display=$("div",
 display.append(screenHead,screenName,canvas,screenTabs,screenActions);
 [["DRIVE","drive"],["DELAY","delay"],["FILTER","filter"]].forEach(([label,key])=>{let b=button(label);masterFxButtons[key]=b;b.onclick=()=>runtime.execute("creator.fx.master.toggle",{name:key});left.append(b)});
 const loadSide=button("LOAD"),chopSide=button("CHOP"),clearSide=button("CLEAR");loadSide.onclick=()=>file.click();chopSide.onclick=()=>runtime.execute("creator.sample.chop");clearSide.onclick=()=>runtime.execute("creator.sample.clear");right.append(loadSide,chopSide,clearSide);
-mid.append(display);app.append(mid);
+mid.append(left,display,right);app.append(mid);
 const transport=$("span","","DETENIDO"),playButton=button("PLAY"),recordButton=button("REC"),stopButton=button("STOP"),bpmDown=button("−"),bpmText=$("strong","",bpm+" BPM"),bpmUp=button("+"),loopButton=button("LOOP"),songButton=button("SONG");
 const toolbar=$("div","row transport-row");[recordButton,playButton,stopButton,bpmDown,bpmText,bpmUp,loopButton,songButton].forEach(b=>toolbar.append(b));
 recordButton.onclick=()=>runtime.execute("creator.record.toggle");playButton.onclick=()=>runtime.execute("creator.transport.toggle");stopButton.onclick=()=>runtime.execute("creator.transport.stop");bpmDown.onclick=()=>runtime.execute("creator.bpm.adjust",{delta:-1});bpmUp.onclick=()=>runtime.execute("creator.bpm.adjust",{delta:1});loopButton.classList.add("on");loopButton.onclick=()=>runtime.execute("creator.loop.toggle");songButton.onclick=()=>runtime.execute("creator.song.toggle");
 const row2=$("div","row"),bankButtons=[];BANKS.forEach(bank=>{let b=button("PAT "+bank);b.dataset.bank=bank;if(bank===activeBank)b.classList.add("active");b.onclick=()=>runtime.execute("creator.pattern.select",{bank:bank});bankButtons.push(b);row2.append(b)});
-const saveButton=button("GUARDAR"),exportButton=button("EXPORT WAV"),clearButton=button("BORRAR RITMO"),muteButton=button("MUTE"),soloButton=button("SOLO");const actionRow=$("div","row action-row");[saveButton,exportButton,clearButton,muteButton,soloButton].forEach(b=>actionRow.append(b));const controlDeck=$("div","control-deck");[left,right,toolbar,row2,actionRow].forEach(x=>controlDeck.append(x));app.append(controlDeck);saveButton.onclick=()=>runtime.execute("creator.project.save");exportButton.onclick=()=>runtime.execute("creator.export.wav");clearButton.onclick=()=>runtime.execute("creator.pattern.clear");muteButton.onclick=()=>runtime.execute("creator.pad.mute.toggle");soloButton.onclick=()=>runtime.execute("creator.pad.solo.toggle");
+const saveButton=button("GUARDAR"),exportButton=button("EXPORT WAV"),clearButton=button("BORRAR RITMO"),muteButton=button("MUTE"),soloButton=button("SOLO");const actionRow=$("div","row action-row");[saveButton,exportButton,clearButton,muteButton,soloButton].forEach(b=>actionRow.append(b));const controlDeck=$("div","control-deck");[toolbar,row2,actionRow].forEach(x=>controlDeck.append(x));app.append(controlDeck);saveButton.onclick=()=>runtime.execute("creator.project.save");exportButton.onclick=()=>runtime.execute("creator.export.wav");clearButton.onclick=()=>runtime.execute("creator.pattern.clear");muteButton.onclick=()=>runtime.execute("creator.pad.mute.toggle");soloButton.onclick=()=>runtime.execute("creator.pad.solo.toggle");
 const seq=$("div","sequencer"),seqTop=$("div","seq-top"),stepGrid=$("div","step-grid");seqTop.append(transport,$("span","","16 PASOS · PAD ACTIVO"));seq.append(seqTop,stepGrid);for(let i=0;i<16;i++){let b=button(String(i+1));b.onclick=()=>runtime.execute("creator.pattern.step.toggle",{step:i});stepGrid.append(b)}app.append(seq);
 const file=$("input");file.type="file";file.accept="audio/*,.wav,.mp3,.aiff,.ogg,.m4a";file.hidden=true;document.body.append(file);file.onchange=e=>{loadSample(e.target.files[0]);file.value=""};
-const padButtons=[],pads=$("div","pads");for(let n=1;n<=9;n++){let cell=$("div","pc"),b=button("<b>"+String(n).padStart(2,"0")+"</b><small>VACÍO</small>");b.className="pad";b.addEventListener("pointerdown",e=>{e.preventDefault();b.classList.add("on");runtime.execute("creator.pad.trigger",{padId:n})});["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>b.classList.remove("on")));cell.append(b);pads.append(cell);padButtons.push(b)}app.append(pads);
+const padButtons=[],pads=$("div","pads");for(let n=1;n<=9;n++){let cell=$("div","pc"),b=button("<b></b><small></small>");b.className="pad";b.addEventListener("pointerdown",e=>{e.preventDefault();b.classList.add("on");runtime.execute("creator.pad.trigger",{padId:n})});["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,()=>b.classList.remove("on")));cell.append(b);pads.append(cell);padButtons.push(b)}app.append(pads);
 
 const menuButton=button("MENU","SYSTEM"),f1Button=button("F1","SAMPLE"),f2Button=button("F2","PAD"),f3Button=button("F3","FX"),enterButton=button("ENTER"),exitButton=button("EXIT");
 const commandRow=$("div","sp-commands");[menuButton,f1Button,f2Button,f3Button,enterButton,exitButton].forEach(b=>commandRow.append(b));
