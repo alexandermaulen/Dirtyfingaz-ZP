@@ -16,7 +16,6 @@ export class RadioRoom {
 
   async fetch(request) {
     const url = new URL(request.url);
-    if (url.pathname === "/api/agent/chat") return handleAgentChat(request, env);
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return json({ ok: false, error: "WEBSOCKET_REQUIRED" }, 426);
     }
@@ -163,6 +162,7 @@ async function handleAgentChat(request, env) {
   }
   if (!bucket || now - bucket.start >= 60000) agentRate.set(ip, { start: now, count: 1 });
   else bucket.count++;
+  if (Number(request.headers.get("Content-Length") || 0) > 18000) return json({ ok: false, error: "PAYLOAD_TOO_LARGE" }, 413);
   const raw = await request.text();
   if (raw.length > 18000) return json({ ok: false, error: "PAYLOAD_TOO_LARGE" }, 413);
   let input;
@@ -205,7 +205,8 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/api/agent/health") {
-      return json({ ok: env.ENVIRONMENT === "preview" && !!env.AI, enabled: env.ENVIRONMENT === "preview" && !!env.AI, model: AGENT_MODEL, environment: env.ENVIRONMENT || "unknown" });
+      const enabled = env.ENVIRONMENT === "preview" && env.AI_AGENT_ENABLED === "true" && !!env.AI;
+      return json({ ok: enabled, enabled, model: AGENT_MODEL, environment: env.ENVIRONMENT || "unknown" });
     }
     if (url.pathname === "/api/agent/chat") return handleAgentChat(request, env);
     if (url.pathname.startsWith("/api/agent/")) return json({ ok: false, error: "NOT_FOUND" }, 404);
