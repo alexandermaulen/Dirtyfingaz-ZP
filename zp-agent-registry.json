@@ -1,0 +1,235 @@
+{
+  "version": "1.0.0",
+  "app": "DIRTYFINGAZ ZP",
+  "architecture": {
+    "gui": {
+      "file": "creator.html",
+      "owner": "Interacción, controles, feedback visual, navegación, contexto seleccionado."
+    },
+    "engine": {
+      "file": "creator-engine.html",
+      "owner": "AudioContext, AudioBuffer, scheduler, parámetros efectivos, estado musical y persistencia."
+    },
+    "bridge": {
+      "protocolVersion": 1,
+      "owner": "Mensajes GUI↔motor con source, requestId, ACK/error y timeout."
+    },
+    "storage": {
+      "file": "zp-storage.js",
+      "owner": "IndexedDB y aislamiento por proyecto."
+    },
+    "worker": {
+      "file": "radio-worker.mjs",
+      "owner": "API contextual del agente y servicios Radio Grid."
+    },
+    "serviceWorker": {
+      "file": "sw.js",
+      "owner": "Caché offline y actualización de assets."
+    },
+    "rules": [
+      "No duplicar estado autoritativo del motor en GUI.",
+      "No ejecutar código arbitrario desde el agente.",
+      "Separar propuesta, validación, aplicación y confirmación.",
+      "Los cambios que crucen GUI y motor requieren contrato y pruebas de ambos lados.",
+      "Trabajar sólo en feat/hybrid-hardware-ui-system; nunca modificar main ni hacer merge sin autorización."
+    ]
+  },
+  "parameters": [
+    {
+      "key": "master",
+      "label": "Volumen maestro",
+      "module": "Master / Mixer",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.75,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "master",
+        "value": "$value"
+      },
+      "unit": "linear",
+      "description": "Ganancia maestra del motor."
+    },
+    {
+      "key": "cutoff",
+      "label": "Filtro Cutoff",
+      "module": "Filter",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.5,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "cutoff",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Frecuencia mapeada de 300 a 18000 Hz."
+    },
+    {
+      "key": "resonance",
+      "label": "Resonancia",
+      "module": "Filter",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.25,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "resonance",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Q mapeado de 0.1 a 18."
+    },
+    {
+      "key": "drive",
+      "label": "Drive",
+      "module": "FX",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.25,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "drive",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Cantidad de saturación del motor."
+    },
+    {
+      "key": "fx-amount",
+      "label": "Cantidad FX",
+      "module": "FX",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.25,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "fx-amount",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Cantidad global del bloque FX."
+    },
+    {
+      "key": "trim.start",
+      "label": "Sample IN",
+      "module": "Sample Editor",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.00005,
+      "default": 0,
+      "command": "creator.sample.trim.set",
+      "payload": {
+        "target": "start",
+        "position": "$value",
+        "commit": true
+      },
+      "unit": "normalized",
+      "description": "Punto inicial del sample. Debe permanecer antes de OUT."
+    },
+    {
+      "key": "trim.end",
+      "label": "Sample OUT",
+      "module": "Sample Editor",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.00005,
+      "default": 1,
+      "command": "creator.sample.trim.set",
+      "payload": {
+        "target": "end",
+        "position": "$value",
+        "commit": true
+      },
+      "unit": "normalized",
+      "description": "Punto final del sample. Debe permanecer después de IN."
+    },
+    {
+      "key": "midi.step",
+      "label": "MIDI Step",
+      "module": "Piano Roll",
+      "owner": "engine",
+      "type": "integer",
+      "min": 0,
+      "max": 15,
+      "step": 1,
+      "default": 0,
+      "command": null,
+      "description": "Posición de nota dentro del patrón. Requiere selección de nota y API MIDI dedicada."
+    },
+    {
+      "key": "midi.pitch",
+      "label": "MIDI Pitch",
+      "module": "Piano Roll",
+      "owner": "engine",
+      "type": "integer",
+      "min": 0,
+      "max": 127,
+      "step": 1,
+      "default": 60,
+      "command": null,
+      "description": "Altura MIDI de la nota seleccionada."
+    },
+    {
+      "key": "midi.length",
+      "label": "MIDI Length",
+      "module": "Piano Roll",
+      "owner": "engine",
+      "type": "integer",
+      "min": 1,
+      "max": 16,
+      "step": 1,
+      "default": 1,
+      "command": null,
+      "description": "Duración de nota en pasos."
+    },
+    {
+      "key": "midi.velocity",
+      "label": "MIDI Velocity",
+      "module": "Piano Roll",
+      "owner": "engine",
+      "type": "integer",
+      "min": 1,
+      "max": 127,
+      "step": 1,
+      "default": 100,
+      "command": null,
+      "description": "Velocidad MIDI de la nota seleccionada."
+    }
+  ],
+  "developerTemplates": [
+    "json",
+    "gui",
+    "bridge",
+    "engine",
+    "test"
+  ],
+  "workflow": [
+    "Inspectar control y leer contexto observado.",
+    "Resolver parámetro en este registro JSON.",
+    "Consultar backend con módulo, valor, proyecto y contrato.",
+    "Generar propuesta o snippet, nunca ejecutar eval.",
+    "Validar allowlist y precondiciones.",
+    "Aplicar sólo parámetros live con comando explícito y ACK del motor.",
+    "Para código, copiar/exportar el snippet y preparar cambios separados GUI/engine/validator."
+  ]
+}
