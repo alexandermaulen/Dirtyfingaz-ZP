@@ -338,3 +338,38 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 4. Diseñar migraciones y RLS en Supabase; revisión previa antes de aplicarlas.
 5. Decidir almacenamiento binario R2 vs Supabase Storage.
 6. Habilitar herramientas de programación sólo con diff, rama feat/* y PR; nunca merge automático.
+
+
+## 14. Cuestionario V3 y Copiloto IA · 2026-11-04
+
+### Fuente canónica
+- Se creó `MASTER-QUESTIONNAIRE-V3-AGENT.md` en la raíz del repositorio.
+- Consolida las respuestas V2 del usuario: trim multi-selección `drag, pinch, independent, rubber, snap, free, knob, wave, remember, undo`; SHIFT+PAD para configuración personalizada; conexión trim-síntesis pendiente de contrato; prioridad IA; orientación `all`.
+- Se repararon los enlaces desde `docs/CUESTIONARIO-MAESTRO-DIRTYFINGAZ-ZP.md` al documento V3.
+
+### Copiloto contextual
+- SHIFT + PAD expone configuración rápida MUTE/SOLO/PREVIEW/LOAD SAMPLE e identidad del pad.
+- Agente contextual recibe pad activo, banco, BPM, proyecto y etiqueta/control visible.
+- Catálogo local incluye transporte, sample browse/preview/chop, patrón clear, save/project manager, BPM, bancos A-D, Drive, Mute y Solo.
+- Acciones destructivas y escrituras requieren confirmación; el modelo no ejecuta comandos directamente.
+- Ventana flotante tiene drag, minimizar, maximizar/restaurar, cierre, launcher y handle de resize táctil.
+
+### Workers AI
+- Worker tiene `POST /api/agent/chat` y `GET /api/agent/health`.
+- Modelo: `@cf/openai/gpt-oss-20b`, binding `AI`.
+- Endpoint bloqueado salvo `ENVIRONMENT=preview` y `AI_AGENT_ENABLED=true`; producción mantiene `AI_AGENT_ENABLED=false`.
+- Se validan Origin, método, tamaño, contexto, historial y rate limit temporal por IP.
+- El rate limit actual vive en memoria del isolate; no equivale a rate limit durable ni autenticación. Antes de beta pública deben añadirse identidad, autorización y límites durables.
+- No se ha verificado despliegue ni inferencia real en Cloudflare Preview.
+- No se habilitó function calling para acciones de app; sólo conversación contextual y Action Registry local.
+
+### Estado de integración
+- Supabase `dirtyfingaz-os` sigue sin tablas/migraciones/Edge Functions y no se modificó.
+- R2 vs Supabase Storage, autenticación, RLS, memoria persistente y backend definitivo siguen pendientes de decisión.
+- No se migró a Java; se mantiene HTML/CSS/JS y TypeScript gradual para contratos nuevos.
+- Modo de programación GitHub (diff, rama feature, PR) todavía no está conectado al agente.
+
+### CI
+- SHA validado: `d73270fe0c876025bbd87cce0ff895433706069f`.
+- GitHub Actions run `41887071325`: **SUCCESS**, job validate.
+- No se modificó `main`, no se hizo merge y no se desplegó producción.
