@@ -5,7 +5,7 @@ function json(data, status = 200) {
 }
 
 function cleanText(value, max = 40) {
-  return String(value || "").replace(/[<>\\u0000-\\u001f]/g, "").trim().slice(0, max);
+  return String(value || "").replace(/[<>]/g, "").trim().slice(0, max);
 }
 
 export class RadioRoom {
@@ -127,7 +127,7 @@ export default {
       return json({ ok: true, service: "DIRTYFINGAZ ZP Radio Grid", realtime: "durable-object-websocket", version: 1 });
     }
 
-    const match = url.pathname.match(/^\\/api\\/radio\\/rooms\\/([a-z0-9-]{2,48})$/i);
+    const match = url.pathname.match(/^\/api\/radio\/rooms\/([a-z0-9-]{2,48})$/i);
     if (match) {
       if (request.method !== "GET") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
       if (!env.RADIO_ROOMS) return json({ ok: false, error: "RADIO_ROOMS_BINDING_MISSING" }, 503);
