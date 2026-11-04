@@ -63,3 +63,7 @@
 .rx::before{content:'Rx'}
 .lx.lx-active{filter:drop-shadow(0 0 8px var(--lcd))}
 .lx-active{outline:2px solid var(--lcd)!important;outline-offset:2px;box-shadow:0 0 10px var(--lcd)!important}
+
+.lx{width:80px;height:80px;margin:-20px 0;justify-self:center;z-index:3}
+@media(max-width:620px){.lx{width:58px;height:58px}}
+@media(max-height:700px){.lx{width:56px;height:56px}}
