@@ -402,3 +402,12 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - Worker consulta el JSON del asset y entrega al modelo la definición del parámetro y el contexto de arquitectura. La IA permanece habilitada sólo en Preview.
 - Validación estática añadida para registro, inspector, snippets y carga PWA. Pendiente ejecutar CI en el SHA final y QA real en Safari iPhone 11.
 - Sin cambios en `main`, sin merge, sin cambios de esquema Supabase.
+
+
+## 17. Encoders Lx / Rx · 2026-11-04
+
+- Se incorporó Lx a la izquierda de Rx en la fila PUSH ENTER. Lx recorre en ciclo las herramientas y funciones visibles (botones, herramientas Piano Roll, marcadores IN/OUT, destinos MIDI y controles LCD), enfoca el elemento, lo resalta y lo desplaza a la vista. No ejecuta la acción seleccionada.
+- Rx conserva el comportamiento existente de PUSH ENTER: trim IN/OUT, MIDI en modo libre y FX amount cuando no hay otro modo activo. Se conserva el selector funcional `.pe` y se añade la identidad explícita `data-rotor=Rx`.
+- Ambos encoders quedan identificados en `zp-agent-registry.json`. El agente distingue Lx como navegación y Rx como control contextual; el Worker adjunta la definición del encoder seleccionado al contexto de IA.
+- Lx usa pasos de navegación de 14 grados y permite avanzar/retroceder mediante flechas de teclado cuando está enfocado.
+- Validación estática de sintaxis inline de Creator: PASS (3 scripts). JSON del registro válido. Pendiente CI en el SHA final y prueba real en Safari iPhone 11, incluyendo foco, scroll, tacto y ACK/error/persistencia de un parámetro.
