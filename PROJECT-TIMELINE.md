@@ -2,8 +2,8 @@
 
 **Corte de contexto:** 2026-11-04  
 **Rama de trabajo:** `feat/hybrid-hardware-ui-system`  
-**HEAD verificado al último corte:** `e8d3722c9cfdf93d8915f13c636902cb0edc1218`  
-**CI del último HEAD:** [run 41875733973 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41875733973)  
+**HEAD de código verificado al último corte:** `19da29f90ae514c2cde0a05e54583893b23a548b`  
+**CI del último HEAD de código:** [run 41876042966 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41876042966)  
 **Creación de la bitácora:** commit `f2787c48b98b8fd38739786da664a61680cf1126`; [CI 41870939896 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41870939896)  
 **Regla de seguridad:** no escribir en `main`, no mover refs de `main`, no fusionar PR. Supabase `dirtyfingaz-os` permanece fuera del alcance.
 
@@ -108,11 +108,13 @@ Mejorar la pantalla LCD/LED y el flujo de sample editing sin desacoplar la GUI d
 - **creator.html:** controles LCD BROWSE, TRNS y audition; menú DIRTYFINGAZ OS dentro de la pantalla con cambio de tema bajo THEME/COLOR; rueda vertical táctil para BPM; barra de transporte por pasos con estado rojo al superar el umbral de peak; barra compacta de Piano Roll con zoom +/- y scroll horizontal.
 - La reproducción del pad reutiliza el sample y el rango IN/OUT que consume el motor; el recorte existente sigue enviando cambios por el bridge y persiste al confirmar.
 - El editor conserva la grilla de 16 pasos y las nueve filas de pads. El zoom amplía el área horizontal sin alterar el patrón guardado.
+- La barra superior ofrece DRAW/SELECT, SNAP 1/16–1/8–1/4, CLEAR y zoom -/+ en los extremos.
+- La barra compacta del Piano Roll incorpora DRAW/SELECT, SNAP 1/16–1/8–1/4, CLEAR y zoom con menos a la izquierda y más a la derecha.
 
 ### Evidencia
 - Rama: feat/hybrid-hardware-ui-system.
-- Último HEAD: e8d3722c9cfdf93d8915f13c636902cb0edc1218.
-- GitHub Actions: [run 41875733973 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41875733973).
+- Último HEAD de código: 19da29f90ae514c2cde0a05e54583893b23a548b.
+- GitHub Actions: [run 41876042966 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41876042966).
 - Archivos principales: creator.html, creator-engine.html.
 - Los primeros intentos de CI fallaron por separadores de línea literales introducidos durante las ediciones; ambos puntos se corrigieron y el SHA final pasó el validador.
 - Preview Cloudflare: URL histórica conocida, sin despliegue verificado para este SHA.
