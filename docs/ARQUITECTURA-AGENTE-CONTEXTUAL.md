@@ -1,5 +1,5 @@
 # AGENTE CONTEXTUAL · DIRTYFINGAZ ZP
-Versión 0.1 · Diseño e integración inicial local
+Versión 0.2 · Cliente local + endpoint IA limitado a Preview
 
 ## Objetivo
 Asistente de desarrollo integrado en Creator. Debe conocer qué módulo/control está activo, explicar su función, recomendar el siguiente paso y ejecutar únicamente acciones registradas. A futuro podrá ayudar a modificar código y abrir PRs desde una rama de trabajo.
@@ -7,11 +7,13 @@ Asistente de desarrollo integrado en Creator. Debe conocer qué módulo/control 
 ## Estado de implementación de esta versión
 - Ventana flotante arrastrable, minimizable, expandible, redimensionable y cerrable.
 - Launcher para reabrir la ventana.
-- Contexto capturado desde controles enfocados o pulsados.
+- Contexto capturado desde controles enfocados o pulsados: módulo, control, pad, banco, BPM y proyecto cuando el motor los expone.
 - Diccionario local de conceptos y recomendaciones.
 - Registro allowlist de acciones locales seguras.
 - Confirmación para acciones que escriben o alteran el proyecto.
-- No llama a un modelo remoto ni finge tener acceso a GitHub, Cloudflare o Supabase.
+- El cliente consulta POST /api/agent/chat sólo en Cloudflare Preview; nunca llama directamente al proveedor desde el navegador.
+- En producción el endpoint permanece desactivado; si la API no está disponible, el diccionario local sigue funcionando.
+- El modelo configurado en Preview es @cf/openai/gpt-oss-20b. No se ha desplegado ni probado todavía.
 - No ejecuta JavaScript arbitrario ni modifica archivos de repositorio.
 
 ## Contrato de contexto
@@ -41,6 +43,11 @@ Cada acción define id, descripción, riesgo, permisos, validación y handler. L
 | `sample.browse` | Abrir selector de samples | Bajo | No |
 | `project.save` | Guardar proyecto actual | Medio | Sí |
 | `project.manager` | Abrir gestor de proyectos | Bajo | No |
+| `sample.chop` | Cortar sample activo | Destructivo | Sí |
+| `pattern.clear` | Limpiar patrón activo | Destructivo | Sí |
+| `bpm.up` / `bpm.down` | Ajustar tempo en 1 BPM | Bajo | No |
+| `bank.A`–`bank.D` | Seleccionar banco | Bajo | No |
+| `fx.drive` | Alternar Drive | Bajo | No |
 | `context.inspect` | Explicar contexto detectado | Ninguno | No |
 
 ## Interfaz
@@ -68,7 +75,7 @@ Creator GUI
       └─ Agent UI / Chat
           └─ Action Registry (allowlist)
               ├─ Local App Actions → zpBridgeSend → Creator Engine
-              └─ Agent API → Cloudflare Worker
+              └─ Preview Agent API → Cloudflare Worker → Workers AI
                     ├─ Auth/JWT validation
                     ├─ Context and permission validation
                     ├─ Rate limit / audit log
@@ -101,14 +108,14 @@ Creator GUI
 - Comandos desconocidos no ejecutan nada.
 - Acciones con escritura requieren confirmación.
 - Transporte STOP usa el comando registrado y muestra el ACK/error real.
-- No se realiza llamada de red desde el agente local.
+- El cliente sólo llama al endpoint same-origin /api/agent/chat en Preview; producción y fallback local no llaman a un modelo remoto.
 - La GUI y el motor conservan sus contratos actuales.
 
-## Pendiente antes de IA real
-1. Acordar proveedor/modelo y presupuesto.
-2. Diseñar autenticación y sesiones.
-3. Implementar endpoint Worker con JWT, rate limits y logs.
-4. Preparar esquema/migraciones Supabase y políticas RLS.
-5. Cargar diccionario versionado y recuperación contextual.
-6. Añadir herramientas GitHub restringidas a rama de desarrollo y PR.
-7. Definir conjunto de pruebas adversariales y regresión.
+## Pendiente para completar IA y modo desarrollador
+1. Desplegar y probar el endpoint en Cloudflare Preview; verificar coste y límites reales.
+2. Añadir autenticación de usuario y rate limit durable antes de cualquier beta pública.
+3. Implementar function calling con esquema estricto, validación de parámetros y confirmación en cliente.
+4. Decidir backend Supabase exclusivo de ZP; diseñar Auth, ownership, RLS y migraciones antes de crear tablas.
+5. Cargar diccionario versionado y RAG; persistencia de sesiones y memoria por proyecto.
+6. Añadir integración GitHub App/OAuth restringida a ramas feature, diffs, CI y PR; nunca merge automático.
+7. Definir pruebas adversariales, regresión y retirada del modo desarrollador antes de beta.
