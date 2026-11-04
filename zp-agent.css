@@ -113,11 +113,14 @@
 }
 
 
-/* Seis accesos físicos restaurados sin reemplazar los paneles contextuales Lx/Rx. */
-.legacy-button-stack{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;width:100%;flex:none}
-.legacy-physical-button{width:100%;min-width:0;min-height:22px!important;height:22px;font-size:9px!important;line-height:1;padding:1px!important;border-radius:6px!important;letter-spacing:.02em;touch-action:manipulation}
-.legacy-physical-button:active{filter:brightness(1.5);transform:translateY(1px)}
-.adaptive-side-panel{gap:3px}
+/* Lx/Rx recuperan el dial vintage 2D/3D de giro continuo. */
+.adaptive-side-panel{gap:5px}
+.adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:66px;height:66px;min-width:66px;min-height:66px;margin-top:8px!important;flex:none;touch-action:none}
+.adaptive-side-panel>.lx::before,.adaptive-side-panel>.rx::before{opacity:1}
+.adaptive-side-panel>.lx i,.adaptive-side-panel>.rx i{inset:8px}
+.zp-value-tick{animation:zpValueTick .12s ease-out 1;transform-origin:center}
+@keyframes zpValueTick{0%{transform:translate3d(0,0,0)}25%{transform:translate3d(-1px,0,0)}50%{transform:translate3d(1px,0,0)}75%{transform:translate3d(-.5px,0,0)}100%{transform:translate3d(0,0,0)}}
+@media(prefers-reduced-motion:reduce){.zp-value-tick{animation:none}}
 .panel-group-nav{flex:none}
 .panel-group{min-height:18px!important;height:18px;font-size:8px!important}
 .panel-option{min-height:20px!important;height:20px;font-size:8px!important}
@@ -125,8 +128,7 @@
 .adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:32px;height:32px;min-width:32px;min-height:32px}
 .panel-secondary{top:43px}
 @media(max-width:620px){
- .legacy-physical-button{min-height:22px!important;height:22px;font-size:8px!important}
  .panel-group{min-height:18px!important;height:18px}
  .panel-option{min-height:20px!important;height:20px}
- .adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:30px;height:30px;min-width:30px;min-height:30px}
+ .adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:58px;height:58px;min-width:58px;min-height:58px}
 }
