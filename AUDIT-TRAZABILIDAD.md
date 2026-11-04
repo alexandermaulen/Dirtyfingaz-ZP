@@ -175,3 +175,44 @@ Esta auditoría es estática. No declara éxito de reproducción, rendimiento, c
 ### Regla de actualización
 - Este corte es una fotografía verificable, no una declaración de que todas las funciones estén terminadas.
 - En cada nuevo hito actualizar SHA, CI, despliegue, pruebas de dispositivo y estado de Supabase por separado.
+
+
+## 10. Registro consolidado de incidencias y cadena de reparación · 2026-11-04 13:40 CLT
+
+Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de GitHub Actions se cuentan como reintentos del mismo fallo, no como defectos independientes.
+
+| ID | Incidencia / causa raíz | Eslabón afectado | Estado | Evidencia / reparación |
+|---|---|---|---|---|
+| CI-01 | Expresión regular inválida al extraer scripts HTML en el validador | CI / parser de scripts | Corregido | Sustituida por recorrido con `indexOf`; posteriormente se eliminó una llave sobrante que provocaba `Unexpected token 'else'`. |
+| BR-01 | El motor emitía `source:"creator.engine"` y el shell esperaba `creator.ui` | Bridge motor → shell | Corregido | El shell acepta el emisor real del motor y el validador exige ambos lados del contrato. |
+| DATA-01 | Chops se guardaban en el proyecto por defecto, no en `currentProjectId` | Samples → IndexedDB / proyectos | Corregido | Escritura mediante `saveProjectSample(currentProjectId,...)`. |
+| DATA-02 | El cambio de rango IN/OUT sólo actualizaba memoria | Trim → persistencia | Corregido | Guardado al finalizar `pointerup` / `pointercancel`; prueba estática añadida. |
+| DATA-03 | El nombre visible del Project Manager podía quedar desincronizado al cargar | Project Manager → GUI | Corregido | Sincronización del campo `#zp-project-name` en refresh y LOAD. |
+| SEQ-01 | Cálculo de fila/pad incorrecto en grid de 16 pasos | GUI secuenciador → padId del motor | Corregido | Mapeo por índice real de celda: `Math.floor((index-1)/17)+1`. |
+| CI-02 | Test del secuenciador comprobaba una fórmula antigua | Validador → contrato del secuenciador | Corregido | Aserciones actualizadas para las tres rutas: playhead, patrón e interacción. |
+| RADIO-01 | El motor creaba `MediaStreamDestination`, pero no exponía `zpGetBroadcastStream` | Audio master Creator → Radio Grid / WebRTC | Corregido en código; QA pendiente | Getter publicado en `window`; Actions run 41869055940 terminó PASS. Falta prueba real entre dos dispositivos y Safari iOS. |
+
+### Eslabones con riesgo residual
+
+1. **Creator GUI ↔ motor:** validar en navegador real todos los comandos, estados ACK/error, pads 1–9 y 16 pasos.
+2. **Audio master ↔ Radio Grid:** confirmar que el stream contiene el bus master del Creator, no el micrófono de respaldo; validar autoplay, permisos y reconexión iOS.
+3. **Trim ↔ IndexedDB ↔ proyecto:** cambiar IN/OUT, cambiar de proyecto, recargar y comprobar aislamiento de muestras y rangos.
+4. **Render WAV/MP3:** probar OfflineAudioContext real en Safari, duración, canales, sample rate, bit depth, encoder MP3 y descarga del archivo completo.
+5. **Durable Objects / Worker:** comprobar deploy Wrangler, binding SQLite, WebSocket, persistencia room-state, presencia, señalización y TURN cuando corresponda.
+6. **PWA / responsive:** probar instalación, offline, cache versioning, safe areas, orientación y pantalla completa desde iPhone 11 en adelante.
+7. **Supabase:** sigue separado. No aplicar cambios ni mezclar con `dirtyfingaz-os`; definir esquema/RLS y migraciones sólo después de aprobar el diseño de datos.
+
+### Estado CI y GitHub verificado
+
+- Rama de desarrollo `feat/hybrid-hardware-ui-system`: HEAD `c02b8539e12a3db319d228e9fae4e06f4b1d449b`.
+- GitHub Actions run `41869055940`: job `validate` completado con **success** para ese SHA.
+- Los fallos anteriores observados fueron en el mismo paso de validación y se agrupan por causa raíz en la tabla; no son ocho defectos distintos.
+- GitHub informa que PR #3 fue fusionado a `main` con merge commit `53b9151b96979da980bd446fa7dbb9f3c3cf3886`. Esta fusión no fue ejecutada por esta intervención. No se realizarán nuevas fusiones ni cambios directos a `main` sin instrucción explícita.
+- El corte anterior de la sección 9 queda como evidencia histórica; no debe usarse como estado actual.
+
+### Política de colaboración de agentes, modelos y complementos
+
+- Los conectores disponibles pueden trabajar sobre el repositorio sólo con los permisos de la cuenta/conexión vinculada; no pueden otorgar por sí solos permisos a identidades de agentes o servicios no especificadas.
+- Recomendación por defecto: escritura limitada a ramas `feat/*`, revisión por PR y CI obligatorio; `main` protegido y sin escritura directa para agentes.
+- Alternativas a aprobar: (A) lectura y diagnóstico solamente; (B) escritura en ramas de trabajo y PR, sin merge; (C) escritura amplia del repositorio, reservada a identidades concretas y con alcance explícito.
+- No se conceden permisos de administrador, secretos, producción, Supabase ni despliegue por defecto. La autorización debe identificar el agente/servicio y el nivel exacto.
