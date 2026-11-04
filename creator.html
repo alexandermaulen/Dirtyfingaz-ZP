@@ -345,12 +345,12 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  bind("UTILITY",()=>zpBridgeSend("creator.export.wav"));
  bind("IMPORT/EXPORT",()=>zpBridgeSend("creator.sample.load.request"));
  bind("PADSETTING",()=>zpBridgeSend("creator.pad.mute.toggle"));
- bind("EFXSETTING",()=>zpBridgeSend("creator.fx.master.toggle",{name:"drive"}));
+ bind("EFXSETTING",()=>zpBridgeSend("creator.fx.master.toggle",{name:"reverb"}));
  bind("FILTERDRIVE",()=>zpBridgeSend("creator.fx.master.toggle",{name:"drive"}));
  bind("RESONATOR",()=>zpBridgeSend("creator.fx.master.toggle",{name:"filter"}));
  bind("ISOLATOR",()=>zpBridgeSend("creator.fx.master.toggle",{name:"filter"}));
  bind("DELAY",()=>zpBridgeSend("creator.fx.master.toggle",{name:"delay"}));
- bind("MFX",()=>zpBridgeSend("creator.fx.master.toggle",{name:"drive"}));
+ bind("MFX",()=>zpBridgeSend("creator.fx.master.toggle",{name:"reverb"}));
  bind("START/END",()=>zpBridgeSend("creator.sample.trim.target.toggle"));
  /* Selector de bancos A-D */
  ["A/F","B/G","C/H","D/I"].forEach((label,i)=>bind(label,()=>zpBridgeSend("creator.pattern.select",{bank:["A","B","C","D"][i]})));
