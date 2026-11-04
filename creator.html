@@ -147,6 +147,7 @@ canvas{width:168px;height:46px}
 </style>
 <style id="zp-engine-frame">#zp-engine{position:fixed!important;left:-10000px!important;top:0!important;width:1px!important;height:1px!important;border:0!important;opacity:0!important;pointer-events:none!important}</style></head>
 <body>
+<button id="creator-home" type="button" aria-label="Volver a la página principal" title="Volver al inicio">←</button>
 <div class="unit" id="unit" data-skin="verde">
  <div class="hd"><i class="screw"></i><h1>DIRTYFINGAZ <b>Z</b></h1><span class="by">BY TAPES CROMO</span><i class="screw"></i></div>
  <div class="kn" id="kn"></div>
@@ -173,8 +174,9 @@ canvas{width:168px;height:46px}
 <script>
 const $=s=>document.querySelector(s),unit=$('#unit'),scr=$('#scr');
 const mk=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
-/* escala para que quepa en cualquier móvil */
-const fit=()=>{unit.style.zoom=1;const cs=getComputedStyle(document.documentElement),pv=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0);unit.style.zoom=Math.min(innerWidth/436,(innerHeight-pv)/(unit.offsetHeight+12),1.6)};fit();addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,250));document.fonts&&document.fonts.ready.then(fit);
+/* escala adaptable: viewport visual, orientación y áreas seguras */
+const fit=()=>{unit.style.zoom=1;const vv=window.visualViewport,w=vv?vv.width:document.documentElement.clientWidth,h=vv?vv.height:window.innerHeight;const safeTop=parseFloat(getComputedStyle(document.documentElement).paddingTop)||0;const availableH=Math.max(280,h-safeTop-54);unit.style.zoom=Math.max(.62,Math.min(w/436,availableH/(unit.offsetHeight+12),1.6));};
+fit();addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>setTimeout(fit,300));window.visualViewport?.addEventListener('resize',fit,{passive:true});document.fonts&&document.fonts.ready.then(fit);
 /* perillas */
 [['VOLUME','<span>MIN</span><span>MAX</span>'],['CTRL 1','&#9670; CUTOFF &#9670;'],['CTRL 2','RESONANCE'],['CTRL 3','&#9670; DRIVE &#9670;']].forEach(([n,s])=>{
  const k=mk('div','k','<label>'+n+'</label>'),kb=mk('div','knob','<i></i>');k.append(kb,mk('div','sub',s));$('#kn').append(k);bindKnob(kb)});
@@ -315,7 +317,9 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
   zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
  });
  /* Salida al hub ZP */
- bind("EXIT",()=>parent.postMessage({type:"zp-exit-creator"},"*"));
+ const goHome=()=>parent.postMessage({type:"zp-exit-creator"},"*");
+ document.getElementById("creator-home")?.addEventListener("click",goHome);
+ bind("EXIT",goHome);
 })();
 </script>
 </body>
