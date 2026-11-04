@@ -78,7 +78,7 @@ h1 b{font-size:46px}
 canvas{width:150px;height:56px;image-rendering:pixelated}
 .ph{display:flex;justify-content:space-between;font-size:19px;line-height:19px}
 .ph span{cursor:pointer}
-.gr{display:grid;grid-template-columns:12px repeat(9,1fr);gap:2px;font-size:13px;line-height:13px}
+.gr{display:grid;grid-template-columns:12px repeat(16,minmax(0,1fr));gap:2px;font-size:13px;line-height:13px}
 .gr em{font-style:normal;text-align:center}
 .c{height:13px;border:1px solid color-mix(in srgb,var(--lcd) 45%,transparent)}
 .c.on{background:var(--lcd);box-shadow:0 0 6px var(--lcd)}
@@ -262,8 +262,8 @@ requestAnimationFrame(()=>requestAnimationFrame(fit));
 const skins=['verde','ambar','cian','rojo'];
 $('#menu').addEventListener('click',()=>{unit.dataset.skin=skins[(skins.indexOf(unit.dataset.skin)+1)%4];wave()});
 /* piano roll: botón PATTERN EDIT */
-const gr=$('#gr');gr.append(mk('em',''));for(let s=1;s<=9;s++)gr.append(mk('em','',s));
-for(let l=1;l<=9;l++){gr.append(mk('em','',l));for(let s=0;s<9;s++){const c=mk('div','c');c.dataset.s=s;gr.append(c)}}
+const gr=$('#gr');gr.append(mk('em',''));for(let s=1;s<=16;s++)gr.append(mk('em','',s));
+for(let l=1;l<=9;l++){gr.append(mk('em','',l));for(let s=0;s<16;s++){const c=mk('div','c');c.dataset.s=s;gr.append(c)}}
 gr.addEventListener('click',e=>{if(e.target.classList.contains('c'))e.target.classList.toggle('on')});
 const pb=by('PATTERNEDIT');pb.addEventListener('click',()=>{scr.classList.toggle('pr');pb.classList.toggle('lit',scr.classList.contains('pr'))});
 let tm=null,st=0;const cells=()=>[...gr.querySelectorAll('.c')];
@@ -303,6 +303,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
    if(data.type==="zp-engine-error")console.error("Creator engine:",data.command,data.error||data.message);
   }
  });
+ window.addEventListener("message",ev=>{const d=ev.data;if(ev.source!==frame.contentWindow||ev.origin!==location.origin||!d||d.type!=="zp-engine-playhead"||d.protocolVersion!==1||d.source!=="creator.engine")return;document.querySelectorAll("#gr .c").forEach(cell=>{const row=cell.parentElement,rowIndex=[...grid.children].indexOf(row),padId=Math.max(1,Math.min(9,Math.floor((rowIndex-17)/17)+1));cell.classList.toggle("hd2",padId===d.activePad&&Number(cell.dataset.s)===d.step)});});
  window.addEventListener("zp-engine-timeout",ev=>console.error("Creator engine timeout:",ev.detail.command));
  window.addEventListener("zp-engine-error",ev=>console.error("Creator engine error:",ev.detail.command,ev.detail.error||ev.detail.message));
  window.addEventListener("zp-engine-result",ev=>{if(ev.detail.result?.ok===false)console.error("Creator command failed:",ev.detail.command,ev.detail.result.error)});
@@ -323,9 +324,9 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  if(oldPlay){const play=oldPlay.cloneNode(true);oldPlay.replaceWith(play);play.addEventListener("click",()=>zpBridgeSend("creator.transport.toggle"));}
  bind("REC",()=>zpBridgeSend("creator.record.toggle"));
  bind("RECORDSETTING",()=>zpBridgeSend("creator.record.toggle"));
- bind("CHOP",()=>zpBridgeSend("creator.sample.chop"));
- bind("LOAD",()=>zpBridgeSend("creator.sample.load.request"));
- bind("CLEAR",()=>zpBridgeSend("creator.sample.clear"));
+ document.querySelectorAll(".tg span").forEach(tag=>{const label=norm(tag.textContent);if(label==="CHOP")tag.addEventListener("click",()=>zpBridgeSend("creator.sample.chop"));if(label==="SAMPLEEDIT")tag.addEventListener("click",()=>zpBridgeSend("creator.sample.load.request"));});
+ 
+ 
  bind("DEL",()=>zpBridgeSend("creator.sample.clear"));
  bind("LOOP",()=>zpBridgeSend("creator.loop.toggle"));
  bind("DJFXLOOPER",()=>zpBridgeSend("creator.loop.toggle"));
@@ -352,8 +353,8 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  if(grid)grid.addEventListener("click",ev=>{
   const cell=ev.target.closest(".c");if(!cell)return;
   const row=cell.parentElement,children=[...grid.children],index=children.indexOf(row);
-  const padId=Math.max(1,Math.min(9,Math.floor((index-10)/10)+1));
-  const step=Math.max(0,Math.min(8,Number(cell.dataset.s)||0));
+  const padId=Math.max(1,Math.min(9,Math.floor((index-17)/17)+1));
+  const step=Math.max(0,Math.min(15,Number(cell.dataset.s)||0));
   zpBridgeSend("creator.pad.select",{padId});
   zpBridgeSend("creator.pattern.step.toggle",{step});
  });
