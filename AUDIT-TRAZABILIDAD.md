@@ -373,3 +373,18 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - SHA validado: `d73270fe0c876025bbd87cce0ff895433706069f`.
 - GitHub Actions run `41887071325`: **SUCCESS**, job validate.
 - No se modificó `main`, no se hizo merge y no se desplegó producción.
+
+## 14. Piano Roll / Pattern Edit · mejoras de interacción · 2026-11-04
+
+- Controles de zoom `+` y `−` agrupados, mayores y con zona táctil ampliada.
+- El playhead del Piano Roll interpola entre pasos con `requestAnimationFrame`, usando el BPM y el último paso confirmado por el motor.
+- Al cambiar de pad, la GUI recibe su estado MIDI y resalta las notas de ese pad dentro del Piano Roll.
+- Barrido táctil sobre Pattern Edit alterna pasos pares (atajo de cada dos pasos) sin exigir taps individuales.
+- Pulsación de dos segundos sobre una nota abre MIDI Tools con información STEP / PITCH / LEN / VEL y selección del parámetro que controlará el rotor.
+- El botón `↕` activa edición libre; el rotor maestro `.pe` mueve pitch, step, length o velocity según el objetivo seleccionado. Si no hay nota seleccionada, desplaza el rango visible del teclado.
+- Mantener SHIFT durante el arrastre desactiva cuantización. En iPhone, el botón de modo libre sustituye la tecla SHIFT.
+- El cursor de movimiento libre se representa como retícula visible sobre el Piano Roll.
+- El motor conserva `micro` (0..0.999 de un paso) en cada nota y programa su reproducción con ese offset, permitiendo microtiming real en vez de sólo mover visualmente el bloque.
+- La edición MIDI sigue entrando por `creator.piano.note.upsert` y conserva persistencia de proyecto; no se modifica el contrato del bridge.
+- CI: run `41887619402` completó `validate` en SUCCESS para SHA `eb1eee612e37570ab30cf3a44e1f38b64d5862ec`. Las mejoras de información contextual y cursor se añadieron después y están pendientes de validación en el nuevo SHA.
+- Pruebas de dispositivo aún pendientes: gesto táctil continuo, rotor, SHIFT con teclado externo y reproducción de microtiming en Safari iOS.
