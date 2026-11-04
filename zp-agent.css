@@ -56,88 +56,22 @@
 @keyframes zpAgentTargetPulse{from{box-shadow:0 0 3px #c5ff45}to{box-shadow:0 0 13px #c5ff45,0 0 22px #80ff39}}
 @media(max-width:420px){#zp-agent-inspector{max-height:105px}#zp-agent-devtools{max-height:38%}#zp-agent-code{min-height:78px}}
 
-/* Lx/Rx: encoders independientes de navegación y control contextual */
-.lx,.rx{position:relative;touch-action:none;user-select:none;-webkit-user-select:none}
-.lx::before,.rx::before{position:absolute;left:50%;top:-13px;transform:translateX(-50%);font:800 9px/1 ui-monospace,monospace;letter-spacing:.08em;color:var(--lcd);text-shadow:0 0 5px var(--lcd)}
+
+/* Lx/Rx: encoders de navegación y ajuste contextual, ahora integrados al borde inferior del display. */
+.lx,.rx{position:absolute;touch-action:none;user-select:none;-webkit-user-select:none}
+.lx::before,.rx::before{position:absolute;left:50%;top:-12px;transform:translateX(-50%);font:800 9px/1 ui-monospace,monospace;letter-spacing:.08em;color:var(--lcd);text-shadow:0 0 5px var(--lcd)}
 .lx::before{content:'Lx'}
 .rx::before{content:'Rx'}
 .lx.lx-active{filter:drop-shadow(0 0 8px var(--lcd))}
 .lx-active{outline:2px solid var(--lcd)!important;outline-offset:2px;box-shadow:0 0 10px var(--lcd)!important}
-
-/* Encoders integrados en los raíles laterales del deck. */
-.mid .col{height:100%;min-width:0;justify-content:space-evenly;gap:2px}
-.mid .col .b{min-height:30px;font-size:13px;padding:2px}
-.mid .col .lx,.mid .col .rx{width:50px;height:50px;min-width:50px;min-height:50px;margin:0;flex:none;align-self:center;justify-self:center}
-.mid .col .lx::before,.mid .col .rx::before{top:-10px}
-.lx{z-index:4}
-@media(max-width:620px){
- .mid .col .b{min-height:28px;font-size:12px}
- .mid .col .lx,.mid .col .rx{width:46px;height:46px;min-width:46px;min-height:46px}
-}
-@media(max-height:700px){
- .mid .col .b{min-height:26px}
- .mid .col .lx,.mid .col .rx{width:42px;height:42px;min-width:42px;min-height:42px}
-}
-
-/* START/END: three interaction phases */
-.trim-marker.phase-locked{opacity:.42;pointer-events:none;filter:grayscale(1)}
-.unit[data-trim-phase="2"] .trim-marker{opacity:1;pointer-events:auto;filter:none}
-.unit[data-trim-phase="3"] .trim-marker{opacity:.4;pointer-events:none}
-
-/* L3x / R3x: paneles laterales adaptativos, selección por toque y opciones extra por hold. */
-.adaptive-side-panel{position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:5px;height:100%;min-width:0;overflow:visible;z-index:5}
-.panel-group-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;width:100%}
-.panel-group{min-height:25px!important;height:25px;font-size:10px!important;line-height:1;padding:1px!important;border-radius:7px!important;letter-spacing:-.04em}
-.panel-group.selected{background:linear-gradient(var(--tx),var(--lcd));color:#071b04;text-shadow:none;box-shadow:0 0 8px var(--lcd),inset 0 0 0 1px #fff8}
-.panel-primary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;width:100%}
-.panel-option{min-width:0;min-height:30px!important;height:30px;font-size:9px!important;line-height:1.05;padding:2px!important;border-radius:7px!important;overflow-wrap:anywhere}
-.panel-hold-hint{grid-column:1/-1;text-align:center;font-size:8px;line-height:10px;color:var(--lcd);opacity:.8;letter-spacing:.08em}
-.panel-secondary{position:absolute;top:52px;left:0;width:184px;max-width:calc(100vw - 32px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:6px;border:2px solid var(--bd);border-radius:10px;background:linear-gradient(145deg,#061b05,#001000);box-shadow:0 5px 18px #000c,0 0 10px var(--glow);z-index:30}
-#cr .panel-secondary{left:auto;right:0}
-.panel-secondary[hidden]{display:none}
-.panel-secondary-option{min-height:28px!important;height:28px;font-size:9px!important}
-.adaptive-side-panel>.lx,.adaptive-side-panel>.rx{align-self:center;margin-top:auto!important;width:46px;height:46px;min-width:46px;min-height:46px;flex:none}
-.adaptive-side-panel[data-expanded="true"]{z-index:31}
-@media(max-width:620px){
- .panel-group{font-size:9px!important;min-height:23px!important;height:23px}
- .panel-option{font-size:8px!important;min-height:27px!important;height:27px}
- .adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:42px;height:42px;min-width:42px;min-height:42px}
- .panel-secondary{width:168px;top:48px}
-}
-@media(max-height:700px){
- .adaptive-side-panel{gap:3px}
- .panel-group{height:22px;min-height:22px!important}
- .panel-option{height:25px;min-height:25px!important}
- .adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:38px;height:38px;min-width:38px;min-height:38px}
- .panel-secondary{top:45px}
-}
-
-
-/* Lx/Rx recuperan el dial vintage 2D/3D de giro continuo. */
-.adaptive-side-panel{gap:5px}
-.adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:66px;height:66px;min-width:66px;min-height:66px;margin-top:8px!important;flex:none;touch-action:none}
-.adaptive-side-panel>.lx::before,.adaptive-side-panel>.rx::before{opacity:1}
-.adaptive-side-panel>.lx i,.adaptive-side-panel>.rx i{inset:8px}
 .zp-value-tick{animation:zpValueTick .12s ease-out 1;transform-origin:center}
 @keyframes zpValueTick{0%{transform:translate3d(0,0,0)}25%{transform:translate3d(-1px,0,0)}50%{transform:translate3d(1px,0,0)}75%{transform:translate3d(-.5px,0,0)}100%{transform:translate3d(0,0,0)}}
 @media(prefers-reduced-motion:reduce){.zp-value-tick{animation:none}}
-.panel-group-nav{flex:none}
-.panel-group{min-height:18px!important;height:18px;font-size:8px!important}
-.panel-option{min-height:20px!important;height:20px;font-size:8px!important}
-.panel-hold-hint{font-size:7px;line-height:8px}
-.adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:32px;height:32px;min-width:32px;min-height:32px}
-.panel-secondary{top:43px}
-@media(max-width:620px){
- .panel-group{min-height:18px!important;height:18px}
- .panel-option{min-height:20px!important;height:20px}
- .adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:58px;height:58px;min-width:58px;min-height:58px}
-}
-
-/* Overrides finales: conservar el tamaño de los encoders en escritorio y móvil. */
-.adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:66px;height:66px;min-width:66px;min-height:66px}
-@media(max-width:620px){.adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:58px;height:58px;min-width:58px;min-height:58px}}
-
-/* Agent idle sequence: warning, 40% fade, compact glitch curtain. */
+/* START/END: tres fases de interacción. */
+.trim-marker.phase-locked{opacity:.42;pointer-events:none;filter:grayscale(1)}
+.unit[data-trim-phase="2"] .trim-marker{opacity:1;pointer-events:auto;filter:none}
+.unit[data-trim-phase="3"] .trim-marker{opacity:.4;pointer-events:none}
+/* Agente contextual: estados de inactividad y controles de GitHub. */
 #zp-agent-window.idle-warning{border-color:#c5ff45;box-shadow:0 0 0 1px #c5ff4540,0 14px 55px #000d}
 #zp-agent-window.idle-fade{animation:zpAgentFade40 2.2s ease-in-out forwards;pointer-events:none}
 @keyframes zpAgentFade40{0%{opacity:1;filter:none}100%{opacity:.4;filter:saturate(.65)}}
@@ -149,76 +83,3 @@
 .zp-agent-github-actions button{border:1px solid #557b38;border-radius:5px;background:#10250b;color:#c5ff45;padding:6px 8px;font-size:10px;min-height:30px!important}
 #zp-agent-github-result{padding:0 8px 8px;color:#a8c998;font:10px/1.45 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
 @media(prefers-reduced-motion:reduce){#zp-agent-window.idle-fade,#zp-agent-window.idle-curtain{animation-duration:.01ms;animation-iteration-count:1}}
-
-
-/* DIRTYFINGAZ ZP: lateral hardware button redesign */
-.adaptive-side-panel{gap:1px!important}
-.panel-group-nav{
- display:grid!important;
- grid-template-columns:minmax(0,1fr)!important;
- grid-template-rows:14px 18px 14px!important;
- gap:0!important;
- width:100%;
- flex:none;
-}
-.panel-group-nav .panel-group{
- position:relative;
- display:flex;
- align-items:center;
- justify-content:center;
- width:100%;
- height:100%!important;
- min-height:0!important;
- margin:0;
- padding:0 3px!important;
- overflow:hidden;
- border:0!important;
- border-radius:0!important;
- background:linear-gradient(145deg,var(--rim),var(--bd2))!important;
- color:var(--tx)!important;
- font-size:8px!important;
- font-weight:900;
- line-height:1!important;
- letter-spacing:.06em;
- text-shadow:var(--ol);
- box-shadow:inset 0 1px 0 #ffffff55,inset 0 -2px 0 #0008,0 2px 0 #000!important;
- clip-path:polygon(5% 0,95% 0,100% 18%,95% 100%,5% 100%,0 82%,0 18%);
- transform:translateZ(0);
- transition:transform .11s ease,filter .11s ease,box-shadow .11s ease,background .11s ease;
- touch-action:manipulation;
-}
-.panel-group-nav .panel-group::before{
- content:"";
- position:absolute;
- inset:2px;
- z-index:-1;
- clip-path:inherit;
- background:linear-gradient(160deg,color-mix(in srgb,var(--btn) 88%,#fff 12%),var(--dk) 82%);
- box-shadow:inset 0 1px 0 #ffffff30,inset 0 -2px 0 #0009;
-}
-#cl .panel-group-nav .panel-group:nth-child(1){clip-path:polygon(5% 0,100% 0,82% 100%,5% 100%,0 82%,0 18%)}
-#cl .panel-group-nav .panel-group:nth-child(2){clip-path:polygon(5% 0,95% 0,100% 18%,92% 100%,8% 100%,0 82%,0 18%)}
-#cl .panel-group-nav .panel-group:nth-child(3){clip-path:polygon(5% 0,82% 0,100% 100%,5% 100%,0 82%,0 18%)}
-#cr .panel-group-nav .panel-group:nth-child(1){clip-path:polygon(0 0,95% 0,100% 18%,100% 82%,95% 100%,18% 100%)}
-#cr .panel-group-nav .panel-group:nth-child(2){clip-path:polygon(5% 0,95% 0,100% 18%,100% 82%,92% 100%,0 100%)}
-#cr .panel-group-nav .panel-group:nth-child(3){clip-path:polygon(18% 0,95% 0,100% 18%,100% 82%,95% 100%,0 100%)}
-.panel-group-nav .panel-group.selected{
- background:linear-gradient(145deg,var(--rim),var(--bd2))!important;
- color:var(--tx)!important;
- filter:brightness(1.12);
- box-shadow:inset 0 0 0 1px var(--rim),inset 0 1px 0 #ffffff66,0 2px 0 #000!important;
-}
-.panel-group-nav .panel-group:active{
- background:linear-gradient(180deg,#eaff9a,var(--lcd))!important;
- color:#071b04!important;
- filter:brightness(1.35);
- transform:translateY(2px);
- text-shadow:none;
- box-shadow:inset 0 0 0 2px #f5ffd9,0 0 5px var(--lcd),0 0 13px var(--lcd)!important;
-}
-@media(max-width:620px){
- .panel-group-nav .panel-group{font-size:7.5px!important}
-}
-@media(prefers-reduced-motion:reduce){
- .panel-group-nav .panel-group{transition:none!important}
-}
