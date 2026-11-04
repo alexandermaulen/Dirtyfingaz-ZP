@@ -376,5 +376,219 @@
     "command": "creator.sample.trim.set",
     "persistence": "commit:true",
     "led": "trim-phase-led"
+  },
+  "panelSystem": {
+    "version": "1.0.0",
+    "presentation": "hybrid",
+    "activation": "hold",
+    "dock": "side",
+    "interaction": {
+      "tap": "select-group",
+      "holdMs": 420,
+      "hold": "expand-secondary-options",
+      "optionTap": "select-option-only"
+    },
+    "ownership": {
+      "gui": "creator.html",
+      "registry": "zp-agent-registry.json",
+      "agent": "zp-agent.js",
+      "engine": "creator-engine.html"
+    },
+    "executionPolicy": "Panel option selection emits zp-panel-option-select for contextual agent/UI handling only. It does not send engine commands unless an option is explicitly mapped to an existing allowlisted command and approved by the engine contract.",
+    "contexts": [
+      "sample",
+      "piano",
+      "pattern",
+      "fx",
+      "master"
+    ],
+    "panels": {
+      "left": [
+        {
+          "id": "L1x",
+          "label": "L1x",
+          "options": [
+            "START",
+            "END",
+            "PITCH",
+            "REVERSE",
+            "RESAMPLE",
+            "TRANSPOSE"
+          ],
+          "contexts": {
+            "piano": [
+              "NOTE",
+              "OCTAVE",
+              "TRANSPOSE",
+              "SCALE",
+              "QUANTIZE",
+              "VELOCITY"
+            ],
+            "pattern": [
+              "PAD",
+              "BANK",
+              "PATTERN",
+              "DUPLICATE",
+              "RESAMPLE",
+              "REVERSE"
+            ]
+          }
+        },
+        {
+          "id": "L2x",
+          "label": "L2x",
+          "options": [
+            "CUTOFF",
+            "RESONANCE",
+            "DRIVE",
+            "BITCRUSH",
+            "FILTER",
+            "SATURATION"
+          ],
+          "contexts": {
+            "piano": [
+              "PITCH",
+              "VELOCITY",
+              "LENGTH",
+              "NUDGE",
+              "MICROTIME",
+              "GATE"
+            ],
+            "pattern": [
+              "TUNE",
+              "DECAY",
+              "ATTACK",
+              "FILTER",
+              "PAN",
+              "GAIN"
+            ]
+          }
+        },
+        {
+          "id": "L3x",
+          "label": "L3x",
+          "options": [
+            "LFO",
+            "ENVELOPE",
+            "DEPTH",
+            "RATE",
+            "SYNC",
+            "AUTOMATION"
+          ],
+          "contexts": {
+            "piano": [
+              "EXPRESSION",
+              "MOD WHEEL",
+              "AFTERTOUCH",
+              "HUMANIZE",
+              "SWING",
+              "AUTOMATION"
+            ],
+            "pattern": [
+              "LFO",
+              "ENVELOPE",
+              "MOD DEPTH",
+              "RATE",
+              "SYNC",
+              "AUTOMATION"
+            ]
+          }
+        }
+      ],
+      "right": [
+        {
+          "id": "R1x",
+          "label": "R1x",
+          "options": [
+            "COMP",
+            "LIMITER",
+            "GATE",
+            "TRANSIENT",
+            "ISOLATOR",
+            "MULTIBAND"
+          ],
+          "contexts": {
+            "piano": [
+              "NOTE DYNAMICS",
+              "VELOCITY",
+              "GATE",
+              "ACCENT",
+              "HUMANIZE",
+              "LIMITER"
+            ],
+            "pattern": [
+              "BUS COMP",
+              "PAD GATE",
+              "TRANSIENT",
+              "ISOLATOR",
+              "MULTIBAND",
+              "LIMITER"
+            ]
+          }
+        },
+        {
+          "id": "R2x",
+          "label": "R2x",
+          "options": [
+            "DELAY",
+            "REVERB",
+            "STUTTER",
+            "LOOPER",
+            "BEAT REPEAT",
+            "GLITCH"
+          ],
+          "contexts": {
+            "piano": [
+              "NOTE DELAY",
+              "ARPEGGIATOR",
+              "QUANTIZE",
+              "SWING",
+              "HUMANIZE",
+              "STUTTER"
+            ],
+            "pattern": [
+              "SYNC DELAY",
+              "BEAT REPEAT",
+              "LOOPER",
+              "STUTTER",
+              "GLITCH",
+              "REVERSE"
+            ]
+          }
+        },
+        {
+          "id": "R3x",
+          "label": "R3x",
+          "options": [
+            "STEREO",
+            "PAN",
+            "CHORUS",
+            "PHASER",
+            "FLANGER",
+            "MASTER FX",
+            "OUTPUT"
+          ],
+          "contexts": {
+            "piano": [
+              "PAN",
+              "STEREO",
+              "CHORUS",
+              "REVERB SEND",
+              "OUTPUT",
+              "MASTER FX"
+            ],
+            "pattern": [
+              "STEREO WIDTH",
+              "PAN",
+              "CHORUS",
+              "PHASER",
+              "FLANGER",
+              "MASTER FX",
+              "OUTPUT"
+            ]
+          }
+        }
+      ]
+    }
   }
 }
