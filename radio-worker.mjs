@@ -137,6 +137,7 @@ const AGENT_SYSTEM = [
   "Para cambios de código, propone un plan y un diff verificable; no inventes que GitHub fue modificado.",
   "Actúas como copiloto de arquitectura y desarrollo de DIRTYFINGAZ ZP. Al retomar una sesión reconstruye rama, SHA, archivos, CI, preview, auditoría y tareas pendientes con evidencia disponible; no inventes continuidad.",
   "La fuente de verdad de controles y parámetros es zp-agent-registry.json. Usa el parámetro seleccionado y su definición JSON para explicar rango, unidad, propietario, comando, payload y dependencias. Si no existe en el registro, declara que falta registrarlo.",
+  "Para recomendar bibliotecas DAW móviles, consulta la base de conocimiento MOBILE-DAW-LIBRARY-GUIDE.md incluida en el contexto. Prioriza APIs nativas y módulos existentes; compara licencia, soporte Safari iOS, costo de CPU/memoria y solapamiento. No recomiendes Tone.js como reemplazo del motor ZP ni WEB MIDI como función nativa disponible en Safari iOS.",
   "El contrato de arquitectura es: creator.html = GUI y selección; creator-engine.html = audio, scheduler y estado autoritativo; zp-core.js = utilidades/runtime; zp-storage.js = IndexedDB y aislamiento de proyectos; radio-worker.mjs = API contextual y Radio Grid; sw.js = caché offline; scripts/validate.mjs = contratos y pruebas estáticas.",
   "Toda función que cruce GUI y motor requiere contrato explícito, protocolo versionado, requestId, ACK/error, timeout, validación de payload y prueba en ambos lados. No dupliques estado del motor en la GUI.",
   "Al recomendar configuración, indica valor actual observado, rango permitido, valor propuesto, motivo, impacto audible/visual, dependencias y forma de revertir. Distingue valor observado, inferencia y recomendación.",
@@ -180,9 +181,14 @@ async function handleAgentChat(request, env) {
   if (!message) return json({ ok: false, error: "MESSAGE_REQUIRED" }, 400);
   const rawContext = input.context && typeof input.context === "object" ? input.context : {};
   let registry = null;
+  let mobileDawKnowledge = "";
   try {
     const registryResponse = await env.ASSETS.fetch(new Request(new URL("/zp-agent-registry.json", requestUrl.origin)));
     if (registryResponse.ok) registry = await registryResponse.json();
+  } catch {}
+  try {
+    const knowledgeResponse = await env.ASSETS.fetch(new Request(new URL("/docs/agent/MOBILE-DAW-LIBRARY-GUIDE.md", requestUrl.origin)));
+    if (knowledgeResponse.ok) mobileDawKnowledge = (await knowledgeResponse.text()).slice(0, 9000);
   } catch {}
   const parameterKey = cleanText(rawContext.parameterKey, 80);
   const selectedParameter = Array.isArray(registry?.parameters) ? registry.parameters.find(item => item.key === parameterKey) || null : null;
@@ -217,6 +223,7 @@ async function handleAgentChat(request, env) {
   const messages = [
     { role: "system", content: AGENT_SYSTEM },
     { role: "system", content: "Contexto actual de la app (datos observados): " + JSON.stringify(context) },
+    ...(mobileDawKnowledge ? [{ role: "system", content: "Base de conocimiento de bibliotecas DAW móviles para DIRTYFINGAZ ZP (referencia técnica; no instalar dependencias sin aprobación):\\n" + mobileDawKnowledge }] : []),
     ...history,
     { role: "user", content: message }
   ];
