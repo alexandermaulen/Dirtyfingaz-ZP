@@ -275,14 +275,23 @@
       "role": "navigation-encoder",
       "owner": "creator.ui",
       "input": "pointer-rotation",
-      "behavior": "Navega las herramientas visibles del GUI, enfoca el destino sin ejecutarlo y desplaza su contenedor si corresponde.",
+      "behavior": "Navegación contextual: inactivo en vista general; se activa al abrir Pattern Edit o Piano Roll desde un patrón seleccionado y navega herramientas/parámetros del patrón.",
       "stepDegrees": 14,
       "wrap": true,
       "commands": [],
       "contextEvent": "focusin",
       "mount": "#cl",
       "placement": "left-side-rail",
-      "adaptive": true
+      "adaptive": true,
+      "activation": {
+        "trigger": [
+          "pattern-selected",
+          "pattern-edit-open",
+          "piano-roll-open"
+        ],
+        "default": "inactive",
+        "deactivateOn": "editor-close"
+      }
     },
     "Rx": {
       "label": "Rx",
@@ -355,7 +364,11 @@
         "position": "right-of-Lx",
         "independent": true
       },
-      "Lx": "preserved",
+      "Lx": {
+        "context": "pattern-edit-or-piano-roll",
+        "position": "left-rail",
+        "default": "inactive"
+      },
       "Rx": "preserved",
       "SHIFT": "preserved"
     }
