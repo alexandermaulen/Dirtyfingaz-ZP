@@ -31,7 +31,7 @@ const engine = read("creator-engine.html");
 const shell = read("index.html");
 const storage = read("zp-storage.js");
 const commands = [...engine.matchAll(/runtime\.register\(["']([^"']+)/g)].map((match) => match[1]);
-const custom = ["creator.sample.load.request", "creator.pad.select", "creator.sample.trim.target.toggle", "creator.control.set"];
+const custom = ["creator.sample.load.request", "creator.pad.select", "creator.sample.trim.target.toggle", "creator.sample.trim.set", "creator.control.set"];
 const sent = [...ui.matchAll(/zpBridgeSend\(["']([^"']+)/g)].map((match) => match[1]);
 const missing = [...new Set(sent)].filter((command) => !commands.includes(command) && !custom.includes(command));
 
@@ -41,6 +41,12 @@ assert.match(ui, /Math\.min\(15,Number\(cell\.dataset\.s\)\|\|0\)/);
 assert.match(ui, /index-17\)\/17/);
 assert.match(ui, /zp-engine-playhead/);
 assert.match(engine, /type:"zp-engine-playhead"/);
+assert.match(ui, /zp-engine-trim-state/);
+assert.match(ui, /creator\.sample\.trim\.set/);
+assert.match(ui, /trimPointer/);
+assert.match(engine, /function publishTrimState\(/);
+assert.match(engine, /payload\.commit&&samples\[activePad\]/);
+
 assert.match(ui, /protocolVersion:1/);
 assert.match(ui, /requestId/);
 assert.match(engine, /packet\.protocolVersion!==1/);
