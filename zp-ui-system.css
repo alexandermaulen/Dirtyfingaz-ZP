@@ -214,6 +214,12 @@ html[data-zp-ui="hardware"] #app .value-panel{
   background:linear-gradient(155deg,#1c3518,#071307 70%)!important;
   border-radius:5px!important;
 }
+html[data-zp-ui="hardware"] #app .mid{
+  grid-template-columns:52px minmax(0,1fr) 52px 88px!important;
+}
+html[data-zp-ui="hardware"] #app .mid>.value-panel{
+  width:88px!important;min-width:88px!important;max-width:88px!important;
+}
 html[data-zp-ui="hardware"] #app .value-panel .sp-dial .kb{
   width:68px!important;height:68px!important;min-width:68px!important;min-height:68px!important;
   border:3px solid #050b04!important;
