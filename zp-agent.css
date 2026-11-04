@@ -78,3 +78,8 @@
  .mid .col .b{min-height:26px}
  .mid .col .lx,.mid .col .rx{width:42px;height:42px;min-width:42px;min-height:42px}
 }
+
+/* START/END: three interaction phases */
+.trim-marker.phase-locked{opacity:.42;pointer-events:none;filter:grayscale(1)}
+.unit[data-trim-phase="2"] .trim-marker{opacity:1;pointer-events:auto;filter:none}
+.unit[data-trim-phase="3"] .trim-marker{opacity:.4;pointer-events:none}

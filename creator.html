@@ -126,6 +126,15 @@ h1{color:var(--tx);text-shadow:1px 1px 0 var(--bd2),2px 2px 0 var(--bd2),3px 3px
 .v1{gap:7px}.l1{gap:11px}.l2{gap:5px;align-items:center}.mn{padding:0 4px}
 canvas{width:168px;height:46px}
 .mk{position:absolute;top:calc(50% + 10px);width:18px;height:14px;border:1px solid var(--lcd);font-size:8px;line-height:12px;font-style:normal;text-align:center;text-shadow:none;cursor:pointer;z-index:3;pointer-events:auto}.mk.l{left:10px}.mk.r{right:10px}.trim-marker.active{background:var(--lcd);color:var(--scr);box-shadow:0 0 8px var(--lcd)}
+.trim-phase-button{display:flex!important;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.trim-phase-button[data-phase="1"]{background:linear-gradient(180deg,#caffb8,#65d77c)!important;color:#08250d!important;text-shadow:none!important;box-shadow:inset 0 0 0 2px #efffea,0 3px 0 #000,0 0 12px #8dff9b!important}
+.trim-phase-button[data-phase="2"]{background:linear-gradient(180deg,#ffc36c,#d87924)!important;color:#351600!important;text-shadow:none!important;box-shadow:inset 0 0 0 2px #ffe0a8,0 3px 0 #000,0 0 12px #ff9b36!important}
+.trim-phase-button[data-phase="3"]{background:linear-gradient(180deg,#ff7770,#a90016)!important;color:#fff!important;text-shadow:0 0 4px #fff!important;box-shadow:inset 0 0 0 2px #ffb0a8,0 3px 0 #000,0 0 14px #ff2020!important}
+.trim-phase-led{display:inline-block;width:8px;height:8px;flex:none;border-radius:50%;background:#baffc2;box-shadow:0 0 5px currentColor,0 0 10px currentColor;border:1px solid #fff9}
+.trim-phase-button[data-phase="2"] .trim-phase-led{background:#ffb04a;color:#ff9a24}
+.trim-phase-button[data-phase="3"] .trim-phase-led{background:#ff2525;color:#ff1717;animation:trimLedPulse .85s infinite alternate}
+.trim-phase-button[data-phase="1"] .trim-phase-led{color:#9dffad}
+@keyframes trimLedPulse{from{opacity:.55;box-shadow:0 0 3px #f00}to{opacity:1;box-shadow:0 0 5px #f44,0 0 15px #f00}}
 .tg{filter:drop-shadow(2px 0 0 #000) drop-shadow(-2px 0 0 #000) drop-shadow(0 -2px 0 #000)}
 .tg span{border:0;border-radius:0;background:color-mix(in srgb,var(--pn) 55%,#000)}
 .tg .tr{clip-path:polygon(0 0,calc(100% - 9px) 0,100% 100%,0 100%)}
@@ -295,10 +304,12 @@ const lx=mk('div','knob lx','<i></i>');lx.dataset.rotor='Lx';lx.setAttribute('ro
 const pe=mk('div','knob pe rx','<i></i>');pe.dataset.rotor='Rx';pe.setAttribute('role','button');pe.setAttribute('aria-label','Rx: información y control contextual lateral derecho');pe.tabIndex=0;bindKnob(pe,1);$('#cr').append(pe);
 row('repeat(6,1fr)',[['PATTERN SEQUENCER',3],['SAMPLE EDIT',3]],
  ['PATTERN<br>SELECT','PATTERN<br>EDIT','RECORD<br>SETTING','START/<br>END','PITCH<br>SPEED','MARK'],'big ra');
+const trimPhaseButton=[...document.querySelectorAll("#rows .b")].find(b=>b.textContent.replace(/\s/g,"")==="START/END");
+if(trimPhaseButton){trimPhaseButton.classList.add("trim-phase-button");trimPhaseButton.innerHTML='<span>START/END</span><i class="trim-phase-led" aria-hidden="true"></i>';trimPhaseButton.setAttribute("aria-live","polite");}
 /* Lx recorre herramientas y funciones sin ejecutarlas; Rx conserva PUSH ENTER. */
 (()=>{let angle=null,remainder=0,index=-1,active=null;const selector='.b,.piano-tools button,.trim-marker,[data-midi-target],.lcd-action,#play,#bpmWheel';
  const targets=()=>[...document.querySelectorAll(selector)].filter(el=>!el.closest('#zp-agent-window')&&!el.disabled&&el.getAttribute('aria-hidden')!=='true'&&el.getClientRects().length);
- const choose=direction=>{const list=targets();if(!list.length)return;index=(index+direction+list.length)%list.length;const el=list[index];if(active)active.classList.remove('lx-active');active=el;active.classList.add('lx-active');if(!el.hasAttribute('tabindex'))el.tabIndex=-1;el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});window.__zpLxTarget=el;window.__zpLx={index,total:list.length,direction,target:el.dataset.agentContext||el.dataset.trimTarget||el.dataset.midiTarget||el.textContent.trim().replace(/\s+/g,' ').slice(0,48)};};
+ const choose=direction=>{if(window.__zpTrimPhase===3)return;const list=targets();if(!list.length)return;index=(index+direction+list.length)%list.length;const el=list[index];if(active)active.classList.remove('lx-active');active=el;active.classList.add('lx-active');if(!el.hasAttribute('tabindex'))el.tabIndex=-1;el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});window.__zpLxTarget=el;window.__zpLx={index,total:list.length,direction,target:el.dataset.agentContext||el.dataset.trimTarget||el.dataset.midiTarget||el.textContent.trim().replace(/\s+/g,' ').slice(0,48)};};
  lx.addEventListener('pointerdown',()=>{angle=parseFloat(getComputedStyle(lx).getPropertyValue('--r'))||0;remainder=0});
  lx.addEventListener('pointermove',()=>{const next=parseFloat(getComputedStyle(lx).getPropertyValue('--r'))||0;if(angle===null){angle=next;return}remainder+=next-angle;angle=next;let steps=Math.trunc(remainder/14);if(!steps)return;remainder-=steps*14;const direction=Math.sign(steps);for(let n=0;n<Math.min(Math.abs(steps),24);n++)choose(direction)});
  ['pointerup','pointercancel'].forEach(type=>lx.addEventListener(type,()=>{angle=null}));
@@ -329,8 +340,26 @@ document.addEventListener('pointerup',rel);document.addEventListener('pointercan
 /* fila inferior */
 $('#bt').append(mk('i','screw'));['UTILITY','IMPORT/EXPORT','PAD SETTING','EFX SETTING','PROJECT'].forEach(t=>$('#bt').append(B(t)));$('#bt').append(mk('i','screw'));
 /* waveform real + recorte IN/OUT táctil */
-let trimState=null,activeTrimTarget="start",trimPointer=false;
-window.__zpTrimRotor={active:false,target:"start",range:{start:0,end:1},lastAngle:null};
+let trimState=null,activeTrimTarget="start";
+const trimPointers=new Map();
+window.__zpTrimPhase=1;
+window.__zpTrimRotor={active:true,target:"start",range:{start:0,end:1},lastAngle:null};
+function setTrimPhase(phase){
+ phase=((Number(phase)-1+3)%3)+1;
+ window.__zpTrimPhase=phase;
+ const state=window.__zpTrimRotor;
+ state.active=phase!==2;
+ state.target=phase===3?"start":activeTrimTarget;
+ state.lastAngle=null;
+ const labels={1:"FASE 1 · SELECCIÓN IN/OUT",2:"FASE 2 · TOUCH LIBRE",3:"FASE 3 · CONTROL Lx/Rx"};
+ if(trimPhaseButton){trimPhaseButton.dataset.phase=String(phase);trimPhaseButton.setAttribute("aria-label","START/END · "+labels[phase]);trimPhaseButton.title=labels[phase]+" · Pulsar para cambiar";}
+ unit.dataset.trimPhase=String(phase);
+ document.querySelectorAll("[data-trim-target]").forEach(el=>{el.classList.toggle("phase-locked",phase===3);el.classList.toggle("active",el.dataset.trimTarget===state.target)});
+ trimPointers.clear();
+ wave();
+ window.dispatchEvent(new CustomEvent("zp-trim-phase-change",{detail:{phase,label:labels[phase]}}));
+}
+setTrimPhase(1);
 function wave(){const c=$('#wv'),x=c.getContext('2d'),w=168,h=46;x.clearRect(0,0,w,h);const lcd=getComputedStyle(unit).getPropertyValue('--lcd').trim();x.fillStyle="#001000";x.fillRect(0,0,w,h);
  if(trimState&&trimState.waveform&&trimState.waveform.length){x.fillStyle=lcd;const data=trimState.waveform;for(let i=0;i<data.length;i++){const xx=i*w/data.length,lo=data[i][0],hi=data[i][1],y1=h*(.5-hi*.46),y2=h*(.5-lo*.46);x.fillRect(xx,y1,Math.max(1,w/data.length-0.5),Math.max(1,y2-y1))}}
  else{x.fillStyle=lcd;for(let i=0;i<40;i++){const p=i%10,env=Math.exp(-p/3)*(p?1:.5),bar=Math.max(2,Math.round(21*env*(.7+.3*Math.abs(Math.sin(i*2.3)))/2)*2);x.fillRect(4+i*4,23-bar,3,bar*2)}}
@@ -339,16 +368,33 @@ function wave(){const c=$('#wv'),x=c.getContext('2d'),w=168,h=46;x.clearRect(0,0
 wave();
 const waveCanvas=$('#wv');
 function trimPosition(e){const r=waveCanvas.getBoundingClientRect();return Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))}
-function sendTrim(e,commit){const p=trimPosition(e);window.__zpTrimRotor.target=activeTrimTarget;window.__zpTrimRotor.range=window.__zpTrimRotor.range||{start:0,end:1};zpBridgeSend("creator.sample.trim.set",{target:activeTrimTarget,position:p,commit:!!commit})}
-waveCanvas.addEventListener("pointerdown",e=>{e.preventDefault();const p=trimPosition(e),r=trimState?.range||{start:0,end:1};activeTrimTarget=Math.abs(p-r.start)<=Math.abs(p-r.end)?"start":"end";window.__zpTrimRotor.active=true;window.__zpTrimRotor.target=activeTrimTarget;trimPointer=true;waveCanvas.setPointerCapture(e.pointerId);sendTrim(e,false)});
-waveCanvas.addEventListener("pointermove",e=>{if(trimPointer)sendTrim(e,false)});
-["pointerup","pointercancel","lostpointercapture"].forEach(type=>waveCanvas.addEventListener(type,e=>{if(trimPointer){trimPointer=false;sendTrim(e,true)}}));
+function sendTrim(e,commit,target=activeTrimTarget){
+ const p=trimPosition(e);window.__zpTrimRotor.target=target;window.__zpTrimRotor.range=window.__zpTrimRotor.range||{start:0,end:1};
+ zpBridgeSend("creator.sample.trim.set",{target,position:p,commit:!!commit});
+}
+waveCanvas.addEventListener("pointerdown",e=>{
+ if(window.__zpTrimPhase===3)return;
+ e.preventDefault();
+ const p=trimPosition(e),r=trimState?.range||{start:0,end:1};
+ let target=Math.abs(p-r.start)<=Math.abs(p-r.end)?"start":"end";
+ if(window.__zpTrimPhase===2&&[...trimPointers.values()].some(item=>item.target===target))target=target==="start"?"end":"start";
+ if(window.__zpTrimPhase===1){
+  activeTrimTarget=target;window.__zpTrimRotor.active=true;window.__zpTrimRotor.target=target;
+  document.querySelectorAll("[data-trim-target]").forEach(el=>el.classList.toggle("active",el.dataset.trimTarget===target));
+ }
+ trimPointers.set(e.pointerId,{target});waveCanvas.setPointerCapture(e.pointerId);sendTrim(e,false,target);
+});
+waveCanvas.addEventListener("pointermove",e=>{const item=trimPointers.get(e.pointerId);if(item)sendTrim(e,false,item.target)});
+["pointerup","pointercancel","lostpointercapture"].forEach(type=>waveCanvas.addEventListener(type,e=>{
+ const item=trimPointers.get(e.pointerId);if(item){sendTrim(e,true,item.target);trimPointers.delete(e.pointerId)}
+}));
 window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-trim-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;trimState=d;window.__zpTrimRotor.range=d.range||{start:0,end:1};wave()});
  window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-radio-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;window.dispatchEvent(new CustomEvent("zp-agent-runtime-context",{detail:{...d.state,projectId:d.project?.id||null,projectName:d.project?.name||null}}))});
 window.addEventListener("zp-engine-result",e=>{const d=e.detail?.result?.data;if(d?.target==="start"||d?.target==="end"){activeTrimTarget=d.target;window.__zpTrimRotor.target=d.target;if(d.range)window.__zpTrimRotor.range=d.range;document.querySelectorAll("[data-trim-target]").forEach(el=>el.classList.toggle("active",el.dataset.trimTarget===d.target))}});
-const selectTrimTarget=marker=>{activeTrimTarget=marker.dataset.trimTarget;const state=window.__zpTrimRotor;state.active=true;state.target=activeTrimTarget;state.range={...(trimState?.range||state.range||{start:0,end:1})};state.lastAngle=null;document.querySelectorAll("[data-trim-target]").forEach(el=>el.classList.toggle("active",el===marker));};
+const selectTrimTarget=marker=>{if(window.__zpTrimPhase===3)return;activeTrimTarget=marker.dataset.trimTarget;const state=window.__zpTrimRotor;state.active=window.__zpTrimPhase===1;state.target=activeTrimTarget;state.range={...(trimState?.range||state.range||{start:0,end:1})};state.lastAngle=null;document.querySelectorAll("[data-trim-target]").forEach(el=>el.classList.toggle("active",el===marker));};
 document.querySelectorAll("[data-trim-target]").forEach(marker=>{marker.addEventListener("click",()=>selectTrimTarget(marker));marker.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectTrimTarget(marker)}})});
 document.querySelector("[data-trim-target=\"start\"]")?.classList.add("active");
+trimPhaseButton?.addEventListener("click",()=>setTrimPhase(window.__zpTrimPhase%3+1));
 
 requestAnimationFrame(()=>requestAnimationFrame(fit));
 /* temas: toca MENU */
@@ -444,7 +490,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  bind("ISOLATOR",()=>zpBridgeSend("creator.fx.master.toggle",{name:"filter"}));
  bind("DELAY",()=>zpBridgeSend("creator.fx.master.toggle",{name:"delay"}));
  bind("MFX",()=>zpBridgeSend("creator.fx.master.toggle",{name:"reverb"}));
- bind("START/END",()=>zpBridgeSend("creator.sample.trim.target.toggle"));
+ // START/END recorre tres modos de interacción coordinados desde la GUI.
  /* Selector de bancos A-D */
  ["A/F","B/G","C/H","D/I"].forEach((label,i)=>bind(label,()=>zpBridgeSend("creator.pattern.select",{bank:["A","B","C","D"][i]})));
  bind("PATTERNSELECT",()=>{
@@ -473,24 +519,33 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
   });
  });
  const valueEncoder=document.querySelector(".pe");
- if(valueEncoder){
-  valueEncoder.addEventListener("pointerdown",()=>{window.__zpTrimRotor.lastAngle=parseFloat(getComputedStyle(valueEncoder).getPropertyValue("--r"))||0});
-  valueEncoder.addEventListener("pointermove",()=>{
-   const angle=parseFloat(getComputedStyle(valueEncoder).getPropertyValue("--r"))||0;
-   if(window.__zpTrimRotor?.active){
+ const bindTrimEncoder=(encoder,trimTarget)=>{
+  let previous=null;
+  encoder.addEventListener("pointerdown",()=>{previous=parseFloat(getComputedStyle(encoder).getPropertyValue("--r"))||0});
+  encoder.addEventListener("pointermove",()=>{
+   const angle=parseFloat(getComputedStyle(encoder).getPropertyValue("--r"))||0;
+   if(previous===null){previous=angle;return}
+   let delta=angle-previous;previous=angle;if(delta>180)delta-=360;if(delta<-180)delta+=360;if(!delta)return;
+   const phase=window.__zpTrimPhase,state=window.__zpTrimRotor;
+   if(phase===3||(phase===1&&encoder===valueEncoder&&state?.active)){
     if(window.__zpMidiRotorActive)return;
-    const state=window.__zpTrimRotor,delta=angle-(state.lastAngle??angle);state.lastAngle=angle;
-    if(!delta)return;
-    const range=state.range||{start:0,end:1},target=state.target||"start",fineStep=0.00005;
-    const next=target==="start"?Math.max(0,Math.min(range.end-0.0001,range.start+delta*fineStep)):Math.max(range.start+0.0001,Math.min(1,range.end+delta*fineStep));
-    state.range=target==="start"?{...range,start:next}:{...range,end:next};
+    const target=phase===3?trimTarget:(state.target||activeTrimTarget),range=state.range||{start:0,end:1},fineStep=.00005;
+    const next=target==="start"?Math.max(0,Math.min(range.end-.0001,range.start+delta*fineStep)):Math.max(range.start+.0001,Math.min(1,range.end+delta*fineStep));
+    state.active=true;state.target=target;state.range=target==="start"?{...range,start:next}:{...range,end:next};
     zpBridgeSend("creator.sample.trim.set",{target,position:next,commit:false});return;
    }
-   if(window.__zpMidiRotorActive)return;
-   zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
+   if(encoder===valueEncoder&&phase!==3&&!window.__zpMidiRotorActive)zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
   });
-  ["pointerup","pointercancel"].forEach(type=>valueEncoder.addEventListener(type,()=>{const state=window.__zpTrimRotor;if(!state?.active)return;const target=state.target,range=state.range||{start:0,end:1};zpBridgeSend("creator.sample.trim.set",{target,position:target==="start"?range.start:range.end,commit:true});state.lastAngle=null}));
- }
+  ["pointerup","pointercancel"].forEach(type=>encoder.addEventListener(type,()=>{
+   previous=null;const phase=window.__zpTrimPhase,state=window.__zpTrimRotor;
+   if(phase===3||(phase===1&&encoder===valueEncoder&&state?.active)){
+    const target=phase===3?trimTarget:(state.target||activeTrimTarget),range=state.range||{start:0,end:1};
+    zpBridgeSend("creator.sample.trim.set",{target,position:target==="start"?range.start:range.end,commit:true});
+   }
+  }));
+ };
+ bindTrimEncoder(lx,"start");
+ bindTrimEncoder(valueEncoder,"end");
  /* Salida al hub ZP */
  const goHome=()=>parent.postMessage({type:"zp-exit-creator",source:"creator.ui",timestamp:Date.now()} ,location.origin);
  document.getElementById("creator-home")?.addEventListener("click",goHome);

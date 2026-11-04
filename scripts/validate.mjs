@@ -255,3 +255,18 @@ console.log("OK: agente contextual local, allowlist y assets PWA.");
 console.log("OK: Piano Roll MIDI, edición de notas, reproducción y persistencia.");
 console.log("OK: sintaxis de " + sources.length + " archivos y " + inlineScripts + " scripts inline.");
 console.log("OK: bridge GUI/motor, handlers y APIs de proyectos.");
+
+ 
+// START/END three-phase interaction contract.
+assert.match(ui,/window\.__zpTrimPhase=1/);
+assert.match(ui,/function setTrimPhase\(phase\)/);
+assert.match(ui,/trim-phase-led/);
+assert.match(ui,/trimPointers=new Map\(\)/);
+assert.match(ui,/window\.__zpTrimPhase===2/);
+assert.match(ui,/window\.__zpTrimPhase===3/);
+assert.match(ui,/bindTrimEncoder\(lx,"start"\)/);
+assert.match(ui,/bindTrimEncoder\(valueEncoder,"end"\)/);
+assert.equal(agentRegistry.trimControl.phases["1"].touch,"single-target");
+assert.equal(agentRegistry.trimControl.phases["2"].touch,"dual-independent");
+assert.equal(agentRegistry.trimControl.phases["3"].encoder.Lx,"trim.start");
+assert.equal(agentRegistry.trimControl.phases["3"].encoder.Rx,"trim.end");

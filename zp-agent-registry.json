@@ -328,5 +328,53 @@
       "shortViewport": "42px"
     },
     "notes": "Lx/Rx permanecen dentro del chassis, en los raíles laterales del GUI. La reubicación es visual y no altera el bridge ni el estado del motor."
+  },
+  "trimControl": {
+    "version": "1.0.0",
+    "phases": {
+      "1": {
+        "name": "select",
+        "label": "Selección IN/OUT",
+        "color": "#A5E8B0",
+        "touch": "single-target",
+        "encoder": {
+          "Lx": "navigation",
+          "Rx": "selected-target-adjust"
+        },
+        "description": "Un marcador activo por vez; la selección se refleja en waveform y LCD."
+      },
+      "2": {
+        "name": "multitouch",
+        "label": "Touch libre",
+        "color": "#E9A044",
+        "touch": "dual-independent",
+        "encoder": {
+          "Lx": "navigation",
+          "Rx": "context-scroll"
+        },
+        "description": "IN y OUT pueden moverse simultáneamente con dos punteros táctiles independientes."
+      },
+      "3": {
+        "name": "encoder",
+        "label": "Control Lx/Rx",
+        "color": "#E53935",
+        "touch": "locked",
+        "encoder": {
+          "Lx": "trim.start",
+          "Rx": "trim.end"
+        },
+        "description": "Touch bloqueado; Lx controla IN y Rx controla OUT directamente."
+      }
+    },
+    "cycle": [
+      1,
+      2,
+      3
+    ],
+    "stateOwner": "creator.ui",
+    "valueOwner": "creator-engine.html",
+    "command": "creator.sample.trim.set",
+    "persistence": "commit:true",
+    "led": "trim-phase-led"
   }
 }
