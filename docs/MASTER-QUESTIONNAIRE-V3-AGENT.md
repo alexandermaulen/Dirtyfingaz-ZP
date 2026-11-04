@@ -189,3 +189,14 @@ Para cada hito registrar fecha/hora, SHA, archivos, contrato afectado, pruebas, 
 - Commits de esta intervención: a709efd58c69c68841b3a44c0ace9d35899eaabc (documentación), 42baeeed50717be41a1fa8ea7c4a41c9df21a808 (acciones del agente), 4e02f2c03761a87a7df159d7c865f2f3545421af (validación).
 - Estado CI del último commit: aún no confirmado por un run/check asociado; el endpoint de estado no devolvió checks.
 - Pendiente crítico: conectar proveedor IA detrás del Worker, añadir autenticación/limitación de uso, y construir modo desarrollador GitHub con diff y aprobación por acción. Esto requiere credenciales del lado servidor, nunca en el navegador.
+
+
+### Actualización de implementación posterior
+
+- SHIFT + PAD ya abre una ventana de configuración rápida para el pad seleccionado; incluye MUTE, SOLO, PREVIEW, LOAD SAMPLE y CLOSE.
+- Cada pad expone padId y los bancos A–D exponen su identidad semántica.
+- El motor publica banco activo, pad activo, BPM y proyecto actual hacia el agente mediante un evento de contexto validado por origen y ventana emisora.
+- El agente sincroniza ese estado con el control que se está manipulando.
+- Se añadieron pruebas estáticas para SHIFT + PAD, identidad del pad, acciones del menú y metadatos de contexto.
+- Commits adicionales: c7034e70f9176956a1723379c67be06f3995ced4 (GUI/SHIFT+PAD), e54ab4466c98609d8c2f3718096a4cdb9d5e3a16 (metadatos del motor), 46f3a18526ac22e8d7885ecad18e5b47453536bb (contexto del agente), 3f08b2d78f3957453277be900d6ba1b607051ff (tests).
+- CI: workflow configurado para push a esta rama, pero no hay check/run asociado visible en la consulta actual. Estado de validación: pendiente, no PASS.
