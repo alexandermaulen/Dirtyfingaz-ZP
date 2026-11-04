@@ -315,6 +315,7 @@ document.addEventListener('pointerup',rel);document.addEventListener('pointercan
 $('#bt').append(mk('i','screw'));['UTILITY','IMPORT/EXPORT','PAD SETTING','EFX SETTING','PROJECT'].forEach(t=>$('#bt').append(B(t)));$('#bt').append(mk('i','screw'));
 /* waveform real + recorte IN/OUT táctil */
 let trimState=null,activeTrimTarget="start",trimPointer=false;
+window.__zpTrimRotor={active:false,target:"start",range:{start:0,end:1},lastAngle:null};
 function wave(){const c=$('#wv'),x=c.getContext('2d'),w=168,h=46;x.clearRect(0,0,w,h);const lcd=getComputedStyle(unit).getPropertyValue('--lcd').trim();x.fillStyle="#001000";x.fillRect(0,0,w,h);
  if(trimState&&trimState.waveform&&trimState.waveform.length){x.fillStyle=lcd;const data=trimState.waveform;for(let i=0;i<data.length;i++){const xx=i*w/data.length,lo=data[i][0],hi=data[i][1],y1=h*(.5-hi*.46),y2=h*(.5-lo*.46);x.fillRect(xx,y1,Math.max(1,w/data.length-0.5),Math.max(1,y2-y1))}}
  else{x.fillStyle=lcd;for(let i=0;i<40;i++){const p=i%10,env=Math.exp(-p/3)*(p?1:.5),bar=Math.max(2,Math.round(21*env*(.7+.3*Math.abs(Math.sin(i*2.3)))/2)*2);x.fillRect(4+i*4,23-bar,3,bar*2)}}
@@ -323,11 +324,11 @@ function wave(){const c=$('#wv'),x=c.getContext('2d'),w=168,h=46;x.clearRect(0,0
 wave();
 const waveCanvas=$('#wv');
 function trimPosition(e){const r=waveCanvas.getBoundingClientRect();return Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))}
-function sendTrim(e,commit){zpBridgeSend("creator.sample.trim.set",{target:activeTrimTarget,position:trimPosition(e),commit:!!commit})}
-waveCanvas.addEventListener("pointerdown",e=>{e.preventDefault();trimPointer=true;waveCanvas.setPointerCapture(e.pointerId);sendTrim(e,false)});
+function sendTrim(e,commit){const p=trimPosition(e);window.__zpTrimRotor.target=activeTrimTarget;window.__zpTrimRotor.range=window.__zpTrimRotor.range||{start:0,end:1};zpBridgeSend("creator.sample.trim.set",{target:activeTrimTarget,position:p,commit:!!commit})}
+waveCanvas.addEventListener("pointerdown",e=>{e.preventDefault();const p=trimPosition(e),r=trimState?.range||{start:0,end:1};activeTrimTarget=Math.abs(p-r.start)<=Math.abs(p-r.end)?"start":"end";window.__zpTrimRotor.active=true;window.__zpTrimRotor.target=activeTrimTarget;trimPointer=true;waveCanvas.setPointerCapture(e.pointerId);sendTrim(e,false)});
 waveCanvas.addEventListener("pointermove",e=>{if(trimPointer)sendTrim(e,false)});
 ["pointerup","pointercancel","lostpointercapture"].forEach(type=>waveCanvas.addEventListener(type,e=>{if(trimPointer){trimPointer=false;sendTrim(e,true)}}));
-window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-trim-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;trimState=d;wave()});
+window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-trim-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;trimState=d;window.__zpTrimRotor.range=d.range||{start:0,end:1};wave()});
  window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-radio-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;window.dispatchEvent(new CustomEvent("zp-agent-runtime-context",{detail:{...d.state,projectId:d.project?.id||null,projectName:d.project?.name||null}}))});
 window.addEventListener("zp-engine-result",e=>{const d=e.detail?.result?.data;if(d?.target==="start"||d?.target==="end")activeTrimTarget=d.target});
 
@@ -454,11 +455,24 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
   });
  });
  const valueEncoder=document.querySelector(".pe");
- if(valueEncoder)valueEncoder.addEventListener("pointermove",()=>{
-  if(window.__zpMidiRotorActive)return;
-  const angle=parseFloat(getComputedStyle(valueEncoder).getPropertyValue("--r"))||0;
-  zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
- });
+ if(valueEncoder){
+  valueEncoder.addEventListener("pointerdown",()=>{window.__zpTrimRotor.lastAngle=parseFloat(getComputedStyle(valueEncoder).getPropertyValue("--r"))||0});
+  valueEncoder.addEventListener("pointermove",()=>{
+   const angle=parseFloat(getComputedStyle(valueEncoder).getPropertyValue("--r"))||0;
+   if(window.__zpTrimRotor?.active){
+    if(window.__zpMidiRotorActive)return;
+    const state=window.__zpTrimRotor,delta=angle-(state.lastAngle??angle);state.lastAngle=angle;
+    if(!delta)return;
+    const range=state.range||{start:0,end:1},target=state.target||"start",fineStep=0.00005;
+    const next=target==="start"?Math.max(0,Math.min(range.end-0.0001,range.start+delta*fineStep)):Math.max(range.start+0.0001,Math.min(1,range.end+delta*fineStep));
+    state.range=target==="start"?{...range,start:next}:{...range,end:next};
+    zpBridgeSend("creator.sample.trim.set",{target,position:next,commit:false});return;
+   }
+   if(window.__zpMidiRotorActive)return;
+   zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
+  });
+  ["pointerup","pointercancel"].forEach(type=>valueEncoder.addEventListener(type,()=>{const state=window.__zpTrimRotor;if(!state?.active)return;const target=state.target,range=state.range||{start:0,end:1};zpBridgeSend("creator.sample.trim.set",{target,position:target==="start"?range.start:range.end,commit:true});state.lastAngle=null}));
+ }
  /* Salida al hub ZP */
  const goHome=()=>parent.postMessage({type:"zp-exit-creator",source:"creator.ui",timestamp:Date.now()} ,location.origin);
  document.getElementById("creator-home")?.addEventListener("click",goHome);
