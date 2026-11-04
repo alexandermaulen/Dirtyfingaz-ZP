@@ -339,7 +339,10 @@
       "placement": "immediately-right-of-Lx",
       "visibility": {
         "showWhen": "sample-context",
-        "hideWhen": "piano-open"
+        "hideWhen": [
+          "pattern-edit",
+          "piano-open"
+        ]
       },
       "persistence": "commit:true"
     }
