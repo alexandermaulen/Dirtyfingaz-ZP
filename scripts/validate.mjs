@@ -290,10 +290,10 @@ assert.equal(agentRegistry.trimControl.phases["3"].encoder.Rx,"trim.end");
 
  
 // Contextual IN encoder: independent START control, Sample-only visibility and engine bridge.
-assert.match(ui, /knob in-encoder/);
-assert.match(ui, /mid\\.sample-context:not\\(\\.piano-open\\)>\\.in-encoder/);
-assert.match(ui, /creator\\.sample\\.trim\\.set.*target:"start"/);
-assert.match(ui, /sample-context',!window\\.__zpPianoEncoderMode/);
+assert.ok(ui.includes("knob in-encoder"));
+assert.ok(ui.includes(".mid.sample-context:not(.piano-open)>.in-encoder"));
+assert.ok(ui.includes('zpBridgeSend("creator.sample.trim.set",{target:"start",position:lastValue,commit:true})'));
+assert.ok(ui.includes("midContainer.classList.toggle('sample-context',!window.__zpPianoEncoderMode)"));
 assert.equal(agentRegistry.controls.IN.role, "sample-start-encoder");
 assert.equal(agentRegistry.controls.IN.command, "creator.sample.trim.set");
 assert.equal(agentRegistry.controls.IN.payload.target, "start");
