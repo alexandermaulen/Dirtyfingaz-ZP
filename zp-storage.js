@@ -22,7 +22,7 @@
         if (!db.objectStoreNames.contains(PROJECT_STORE)) db.createObjectStore(PROJECT_STORE, { keyPath: "id" });
         if (!db.objectStoreNames.contains(PROJECT_SAMPLE_STORE)) db.createObjectStore(PROJECT_SAMPLE_STORE, { keyPath: "id" });
         if (db.objectStoreNames.contains(SAMPLE_STORE)) { const legacy=request.transaction.objectStore(SAMPLE_STORE), cursorRequest=legacy.openCursor(); cursorRequest.onsuccess=function(){const cursor=cursorRequest.result;if(!cursor)return;const item=cursor.value;request.transaction.objectStore(PROJECT_SAMPLE_STORE).put(Object.assign({},item,{id:DEFAULT_PROJECT_ID+":"+Number(item.pad),projectId:DEFAULT_PROJECT_ID}));cursor.continue();}; }
-        if (db.objectStoreNames.contains(PROJECT_STORE)) { const projects=request.transaction.objectStore(PROJECT_STORE), oldProject=projects.get("current"); oldProject.onsuccess=function(){if(oldProject.result&&!projects.get(DEFAULT_PROJECT_ID)){const copy=oldProject.result;copy.id=DEFAULT_PROJECT_ID;projects.put(copy);}}; }
+        if (db.objectStoreNames.contains(PROJECT_STORE)) { const projects=request.transaction.objectStore(PROJECT_STORE), oldProject=projects.get("current"); oldProject.onsuccess=function(){if(oldProject.result){const target=projects.get(DEFAULT_PROJECT_ID);target.onsuccess=function(){if(!target.result){const copy=oldProject.result;copy.id=DEFAULT_PROJECT_ID;projects.put(copy);}};}}; }
       };
       request.onsuccess = function () { resolve(request.result); };
       request.onerror = function () { dbPromise = null; reject(request.error || new Error("No se pudo abrir la base local")); };
