@@ -204,6 +204,12 @@ async function handleAgentChat(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === "/api/agent/health") {
+      return json({ ok: env.ENVIRONMENT === "preview" && !!env.AI, enabled: env.ENVIRONMENT === "preview" && !!env.AI, model: AGENT_MODEL, environment: env.ENVIRONMENT || "unknown" });
+    }
+    if (url.pathname === "/api/agent/chat") return handleAgentChat(request, env);
+    if (url.pathname.startsWith("/api/agent/")) return json({ ok: false, error: "NOT_FOUND" }, 404);
+
     if (url.pathname === "/api/radio/health") {
       return json({ ok: true, service: "DIRTYFINGAZ ZP Radio Grid", realtime: "durable-object-websocket", version: 1 });
     }
