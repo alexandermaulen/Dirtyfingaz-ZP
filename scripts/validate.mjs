@@ -143,6 +143,7 @@ assert.match(agent, /project\.save/);
 assert.match(agent, /document\.addEventListener\("pointerdown"/);
 assert.match(agent, /zp-agent-window/);
 assert.match(agent, /zp-agent-launcher/);
+assert.match(agent, /zp-agent-resize/);
 assert.match(agent, /item\.risk==="write"/);
 assert.match(agent, /item\.risk==="destructive"/, "Las acciones destructivas deben exigir confirmación.");
 for (const command of ["creator.sample.chop", "creator.pattern.clear", "creator.bpm.adjust", "creator.pattern.select", "creator.fx.sample.drive.toggle"]) {
