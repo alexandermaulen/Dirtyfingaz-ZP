@@ -174,7 +174,7 @@ canvas{width:168px;height:46px}
 .piano-playhead{z-index:4;pointer-events:none;border-left:1px solid #ff4646;box-shadow:0 0 5px #ff2525;opacity:.85}
 .scr.pr{height:260px!important;margin-top:-130px!important;border-radius:18px}.scr.pr .v2{padding:5px 7px!important;gap:3px!important}.scr.pr .ph{font-size:15px;line-height:16px}.scr.pr .piano-tools{height:17px;flex-wrap:nowrap}.scr.pr .piano-tools button{height:15px;min-width:18px;font-size:10px}.scr.pr .piano-viewport{height:145px}
 @media(max-width:430px){.scr.pr{width:min(400px,96vw)!important}.scr.pr .v2{padding:4px 5px!important}.scr.pr .piano-tools{gap:1px}.scr.pr .piano-tools button{padding:0 2px;font-size:9px}.piano-vel input{width:28px}}
-</style>
+.zp-pad-config{position:fixed;z-index:99980;left:50%;top:calc(env(safe-area-inset-top) + 12px);transform:translateX(-50%);width:min(330px,calc(100vw - 24px));padding:12px;background:#071407f5;color:#c5ff45;border:1px solid #a8ff35;border-radius:10px;box-shadow:0 12px 40px #000c;font:700 12px/1.4 -apple-system,BlinkMacSystemFont,sans-serif}.zp-pad-config[hidden]{display:none!important}.zp-pad-config-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}.zp-pad-config-actions button{min-height:36px;border:1px solid #638d3c;border-radius:5px;background:#10250b;color:#d5ffbd;font-size:11px}.zp-pad-config-actions button:last-child{grid-column:1/-1}</style>
 <style id="zp-engine-frame">#zp-engine{position:fixed!important;left:-10000px!important;top:0!important;width:1px!important;height:1px!important;border:0!important;opacity:0!important;pointer-events:none!important}</style>
 <style id="zp-iphone11-fullscreen">
 html,body{width:100%;height:100%;min-height:100%;margin:0;overflow:hidden;background:#041a06}
@@ -272,7 +272,7 @@ row('repeat(9,1fr)',[['',6],['BANK',2],['ROLL SET',1]],
 const all=[...document.querySelectorAll('#rows .b')];const by=t=>all.find(b=>b.textContent.replace(/\s/g,'')===t.replace(/\s/g,''));
 by('REC').classList.add('lit');by('A/F').classList.add('lit');
 const bank=['A/F','B/G','C/H','D/I','E/J'].map(by);
-bank.forEach(b=>b.addEventListener('click',()=>{bank.forEach(x=>x.classList.remove('lit'));b.classList.add('lit')}));
+bank.forEach((b,i)=>{if(i<4)b.dataset.bank=["A","B","C","D"][i];b.addEventListener('click',()=>{bank.forEach(x=>x.classList.remove('lit'));b.classList.add('lit')})});
 ['REC','SHIFT'].forEach(t=>by(t).addEventListener('click',e=>e.currentTarget.classList.toggle('lit')));
 /* pads: multitouch real, luz al sonar */
 const held=new Map();
@@ -297,6 +297,7 @@ waveCanvas.addEventListener("pointerdown",e=>{e.preventDefault();trimPointer=tru
 waveCanvas.addEventListener("pointermove",e=>{if(trimPointer)sendTrim(e,false)});
 ["pointerup","pointercancel","lostpointercapture"].forEach(type=>waveCanvas.addEventListener(type,e=>{if(trimPointer){trimPointer=false;sendTrim(e,true)}}));
 window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-trim-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;trimState=d;wave()});
+ window.addEventListener("message",e=>{const d=e.data;if(e.source!==document.getElementById("zp-engine")?.contentWindow||e.origin!==location.origin||!d||d.type!=="zp-engine-radio-state"||d.protocolVersion!==1||d.source!=="creator.engine")return;window.dispatchEvent(new CustomEvent("zp-agent-runtime-context",{detail:{...d.state,projectId:d.project?.id||null,projectName:d.project?.name||null}}))});
 window.addEventListener("zp-engine-result",e=>{const d=e.detail?.result?.data;if(d?.target==="start"||d?.target==="end")activeTrimTarget=d.target});
 
 requestAnimationFrame(()=>requestAnimationFrame(fit));
@@ -359,9 +360,18 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
   allButtons().filter(el=>norm(el.textContent)===key).forEach(el=>el.addEventListener("click",fn));
  };
  /* Pads: nueve superficies limpias, conectadas al motor real */
+ const shiftControl=by("SHIFT");
+ const padConfig=document.createElement("aside");
+ padConfig.className="zp-pad-config";padConfig.hidden=true;
+ padConfig.innerHTML='<strong id="zp-pad-config-title">PAD SETTINGS</strong><div class="zp-pad-config-actions"><button type="button" data-pad-action="mute">MUTE</button><button type="button" data-pad-action="solo">SOLO</button><button type="button" data-pad-action="preview">PREVIEW</button><button type="button" data-pad-action="browse">LOAD SAMPLE</button><button type="button" data-pad-action="close">CLOSE</button></div>';
+ document.body.append(padConfig);
+ let configuredPad=1;
+ function openPadConfig(padId){configuredPad=padId;zpBridgeSend("creator.pad.select",{padId});$("#zp-pad-config-title").textContent="PAD "+String(padId).padStart(2,"0")+" · CUSTOM";padConfig.hidden=false;}
+ padConfig.addEventListener("click",e=>{const action=e.target.closest("[data-pad-action]")?.dataset.padAction;if(!action)return;if(action==="mute")zpBridgeSend("creator.pad.mute.toggle");else if(action==="solo")zpBridgeSend("creator.pad.solo.toggle");else if(action==="preview")zpBridgeSend("creator.sample.preview");else if(action==="browse")zpBridgeSend("creator.sample.load.request");else if(action==="close")padConfig.hidden=true;});
  document.querySelectorAll("#pads .p").forEach((pad,i)=>{
+  pad.dataset.padId=String(i+1);
   pad.setAttribute("aria-label","Pad "+(i+1));
-  pad.addEventListener("pointerdown",()=>zpBridgeSend("creator.pad.trigger",{padId:i+1}));
+  pad.addEventListener("pointerdown",()=>{const padId=i+1;if(shiftControl?.classList.contains("lit")){shiftControl.classList.remove("lit");openPadConfig(padId);return;}zpBridgeSend("creator.pad.select",{padId});zpBridgeSend("creator.pad.trigger",{padId});});
  });
  /* Transporte real, sin el temporizador visual de demostración */
  const oldPlay=document.getElementById("play");
