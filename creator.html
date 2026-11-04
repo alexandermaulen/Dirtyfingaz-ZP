@@ -329,7 +329,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  bind("DEL",()=>zpBridgeSend("creator.sample.clear"));
  bind("LOOP",()=>zpBridgeSend("creator.loop.toggle"));
  bind("DJFXLOOPER",()=>zpBridgeSend("creator.loop.toggle"));
- bind("PROJECT",()=>zpBridgeSend("creator.project.save"));
+ bind("PROJECT",()=>zpBridgeSend("creator.project.manager.open"));
  bind("UTILITY",()=>zpBridgeSend("creator.export.wav"));
  bind("IMPORT/EXPORT",()=>zpBridgeSend("creator.sample.load.request"));
  bind("PADSETTING",()=>zpBridgeSend("creator.pad.mute.toggle"));
