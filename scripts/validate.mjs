@@ -139,7 +139,7 @@ assert.match(ui, /piano-zoom/, "Los controles +/- del Piano Roll deben estar agr
 assert.match(ui, /zpNudge/, "Debe existir el modo de movimiento MIDI con rotor.");
 assert.match(ui, /e\.shiftKey\|\|freeMove/, "SHIFT debe habilitar movimiento MIDI sin cuantización.");
 assert.match(ui, /zpLongVelocity/, "La pulsación larga debe abrir herramientas MIDI.");
-assert.match(ui, /longPressTimer=setTimeout[\\s\\S]{0,250},2000\\)/, "Las herramientas MIDI deben abrirse tras dos segundos.");
+assert.match(ui, /longPressTimer=setTimeout[\s\S]{0,250},2000\)/, "Las herramientas MIDI deben abrirse tras dos segundos.");
 assert.match(ui, /step%2===0/, "El barrido táctil de patrones debe marcar pasos alternos.");
 assert.match(ui, /animatePianoPlayhead/, "El playhead debe interpolarse entre pasos.");
 assert.match(ui, /zp-engine-piano-state/);
