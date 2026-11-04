@@ -4,6 +4,7 @@
 **Rama de trabajo:** `feat/hybrid-hardware-ui-system`  
 **HEAD verificado al abrir este registro:** `653569f0c318408dc9527a857ee17ee1fbedbd2e`  
 **CI del HEAD anterior:** [run 41870648909 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41870648909)  
+**Creación de la bitácora:** commit `f2787c48b98b8fd38739786da664a61680cf1126`; [CI 41870939896 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41870939896)  
 **Regla de seguridad:** no escribir en `main`, no mover refs de `main`, no fusionar PR. Supabase `dirtyfingaz-os` permanece fuera del alcance.
 
 Este documento es la bitácora cronológica del proyecto. Se actualiza después de cada cambio relevante y conserva tanto los hitos como los pendientes. Los estados distinguen código, CI, preview y pruebas físicas: un PASS estático no significa que una función haya sido probada en Safari.
@@ -18,7 +19,7 @@ Este documento es la bitácora cronológica del proyecto. Se actualiza después 
 | 2026-11-04 · RADIO-01 | El motor expuso `window.zpGetBroadcastStream` para entregar el stream del bus master. | Commit `c02b8539e12a3db319d228e9fae4e06f4b1d449b`; [CI 41869055940](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41869055940). | CI PASS; QA Safari/P2P pendiente |
 | 2026-11-04 · auditoría | Se consolidaron ocho causas raíz de fallos de CI y su cadena de reparación. | Commit `a257429c728ffcd1f53720776692ef58d0000871`; [CI 41869336972](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41869336972). | CI PASS |
 | 2026-11-04 · colaboración | Se añadió política de agentes/modelos/conectores con escritura limitada a ramas de feature, sin secretos, producción ni Supabase. | Commit `653569f0c318408dc9527a857ee17ee1fbedbd2e`; [CI 41870648909](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41870648909); [.github/agent-policy.json](https://github.com/alexandermaulen/Dirtyfingaz-ZP/blob/feat/hybrid-hardware-ui-system/.github/agent-policy.json). | CI PASS; política declarativa |
-| 2026-11-04 · cronología | Se crea este registro como fuente compacta para recuperar el estado y viajar por hitos. | Este archivo y su página espejo en Notion. | En curso |
+| 2026-11-04 · cronología | Se crea este registro como fuente compacta para recuperar el estado y viajar por hitos. | Commit inicial `f2787c48b98b8fd38739786da664a61680cf1126`; [CI 41870939896 · SUCCESS](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41870939896); [página Notion](https://app.notion.com/p/40e25ee02fef81c5b0daf86159f66db2). | Registrado y validado |
 
 ### Nota sobre main y PR
 
