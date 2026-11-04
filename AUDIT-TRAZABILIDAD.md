@@ -216,3 +216,45 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - Recomendación por defecto: escritura limitada a ramas `feat/*`, revisión por PR y CI obligatorio; `main` protegido y sin escritura directa para agentes.
 - Alternativas a aprobar: (A) lectura y diagnóstico solamente; (B) escritura en ramas de trabajo y PR, sin merge; (C) escritura amplia del repositorio, reservada a identidades concretas y con alcance explícito.
 - No se conceden permisos de administrador, secretos, producción, Supabase ni despliegue por defecto. La autorización debe identificar el agente/servicio y el nivel exacto.
+
+## 11. Creator · pantalla LCD, waveform y controles de edición · 2026-11-04
+
+### Contrato GUI ↔ motor aplicado
+- GUI (creator.html) conserva el bridge versionado zp-engine-command con source, protocolVersion, requestId, ACK y error.
+- Motor (creator-engine.html) conserva la propiedad de buffers, análisis, reproducción, tempo y persistencia. La GUI sólo presenta telemetría y solicita acciones.
+- El pad activo reproduce el mismo AudioBuffer y el mismo rango IN/OUT utilizado por el waveform editor.
+
+### Funciones añadidas
+| ID | Función | GUI | Motor | Estado CI |
+|---|---|---|---|---|
+| WAVE-01 | Análisis de forma de onda y detección de transientes | Marcadores sobre waveform LCD | Peak local por bins; lista normalizada de transientes | PASS estático |
+| WAVE-02 | Slicing automático por transientes | Acción TRNS en LCD | Divide sample en segmentos y guarda en pads vacíos del proyecto actual | PASS estático |
+| WAVE-03 | Audition del sample del pad | Acción de preview | creator.sample.preview usa el mismo pad/sample/rango | PASS estático |
+| BPM-01 | Rueda vertical de tempo | Drag vertical y rueda | creator.bpm.adjust, límites 40–240 y publicación de estado | PASS estático |
+| SEQ-02 | Transporte visual | Barra de progreso sincronizada a los 16 pasos | Mensajes de playhead desde scheduler | PASS estático |
+| METER-01 | Alerta de peak | Barra cambia a rojo al superar 0.82 | Medición del pico del bus master y telemetría periódica | PASS estático |
+| PIANO-01 | Zoom y desplazamiento | Zoom +/- y scroll horizontal | Patrón de 16 pasos sin mutar los datos guardados | PASS estático |
+| LCD-01 | Menú del sistema | Overlay dentro del LCD; tema sólo desde THEME/COLOR | No cambia el motor de audio | PASS estático |
+| SAMPLE-01 | Browse | Abre selector de archivos del motor | File picker existente | PASS estático |
+
+### Evidencia de integración
+- Rama: feat/hybrid-hardware-ui-system.
+- HEAD del código antes de la actualización documental: e8d3722c9cfdf93d8915f13c636902cb0edc1218.
+- GitHub Actions run 41875733973: SUCCESS para ese SHA.
+- Archivos modificados: creator.html, creator-engine.html.
+- Se corrigieron dos separadores de línea literales que impedían compilar los scripts inline; el SHA final pasó la validación JavaScript y Creator contracts.
+
+### Límites y riesgos no certificados
+1. El umbral 0.82 es una señal visual de pico digital del bus, no un medidor calibrado de dBFS ni un detector de clipping verdadero.
+2. La detección de transientes es heurística por máximos locales. Requiere prueba con kicks, breaks, material tonal y samples con ruido.
+3. El slicing automático usa pads vacíos; si no hay espacio, limita la cantidad de cortes y no sobrescribe muestras existentes.
+4. El scroll/zoom y la rueda BPM requieren QA táctil en Safari iOS.
+5. La grilla actual continúa siendo un editor de patrones por pad/step. Un Piano Roll MIDI completo con pitch, duración de nota y velocity por evento sigue pendiente.
+6. No se verificó despliegue Cloudflare para este SHA ni se probó render/sonido real en iPhone.
+
+### Próxima secuencia recomendada
+- P1: probar la interacción de cada control y ACK/error en Safari.
+- P2: validar transientes, slicing, preview y persistencia por projectId.
+- P3: calibrar el medidor de peak con RMS/peak hold y una referencia de nivel.
+- P4: evolucionar la grilla actual a Piano Roll con pitch/length/velocity sin romper el modelo de patrones existente.
+- Mantener main y Supabase fuera del alcance; no hacer merge.
