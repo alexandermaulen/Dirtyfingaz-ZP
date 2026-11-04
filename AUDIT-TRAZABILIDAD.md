@@ -271,8 +271,8 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 
 ### Pruebas estáticas añadidas
 - scripts/validate.mjs comprueba presencia de Piano Roll, controles de velocity, gestos de drag/resize, comandos registrados, scheduler MIDI y snapshot persistente.
-- CI para el último commit de GUI (23a434ec767fee2412dc719c8a51a7022f8774cb) quedó en cola al corte de esta bitácora: run 41877908234.
-- SHA de motor que incorpora la reproducción de notas y la persistencia: 6ad2c3de8be97c6fd9a063dfa1bbd48121d98732.
+- CI para el último commit de GUI (b7363a6ef234c823de3194ccda5e22f444ff3c0a) quedó en cola al corte de esta bitácora: run 41878092266.
+- SHA de motor que incorpora la reproducción de notas y la persistencia: 5a22793de89abb9aa0d8a73e7f90cc064bcac48c.
 - Commit del validador MIDI: 3880a00536bcd51ac031548a43a946282d075853.
 
 ### Riesgos / QA pendiente
@@ -287,3 +287,11 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - Sólo rama feat/hybrid-hardware-ui-system.
 - No modificar main, no merge, no desplegar producción.
 - Supabase dirtyfingaz-os continúa independiente y fuera del alcance.
+
+
+### Revisión de estabilidad adicional
+- El estado MIDI ya no se retransmite desde refreshSteps en cada tick; sólo se publica al cambiar nota, pad, banco o proyecto.
+- Pointer capture se conserva sobre el elemento de nota durante el drag; la selección visual no reemplaza el nodo capturado.
+- Longitud de nota limitada al espacio restante hasta el final de los 16 pasos.
+- Mensajes de telemetría LCD/Piano Roll validados por origen y ventana del iframe del motor.
+- Song Mode publica el banco activo al avanzar, manteniendo sincronizada la vista de notas.
