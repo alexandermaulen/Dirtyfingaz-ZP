@@ -234,12 +234,13 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 | SEQ-02 | Transporte visual | Barra de progreso sincronizada a los 16 pasos | Mensajes de playhead desde scheduler | PASS estático |
 | METER-01 | Alerta de peak | Barra cambia a rojo al superar 0.82 | Medición del pico del bus master y telemetría periódica | PASS estático |
 | PIANO-01 | Zoom y desplazamiento | Zoom +/- y scroll horizontal | Patrón de 16 pasos sin mutar los datos guardados | PASS estático |
+| PIANO-02 | Herramientas de edición | DRAW/SELECT, SNAP 1/16–1/8–1/4 y CLEAR; zoom - a la izquierda y + a la derecha | Cuantización limitada al step válido 0–15; selección de fila no altera el patrón | PASS estático |
 | LCD-01 | Menú del sistema | Overlay dentro del LCD; tema sólo desde THEME/COLOR | No cambia el motor de audio | PASS estático |
 | SAMPLE-01 | Browse | Abre selector de archivos del motor | File picker existente | PASS estático |
 
 ### Evidencia de integración
 - Rama: feat/hybrid-hardware-ui-system.
-- HEAD del código antes de la actualización documental: e8d3722c9cfdf93d8915f13c636902cb0edc1218.
+- HEAD de código actualizado: 19da29f90ae514c2cde0a05e54583893b23a548b.
 - GitHub Actions run 41875733973: SUCCESS para ese SHA.
 - Archivos modificados: creator.html, creator-engine.html.
 - Se corrigieron dos separadores de línea literales que impedían compilar los scripts inline; el SHA final pasó la validación JavaScript y Creator contracts.
