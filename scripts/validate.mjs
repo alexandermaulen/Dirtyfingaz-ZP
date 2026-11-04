@@ -67,6 +67,9 @@ assert.match(ui, /const selector='\.b,\.piano-tools button,\.trim-marker/, "Lx d
 assert.match(ui, /choose\(direction\)/, "Lx debe cambiar el control enfocado por pasos.");
 assert.match(read("zp-agent-registry.json"), /"Lx"/);
 assert.match(read("zp-agent-registry.json"), /"Rx"/);
+assert.match(agent, /el\.dataset\.rotor==="Lx"/, "El agente debe reconocer Lx como navegación.");
+assert.match(agent, /el\.dataset\.rotor==="Rx"/, "El agente debe reconocer Rx como PUSH ENTER.");
+assert.match(radioWorker, /selectedControl/, "El backend debe recibir la definición del encoder seleccionado.");
 
 assert.match(ui, /creator\.sample\.trim\.set.*commit:true/, "El rotor debe confirmar la persistencia del recorte.");
 assert.match(engine, /function publishTrimState\(/);
