@@ -118,5 +118,22 @@ for (const command of ["creator.project.manager.open", "creator.project.create",
   assert.ok(commands.includes(command), "Handler faltante: " + command);
 }
 assert.deepEqual(missing, [], "Comandos de GUI sin handler o ruta directa");
+
+// Piano Roll MIDI: GUI, bridge, scheduler y persistencia deben evolucionar juntos.
+assert.match(ui, /piano-grid/);
+assert.match(ui, /zpVelocity/);
+assert.match(ui, /noteDrag\.resize/);
+assert.match(ui, /zp-engine-piano-state/);
+assert.match(engine, /const pianoData=\{\}/);
+assert.match(engine, /pianoNotes:pianoData/);
+assert.match(engine, /creator\.piano\.note\.upsert/);
+assert.match(engine, /creator\.piano\.note\.delete/);
+assert.match(engine, /creator\.piano\.notes\.clear/);
+assert.match(engine, /notes\.filter\(note=>note\.step===scheduledStep\)/);
+assert.match(engine, /options\.pitch/);
+assert.match(engine, /options\.velocity/);
+assert.match(engine, /options\.length/);
+assert.match(engine, /publishPianoState\(\)/);
+console.log("OK: Piano Roll MIDI, edición de notas, reproducción y persistencia.");
 console.log("OK: sintaxis de " + sources.length + " archivos y " + inlineScripts + " scripts inline.");
 console.log("OK: bridge GUI/motor, handlers y APIs de proyectos.");
