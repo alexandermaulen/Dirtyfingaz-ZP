@@ -53,7 +53,7 @@ assert.match(ui, /zp-engine-trim-state/);
 assert.match(ui, /data-trim-target="start"/, "IN debe poder seleccionarse directamente.");
 assert.match(ui, /data-trim-target="end"/, "OUT debe poder seleccionarse directamente.");
 assert.match(ui, /const selectTrimTarget=marker/, "La selección IN/OUT debe activar el rotor maestro.");
-assert.match(ui, /state\.active=true;state\.target=activeTrimTarget/, "PUSH ENTER debe quedar asignado al punto seleccionado.");
+assert.match(ui, /state\.active=window\.__zpTrimPhase===1;state\.target=activeTrimTarget/, "La selección de IN/OUT debe activar el rotor en fase 1.");
 assert.match(ui, /fineStep=0\.00005/, "El rotor debe conservar el ajuste fino incremental.");
 assert.match(ui, /commit:true/, "El trim debe persistirse al soltar el rotor.");
 
