@@ -259,3 +259,31 @@ Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de Gi
 - P3: calibrar el medidor de peak con RMS/peak hold y una referencia de nivel.
 - P4: evolucionar la grilla actual a Piano Roll con pitch/length/velocity sin romper el modelo de patrones existente.
 - Mantener main y Supabase fuera del alcance; no hacer merge.
+
+
+## 12. Piano Roll MIDI · implementación de eventos editables · 2026-11-04
+
+### Contrato
+- GUI: creator.html presenta 24 filas visibles (dos octavas), 16 pasos temporales, notas movibles y redimensionables, cuantización y control de velocity.
+- Motor: creator-engine.html administra pianoData por banco y pad, valida los eventos, agenda la reproducción y guarda los datos en el snapshot del proyecto.
+- Mensajería: creator.piano.note.upsert / creator.piano.note.delete / creator.piano.notes.clear; retorno de estado por zp-engine-piano-state.
+- Evento MIDI interno: id, step, pitch, length y velocity. Límites: step 0–15, pitch 36–96, length 1–(16-step), velocity 1–127.
+
+### Pruebas estáticas añadidas
+- scripts/validate.mjs comprueba presencia de Piano Roll, controles de velocity, gestos de drag/resize, comandos registrados, scheduler MIDI y snapshot persistente.
+- CI para el último commit de GUI (23a434ec767fee2412dc719c8a51a7022f8774cb) quedó en cola al corte de esta bitácora: run 41877908234.
+- SHA de motor que incorpora la reproducción de notas y la persistencia: 6ad2c3de8be97c6fd9a063dfa1bbd48121d98732.
+- Commit del validador MIDI: 3880a00536bcd51ac031548a43a946282d075853.
+
+### Riesgos / QA pendiente
+1. Confirmar que el drag/resize responde en Safari iOS con pointer capture y scroll táctil.
+2. Escuchar samples con pitch variable y verificar que velocity se aplica una sola vez al nivel final.
+3. Comprobar gates de longitud para samples largos y sonidos sintetizados.
+4. Probar guardado, recarga, cambio de banco/pad, duplicación de eventos y recuperación de proyectos antiguos.
+5. El editor tiene rango visible de dos octavas; OCT-/OCT+ desplaza el rango, sin transposición destructiva de los eventos.
+6. La compatibilidad MIDI externa (MIDI IN/OUT, clock sync y export MIDI estándar) no está implementada en esta etapa.
+
+### Estado de seguridad de cambios
+- Sólo rama feat/hybrid-hardware-ui-system.
+- No modificar main, no merge, no desplegar producción.
+- Supabase dirtyfingaz-os continúa independiente y fuera del alcance.
