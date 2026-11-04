@@ -275,23 +275,58 @@
       "role": "navigation-encoder",
       "owner": "creator.ui",
       "input": "pointer-rotation",
-      "behavior": "Recorre secuencialmente herramientas y funciones visibles, enfoca y desplaza el control seleccionado sin ejecutarlo.",
+      "behavior": "Navega las herramientas visibles del GUI, enfoca el destino sin ejecutarlo y desplaza su contenedor si corresponde.",
       "stepDegrees": 14,
       "wrap": true,
       "commands": [],
-      "contextEvent": "focusin"
+      "contextEvent": "focusin",
+      "mount": "#cl",
+      "placement": "left-side-rail",
+      "adaptive": true
     },
     "Rx": {
       "label": "Rx",
       "role": "contextual-parameter-encoder",
       "owner": "creator.ui+creator-engine.html",
       "input": "pointer-rotation",
-      "behavior": "Conserva PUSH ENTER contextual: trim IN/OUT, MIDI en modo libre y FX amount cuando no hay otro modo activo.",
+      "behavior": "Control contextual adaptativo: conserva trim IN/OUT, edición MIDI y FX; cuando no hay edición activa, desplaza vertical u horizontalmente el contenedor del elemento seleccionado por Lx.",
       "existingSelector": ".pe",
       "commands": [
         "creator.sample.trim.set",
         "creator.control.set"
-      ]
+      ],
+      "mount": "#cr",
+      "placement": "right-side-rail",
+      "adaptive": true,
+      "scrollFallback": {
+        "enabled": true,
+        "source": "window.__zpLxTarget",
+        "axisPriority": [
+          "y",
+          "x"
+        ],
+        "step": "proportional-to-rotation",
+        "disabledWhen": [
+          "trim.active",
+          "midi.freeMove",
+          "selected-target-is-trim-or-midi"
+        ]
+      }
     }
+  },
+  "layout": {
+    "encoderPlacement": "sides",
+    "behavior": "adaptive",
+    "spacing": "compact",
+    "mount": {
+      "Lx": "#cl",
+      "Rx": "#cr"
+    },
+    "responsiveSizes": {
+      "default": "50px",
+      "narrow": "46px",
+      "shortViewport": "42px"
+    },
+    "notes": "Lx/Rx permanecen dentro del chassis, en los raíles laterales del GUI. La reubicación es visual y no altera el bridge ni el estado del motor."
   }
 }
