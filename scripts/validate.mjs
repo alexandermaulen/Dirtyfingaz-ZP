@@ -61,6 +61,13 @@ assert.match(ui, /creator\.sample\.trim\.set/);
 assert.match(ui, /trimPointer/);
 assert.match(ui, /__zpTrimRotor/, "El estado del rotor de recorte debe existir.");
 assert.match(ui, /fineStep=0\.00005/, "Push Enter debe ajustar IN/OUT con resolución fina.");
+assert.match(ui, /data-rotor='Lx'/, "Lx debe identificarse como encoder de navegación.");
+assert.match(ui, /data-rotor='Rx'/, "Rx debe conservar su identidad como encoder contextual.");
+assert.match(ui, /const selector='\.b,\.piano-tools button,\.trim-marker/, "Lx debe recorrer herramientas y funciones visibles.");
+assert.match(ui, /choose\(direction\)/, "Lx debe cambiar el control enfocado por pasos.");
+assert.match(read("zp-agent-registry.json"), /"Lx"/);
+assert.match(read("zp-agent-registry.json"), /"Rx"/);
+
 assert.match(ui, /creator\.sample\.trim\.set.*commit:true/, "El rotor debe confirmar la persistencia del recorte.");
 assert.match(engine, /function publishTrimState\(/);
 assert.match(engine, /payload\.commit&&samples\[activePad\]/);
