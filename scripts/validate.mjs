@@ -2,7 +2,7 @@ import fs from "node:fs";
 import assert from "node:assert/strict";
 
 const read = (path) => fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");
-const sources = ["index.html", "creator.html", "creator-engine.html", "sw.js", "zp-core.js", "zp-storage.js", "vendor/lame.min.js"];
+const sources = ["index.html", "creator.html", "creator-engine.html", "sw.js", "zp-core.js", "zp-storage.js", "vendor/lame.min.js", "zp-agent.js"];
 let inlineScripts = 0;
 
 for (const path of sources) {
@@ -134,6 +134,22 @@ assert.match(engine, /options\.pitch/);
 assert.match(engine, /options\.velocity/);
 assert.match(engine, /options\.length/);
 assert.match(engine, /publishPianoState\(\)/);
+
+const agent = read("zp-agent.js");
+assert.match(agent, /window\\.__zpAgentLoaded/);
+assert.match(agent, /transport\\.stop/);
+assert.match(agent, /project\\.save/);
+assert.match(agent, /document\\.addEventListener\\("pointerdown"/);
+assert.match(agent, /zp-agent-window/);
+assert.match(agent, /zp-agent-launcher/);
+assert.match(agent, /item\\.risk==="write"/);
+assert.doesNotMatch(agent, /\\bfetch\\s*\\(|new\\s+WebSocket\\s*\\(|\\beval\\s*\\(/, "El agente local no debe realizar llamadas remotas ni ejecutar código arbitrario");
+assert.match(ui, /zp-agent\\.css/);
+assert.match(ui, /zp-agent\\.js/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v8/);
+assert.match(read("sw.js"), /\\.\\/zp-agent\\.js/);
+
+console.log("OK: agente contextual local, allowlist y assets PWA.");
 console.log("OK: Piano Roll MIDI, edición de notas, reproducción y persistencia.");
 console.log("OK: sintaxis de " + sources.length + " archivos y " + inlineScripts + " scripts inline.");
 console.log("OK: bridge GUI/motor, handlers y APIs de proyectos.");
