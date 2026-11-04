@@ -293,12 +293,12 @@ assert.equal(agentRegistry.trimControl.phases["3"].encoder.Rx,"trim.end");
 \n// Contextual encoders: Lx left rail activation and IN Sample-only control.
 assert.ok(ui.includes("knob in-encoder"));
 assert.ok(ui.includes("sample-context:not(.piano-open)"));
-assert.ok(ui.includes("classList.toggle('sample-context'"));
+assert.ok(ui.includes("midContainer.classList.toggle('sample-context',!scr.classList.contains('pr'))"));
 assert.ok(ui.includes("setLxContext(!!window.__zpPianoEncoderMode)"));
 assert.ok(ui.includes("creator.sample.trim.set",{target:"start"));
 assert.equal(agentRegistry.controls.IN.role, "sample-start-encoder");
 assert.equal(agentRegistry.controls.IN.command, "creator.sample.trim.set");
 assert.equal(agentRegistry.controls.IN.payload.target, "start");
-assert.equal(agentRegistry.controls.IN.visibility.hideWhen, "piano-open");
+assert.deepEqual(agentRegistry.controls.IN.visibility.hideWhen, ["pattern-edit", "piano-open"]);
 assert.equal(agentRegistry.controls.Lx.placement, "left-side-rail");
 assert.equal(agentRegistry.controls.Lx.activation.default, "inactive");
