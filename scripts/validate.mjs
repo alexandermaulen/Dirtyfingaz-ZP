@@ -165,6 +165,15 @@ assert.match(engine, /micro:Math\.max\(0,Math\.min\(\.999,Number\(input\.micro\)
 assert.match(engine, /scheduledAt\+\(Math\.max\(0,Math\.min\(\.999,Number\(note\.micro\)\|\|0\)\)\*beat\)/, "El scheduler debe respetar el microtiming.");
 
 
+const agentCss = read("zp-agent.css");
+const agentRegistry = JSON.parse(read("zp-agent-registry.json"));
+assert.equal(agentRegistry.version, "1.0.0", "Debe existir una versión explícita del registro JSON.");
+assert.ok(agentRegistry.project?.handoff?.parallelTracks, "El registro debe contener contexto para retomar el desarrollo.");
+assert.ok(agentRegistry.parameters.some(item => item.key === "trim.start" && item.command === "creator.sample.trim.set"), "IN debe tener comando de motor registrado.");
+assert.ok(agentRegistry.parameters.some(item => item.key === "trim.end" && item.command === "creator.sample.trim.set"), "OUT debe tener comando de motor registrado.");
+assert.match(agentCss, /opacity:\.2/, "El agente debe quedar al 20% de opacidad en reposo.");
+assert.match(agentCss, /zpAgentTargetPulse/, "El control seleccionado debe tener brillo contextual.");
+assert.match(agentCss, /touch-action:none/, "Arrastre y resize deben usar gestos táctiles dedicados.");
 const agent = read("zp-agent.js");
 assert.match(agent, /window\.__zpAgentLoaded/);
 assert.match(agent, /transport\.stop/);
