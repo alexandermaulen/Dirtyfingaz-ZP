@@ -239,6 +239,39 @@ async function handleAgentChat(request, env) {
   }
 }
 
+async function handleGithubStatus(request, env) {
+  if (request.method !== "GET") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+  if (env.ENVIRONMENT !== "preview") return json({ ok: false, error: "PREVIEW_ONLY" }, 404);
+  const owner = "alexandermaulen", repo = "Dirtyfingaz-ZP", branch = "feat/hybrid-hardware-ui-system";
+  const base = "https://api.github.com/repos/" + owner + "/" + repo;
+  const headers = { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "DIRTYFINGAZ-ZP-Agent" };
+  const read = async path => {
+    const response = await fetch(base + path, { headers });
+    if (!response.ok) throw new Error("GITHUB_API_" + response.status);
+    return response.json();
+  };
+  const [repository, branchData, pullRequest, workflows] = await Promise.allSettled([
+    read(""),
+    read("/branches/" + encodeURIComponent(branch)),
+    read("/pulls/3"),
+    read("/actions/runs?branch=" + encodeURIComponent(branch) + "&per_page=5")
+  ]);
+  const value = (result, fallback = null) => result.status === "fulfilled" ? result.value : fallback;
+  const repoData = value(repository), branchValue = value(branchData), pr = value(pullRequest), runs = value(workflows);
+  if (!repoData && !branchValue) return json({ ok: false, error: "GITHUB_READ_FAILED" }, 502);
+  const commit = branchValue?.commit || {};
+  return json({
+    ok: true,
+    repository: repoData ? { full_name: repoData.full_name, visibility: repoData.private ? "private" : "public", default_branch: repoData.default_branch, html_url: repoData.html_url } : null,
+    branch: branchValue ? { name: branchValue.name, sha: commit.sha, commitMessage: commit.commit?.message?.split("\n")[0] || "", committedAt: commit.commit?.committer?.date || null, html_url: commit.html_url } : null,
+    pullRequest: pr ? { number: pr.number, title: pr.title, state: pr.state, draft: pr.draft, html_url: pr.html_url, head_sha: pr.head?.sha, base: pr.base?.ref } : null,
+    workflowRuns: (runs?.workflow_runs || []).map(run => ({ name: run.name, status: run.status, conclusion: run.conclusion, head_sha: run.head_sha, html_url: run.html_url, created_at: run.created_at })),
+    partial: [repository, branchData, pullRequest, workflows].some(result => result.status === "rejected"),
+    access: "read-only",
+    source: "GitHub REST API"
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -247,6 +280,7 @@ export default {
       return json({ ok: enabled, enabled, model: AGENT_MODEL, environment: env.ENVIRONMENT || "unknown" });
     }
     if (url.pathname === "/api/agent/chat") return handleAgentChat(request, env);
+    if (url.pathname === "/api/agent/github/status") return handleGithubStatus(request, env);
     if (url.pathname.startsWith("/api/agent/")) return json({ ok: false, error: "NOT_FOUND" }, 404);
 
     if (url.pathname === "/api/radio/health") {
