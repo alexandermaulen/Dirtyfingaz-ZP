@@ -95,7 +95,7 @@ La implementación local puede sustituir temporalmente servicios remotos, pero d
 - Presencia, transporte colaborativo y señales en vivo: canales realtime; no generar un archivo por cada evento.
 - Backend futuro: Supabase detrás de adaptadores. El Core no importa SDK de Supabase.
 
-**Estado actual:** Creator conserva BPM, patrones y orden de canción en localStorage; las muestras aún viven en memoria durante la sesión. La persistencia de audio en IndexedDB sigue pendiente. Radio Grid conserva salas de demostración locales; aún no hay presencia, identidad remota ni colaboración sincronizada.
+**Estado actual (2026-11-04):** Creator utiliza IndexedDB para proyectos y samples, con patrones, BPM, parámetros y rangos IN/OUT asociados al proyecto. La GUI y el motor se comunican mediante bridge `postMessage`; la verificación funcional en Safari sigue pendiente. Radio Grid incorpora un Worker con Durable Object SQLite para presencia y señalización WebSocket, más audio P2P WebRTC entre colaboradores. La identidad es temporal por invitado; no hay autenticación, perfiles persistentes ni servidor TURN configurado. El despliegue del Worker y la prueba entre dispositivos siguen pendientes.
 
 ## 6. Reglas de implementación
 
@@ -132,7 +132,7 @@ Códigos sugeridos: INVALID_INPUT, NOT_FOUND, NOT_READY, PERMISSION_DENIED, PERS
 - [ ] Extraer el estado y los casos de uso del Creator fuera del DOM.
 - [x] Añadir persistencia de muestras y proyectos con IndexedDB detrás de AssetStorage.
 - [ ] Aplicar el mismo patrón a Simple Mixer.
-- [ ] Definir contratos de identidad, salas y presencia para Radio Grid.
+- [x] Definir contratos de salas, presencia y señalización WebRTC para Radio Grid.\n- [ ] Incorporar identidad autenticada, perfiles y permisos persistentes.\n- [ ] Configurar TURN y validar conectividad entre redes móviles/Wi-Fi.
 - [ ] Conectar catálogo y streaming mediante repositorios.
 - [ ] Incorporar Supabase solo después de validar los contratos locales.
 - [ ] Añadir pruebas de contrato y regresión para cada módulo.
