@@ -61,6 +61,8 @@ assert.match(radioWorker, /type: "presence"/);
 assert.match(radioWorker, /type: "signal"/);
 assert.equal(wrangler.main, "./radio-worker.mjs");
 assert.ok(wrangler.durable_objects.bindings.some(binding => binding.name === "RADIO_ROOMS" && binding.class_name === "RadioRoom"));
+assert.equal(wrangler.exports.RadioRoom.type, "durable-object");
+assert.equal(wrangler.exports.RadioRoom.storage, "sqlite");
 assert.match(shell, /new WebSocket\(url\)/);
 assert.match(shell, /new RTCPeerConnection/);
 assert.match(shell, /getUserMedia/);
