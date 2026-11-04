@@ -152,7 +152,7 @@ El modelo no ejecuta directamente comandos, código ni SQL. Las acciones musical
 - No hay function calling conectado a acciones de la app todavía.
 - No hay integración GitHub de escritura todavía.
 
-El modelo GPT-OSS 20B se eligió como base de copiloto de programación; tiene contexto de 128k y soporte de function calling/reasoning en Workers AI. La función de herramientas seguirá deshabilitada hasta contar con esquemas, permisos y confirmación explícita.
+El modelo GPT-OSS 20B se eligió como base de copiloto de programación; tiene contexto de 128k, soporte de function calling/reasoning y zero data retention en Workers AI. La documentación vigente indica un precio de referencia de USD 0,20 por millón de tokens de entrada y USD 0,30 por millón de salida. La función de herramientas seguirá deshabilitada hasta contar con esquemas, permisos y confirmación explícita.
 
 ### 4.5 Permisos por niveles
 
