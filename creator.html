@@ -213,7 +213,7 @@ body::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;transform:
 const $=s=>document.querySelector(s),unit=$('#unit'),scr=$('#scr');
 const mk=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
 /* escala adaptable: viewport visual, orientación y áreas seguras */
-const fit=()=>{const vv=window.visualViewport,w=vv?vv.width:document.documentElement.clientWidth,h=vv?vv.height:window.innerHeight;const safeTop=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("padding-top"))||0;const safeBottom=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("padding-bottom"))||0;const usableH=Math.max(320,h-safeTop-safeBottom-16);const stageW=Math.max(260,Math.min(w-24,usableH*9/16));const stageH=stageW*16/9;const scale=Math.min(stageW/(unit.offsetWidth+8),stageH/(unit.offsetHeight+8));document.documentElement.style.setProperty("--zp-stage-width",stageW+"px");unit.style.zoom="1";unit.style.transform="scale("+Math.max(.42,Math.min(1.2,scale))+")";};
+const fit=()=>{const vv=window.visualViewport,w=vv?vv.width:document.documentElement.clientWidth,h=vv?vv.height:window.innerHeight;const safeTop=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("padding-top"))||0;const safeBottom=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("padding-bottom"))||0;const usableH=Math.max(320,h-safeTop-safeBottom-16);const stageW=Math.max(260,Math.min(w-12,usableH*9/16));const stageH=stageW*16/9;const scale=Math.min(stageW/(unit.offsetWidth+8),stageH/(unit.offsetHeight+8));document.documentElement.style.setProperty("--zp-stage-width",stageW+"px");unit.style.zoom="1";unit.style.transform="scale("+Math.max(.42,Math.min(1.2,scale))+")";};
 fit();addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>setTimeout(fit,300));window.visualViewport?.addEventListener('resize',fit,{passive:true});document.fonts&&document.fonts.ready.then(fit);
 /* perillas */
 [['VOLUME','<span>MIN</span><span>MAX</span>'],['CTRL 1','&#9670; CUTOFF &#9670;'],['CTRL 2','RESONANCE'],['CTRL 3','&#9670; DRIVE &#9670;']].forEach(([n,s])=>{
@@ -257,6 +257,7 @@ function wave(){const c=$('#wv'),x=c.getContext('2d');x.clearRect(0,0,168,46);
  for(let i=0;i<40;i++){const p=i%10,env=Math.exp(-p/3)*(p?1:.5),h=Math.max(2,Math.round(21*env*(.7+.3*Math.abs(Math.sin(i*2.3)))/2)*2);x.fillRect(4+i*4,23-h,3,h*2)}
  x.fillRect(0,22,168,2)}
 wave();
+requestAnimationFrame(()=>requestAnimationFrame(fit));
 /* temas: toca MENU */
 const skins=['verde','ambar','cian','rojo'];
 $('#menu').addEventListener('click',()=>{unit.dataset.skin=skins[(skins.indexOf(unit.dataset.skin)+1)%4];wave()});
