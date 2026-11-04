@@ -145,11 +145,25 @@ canvas{width:168px;height:46px}
 .scr.pr::after{background:repeating-linear-gradient(0deg,#0005 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#0004 0 1px,transparent 1px 3px)}
 .v1,.v2{text-shadow:0 0 3px var(--lcd)}
 </style>
-<style id="zp-engine-frame">#zp-engine{position:fixed!important;left:-10000px!important;top:0!important;width:1px!important;height:1px!important;border:0!important;opacity:0!important;pointer-events:none!important}</style></head>
+<style id="zp-engine-frame">#zp-engine{position:fixed!important;left:-10000px!important;top:0!important;width:1px!important;height:1px!important;border:0!important;opacity:0!important;pointer-events:none!important}</style>
+<style id="zp-iphone11-fullscreen">
+html,body{width:100%;height:100%;min-height:100%;overflow:hidden;background:#041a06}
+body{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;padding:env(safe-area-inset-top) 6px env(safe-area-inset-bottom);min-height:0;height:100dvh;width:100vw;overflow:hidden}
+.unit{flex:none;width:430px;max-width:none;margin:0;transform-origin:center center}
+.hd{gap:9px;min-width:0}
+.home-arrow{appearance:none;-webkit-appearance:none;display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;min-height:34px;padding:0;margin:0;border:2px solid #061b05;border-radius:7px;background:linear-gradient(180deg,#267d16,#0a3508);color:var(--tx);font:800 25px/1 'Courier New',monospace;text-shadow:0 0 7px var(--lcd);box-shadow:inset 0 1px #dfff8c66,0 0 0 1px var(--bd2),0 2px 5px #0009;touch-action:manipulation}
+.home-arrow:active{background:var(--lcd);color:var(--scr);transform:translateY(1px)}
+.hd h1{flex:1;min-width:0;font-size:clamp(25px,7.6vw,34px);white-space:nowrap}
+.hd h1 b{font-size:clamp(34px,10vw,46px)}
+.hd .by{font-size:clamp(11px,4vw,18px);white-space:nowrap}
+@media(max-height:620px){body{align-items:flex-start}.unit{margin-top:0}}
+@media(display-mode:standalone){body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}}
+</style>
+</head>
 <body>
-<button id="creator-home" type="button" aria-label="Volver a la página principal" title="Volver al inicio">←</button>
+
 <div class="unit" id="unit" data-skin="verde">
- <div class="hd"><i class="screw"></i><h1>DIRTYFINGAZ <b>Z</b></h1><span class="by">BY TAPES CROMO</span><i class="screw"></i></div>
+ <div class="hd"><button id="creator-home" class="home-arrow" type="button" aria-label="Volver a la página principal" title="Volver al inicio">←</button><h1>DIRTYFINGAZ <b>Z</b></h1><span class="by">BY TAPES CROMO</span><i class="screw"></i></div>
  <div class="kn" id="kn"></div>
  <div class="mid">
   <div class="col" id="cl"></div><div></div><div class="col" id="cr"></div>
@@ -175,7 +189,7 @@ canvas{width:168px;height:46px}
 const $=s=>document.querySelector(s),unit=$('#unit'),scr=$('#scr');
 const mk=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
 /* escala adaptable: viewport visual, orientación y áreas seguras */
-const fit=()=>{unit.style.zoom=1;const vv=window.visualViewport,w=vv?vv.width:document.documentElement.clientWidth,h=vv?vv.height:window.innerHeight;const safeTop=parseFloat(getComputedStyle(document.documentElement).paddingTop)||0;const availableH=Math.max(280,h-safeTop-54);unit.style.zoom=Math.max(.62,Math.min(w/436,availableH/(unit.offsetHeight+12),1.6));};
+const fit=()=>{unit.style.zoom=1;const vv=window.visualViewport,w=vv?vv.width:document.documentElement.clientWidth,h=vv?vv.height:window.innerHeight;const cs=getComputedStyle(document.documentElement);const safeTop=parseFloat(cs.paddingTop)||0;const safeBottom=parseFloat(cs.paddingBottom)||0;const availableW=Math.max(280,w-12);const availableH=Math.max(320,h-safeTop-safeBottom-8);const scale=Math.min(availableW/(unit.offsetWidth+12),availableH/(unit.offsetHeight+8),1.35);unit.style.zoom=Math.max(.48,scale);};
 fit();addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>setTimeout(fit,300));window.visualViewport?.addEventListener('resize',fit,{passive:true});document.fonts&&document.fonts.ready.then(fit);
 /* perillas */
 [['VOLUME','<span>MIN</span><span>MAX</span>'],['CTRL 1','&#9670; CUTOFF &#9670;'],['CTRL 2','RESONANCE'],['CTRL 3','&#9670; DRIVE &#9670;']].forEach(([n,s])=>{
