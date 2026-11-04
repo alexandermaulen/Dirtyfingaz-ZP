@@ -1,10 +1,27 @@
 {
   "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
   "name": "dirtyfingaz-zp",
+  "main": "./radio-worker.mjs",
   "compatibility_date": "2026-11-04",
   "assets": {
-    "directory": "./"
+    "directory": "./",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
   },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "RADIO_ROOMS",
+        "class_name": "RadioRoom"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1-radio-rooms",
+      "new_sqlite_classes": ["RadioRoom"]
+    }
+  ],
   "vars": {
     "ENVIRONMENT": "production"
   },
