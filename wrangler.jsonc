@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "dirtyfingaz-zp",
+  "compatibility_date": "2026-11-04",
+  "assets": {
+    "directory": "./"
+  },
+  "vars": {
+    "ENVIRONMENT": "production"
+  },
+  "previews": {
+    "vars": {
+      "ENVIRONMENT": "preview"
+    }
+  }
+}
