@@ -148,7 +148,11 @@ async function handleAgentChat(request, env) {
   }
   const origin = request.headers.get("Origin");
   const requestUrl = new URL(request.url);
-  if (!origin || new URL(origin).origin !== requestUrl.origin) {
+  try {
+    if (!origin || new URL(origin).origin !== requestUrl.origin) {
+      return json({ ok: false, error: "ORIGIN_DENIED" }, 403);
+    }
+  } catch {
     return json({ ok: false, error: "ORIGIN_DENIED" }, 403);
   }
   const ip = request.headers.get("CF-Connecting-IP") || "preview-client";
@@ -171,9 +175,9 @@ async function handleAgentChat(request, env) {
     surface: cleanText(rawContext.surface, 60),
     control: cleanText(rawContext.control, 60),
     label: cleanText(rawContext.label, 90),
-    padId: Number.isFinite(Number(rawContext.padId)) ? Math.max(1, Math.min(9, Number(rawContext.padId))) : null,
+    padId: rawContext.padId !== null && rawContext.padId !== undefined && rawContext.padId !== "" && Number.isFinite(Number(rawContext.padId)) ? Math.max(1, Math.min(9, Number(rawContext.padId))) : null,
     bank: ["A", "B", "C", "D"].includes(rawContext.bank) ? rawContext.bank : null,
-    bpm: Number.isFinite(Number(rawContext.bpm)) ? Math.max(40, Math.min(240, Number(rawContext.bpm))) : null,
+    bpm: rawContext.bpm !== null && rawContext.bpm !== undefined && rawContext.bpm !== "" && Number.isFinite(Number(rawContext.bpm)) ? Math.max(40, Math.min(240, Number(rawContext.bpm))) : null,
     projectName: cleanText(rawContext.projectName, 80)
   };
   const history = Array.isArray(input.history) ? input.history.slice(-8).filter(item =>
