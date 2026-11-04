@@ -35,6 +35,12 @@ const custom = ["creator.sample.load.request", "creator.pad.select", "creator.sa
 const sent = [...ui.matchAll(/zpBridgeSend\(["']([^"']+)/g)].map((match) => match[1]);
 const missing = [...new Set(sent)].filter((command) => !commands.includes(command) && !custom.includes(command));
 
+assert.match(ui, /repeat\(16,minmax\(0,1fr\)\)/, "La GUI debe mostrar 16 pasos");
+assert.match(ui, /s<=16/);
+assert.match(ui, /Math\.min\(15,Number\(cell\.dataset\.s\)\|\|0\)/);
+assert.match(ui, /index-17\)\/17/);
+assert.match(ui, /zp-engine-playhead/);
+assert.match(engine, /type:"zp-engine-playhead"/);
 assert.match(ui, /protocolVersion:1/);
 assert.match(ui, /requestId/);
 assert.match(engine, /packet\.protocolVersion!==1/);
