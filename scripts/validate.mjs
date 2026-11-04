@@ -30,6 +30,9 @@ const ui = read("creator.html");
 const engine = read("creator-engine.html");
 const shell = read("index.html");
 const storage = read("zp-storage.js");
+const radioWorker = read("radio-worker.mjs");
+const wrangler = JSON.parse(read("wrangler.jsonc"));
+new Function(radioWorker.replace(/^export class /gm, "class ").replace(/^export default /gm, "const __default = "));
 const commands = [...engine.matchAll(/runtime\.register\(["']([^"']+)/g)].map((match) => match[1]);
 const custom = ["creator.sample.load.request", "creator.pad.select", "creator.sample.trim.target.toggle", "creator.sample.trim.set", "creator.control.set"];
 const sent = [...ui.matchAll(/zpBridgeSend\(["']([^"']+)/g)].map((match) => match[1]);
@@ -53,6 +56,15 @@ assert.match(engine, /creator\.export\.render/);
 assert.match(engine, /createConvolver\(\)/);
 assert.match(engine, /fxState=\{drive:false,delay:false,filter:false,reverb:false\}/);
 assert.match(read("sw.js"), /\.\/vendor\/lame\.min\.js/);
+assert.match(radioWorker, /class RadioRoom/);
+assert.match(radioWorker, /type: "presence"/);
+assert.match(radioWorker, /type: "signal"/);
+assert.equal(wrangler.main, "./radio-worker.mjs");
+assert.ok(wrangler.durable_objects.bindings.some(binding => binding.name === "RADIO_ROOMS" && binding.class_name === "RadioRoom"));
+assert.match(shell, /new WebSocket\\(url\\)/);
+assert.match(shell, /new RTCPeerConnection/);
+assert.match(shell, /getUserMedia/);
+
 
 
 assert.match(ui, /protocolVersion:1/);
