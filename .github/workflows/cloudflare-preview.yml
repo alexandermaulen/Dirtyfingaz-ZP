@@ -45,13 +45,28 @@ jobs:
 
       - name: Publish or update Cloudflare Worker Preview
         if: steps.credentials.outputs.ready == 'true'
+        id: publish
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@4.135.0 preview --name zp-roadmap
+        run: |
+          set -o pipefail
+          npx --yes wrangler@4.135.0 preview --name zp-roadmap --json | tee preview-output.json
+          PREVIEW_URL="$(jq -er '.preview.urls[0]' preview-output.json)"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          {
+            echo "## DIRTYFINGAZ ZP Preview"
+            echo
+            echo "Preview URL: $PREVIEW_URL"
+            echo
+            echo "Commit: $GITHUB_SHA"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Report missing credentials
         if: steps.credentials.outputs.ready != 'true'
         run: |
-          echo "Cloudflare Preview is waiting for repository secrets."
-          echo "Required: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID."
+          {
+            echo "## Cloudflare Preview pendiente"
+            echo
+            echo "Agrega CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en Repository secrets."
+          } >> "$GITHUB_STEP_SUMMARY"
