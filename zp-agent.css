@@ -132,3 +132,7 @@
  .panel-option{min-height:20px!important;height:20px}
  .adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:58px;height:58px;min-width:58px;min-height:58px}
 }
+
+/* Overrides finales: conservar el tamaño de los encoders en escritorio y móvil. */
+.adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:66px;height:66px;min-width:66px;min-height:66px}
+@media(max-width:620px){.adaptive-side-panel>.lx,.adaptive-side-panel>.rx{width:58px;height:58px;min-width:58px;min-height:58px}}
