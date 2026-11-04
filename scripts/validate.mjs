@@ -83,6 +83,10 @@ assert.equal(wrangler.exports.RadioRoom.storage, "sqlite");
 assert.match(shell, /new WebSocket\(url\)/);
 assert.match(shell, /new RTCPeerConnection/);
 assert.match(shell, /getUserMedia/);
+assert.match(engine, /createMediaStreamDestination\(\)/);
+assert.match(engine, /zpGetBroadcastStream/);
+assert.match(shell, /getCreatorAudioStream\(\)/);
+assert.match(shell, /radioLocalStreamIsCreator/);
 
 
 
