@@ -206,7 +206,8 @@ async function handleAgentChat(request, env) {
     transport: cleanText(rawContext.transport, 24),
     agentVersion: cleanText(rawContext.agentVersion, 20),
     workflow: cleanText(rawContext.workflow, 60),
-    registryVersion: cleanText(registry?.version, 20)
+    registryVersion: cleanText(registry?.version, 20),
+    projectContext: registry?.project || null
   };
   const history = Array.isArray(input.history) ? input.history.slice(-8).filter(item =>
     item && ["user", "assistant"].includes(item.role) && typeof item.content === "string"
