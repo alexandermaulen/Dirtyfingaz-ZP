@@ -366,7 +366,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  padConfig.innerHTML='<strong id="zp-pad-config-title">PAD SETTINGS</strong><div class="zp-pad-config-actions"><button type="button" data-pad-action="mute">MUTE</button><button type="button" data-pad-action="solo">SOLO</button><button type="button" data-pad-action="preview">PREVIEW</button><button type="button" data-pad-action="browse">LOAD SAMPLE</button><button type="button" data-pad-action="close">CLOSE</button></div>';
  document.body.append(padConfig);
  let configuredPad=1;
- function openPadConfig(padId){configuredPad=padId;zpBridgeSend("creator.pad.select",{padId});$("#zp-pad-config-title").textContent="PAD "+String(padId).padStart(2,"0")+" · CUSTOM";padConfig.hidden=false;}
+ function openPadConfig(padId){configuredPad=padId;padConfig.dataset.padId=String(padId);zpBridgeSend("creator.pad.select",{padId});$("#zp-pad-config-title").textContent="PAD "+String(padId).padStart(2,"0")+" · CUSTOM";padConfig.hidden=false;}
  padConfig.addEventListener("click",e=>{const action=e.target.closest("[data-pad-action]")?.dataset.padAction;if(!action)return;if(action==="mute")zpBridgeSend("creator.pad.mute.toggle");else if(action==="solo")zpBridgeSend("creator.pad.solo.toggle");else if(action==="preview")zpBridgeSend("creator.sample.preview");else if(action==="browse")zpBridgeSend("creator.sample.load.request");else if(action==="close")padConfig.hidden=true;});
  document.querySelectorAll("#pads .p").forEach((pad,i)=>{
   pad.dataset.padId=String(i+1);
