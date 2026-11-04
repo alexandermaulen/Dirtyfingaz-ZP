@@ -4,3 +4,6 @@
 .assetsignore
 ARCHITECTURE.md
 wrangler.jsonc
+
+radio-worker.mjs
+scripts/
