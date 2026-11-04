@@ -272,10 +272,10 @@
   "controls": {
     "Lx": {
       "label": "Lx",
-      "role": "navigation-encoder",
+      "role": "master-left-navigation",
       "owner": "creator.ui",
       "input": "pointer-rotation",
-      "behavior": "Navegación contextual: inactivo en vista general; se activa al abrir Pattern Edit o Piano Roll desde un patrón seleccionado y navega herramientas/parámetros del patrón.",
+      "behavior": "Control maestro izquierdo. Inactivo en vista general; se activa al seleccionar/abrir un patrón en Pattern Edit o Piano Roll y navega herramientas/parámetros del patrón sin ejecutarlos.",
       "stepDegrees": 14,
       "wrap": true,
       "commands": [],
@@ -291,14 +291,15 @@
         ],
         "default": "inactive",
         "deactivateOn": "editor-close"
-      }
+      },
+      "master": true
     },
     "Rx": {
       "label": "Rx",
-      "role": "contextual-parameter-encoder",
+      "role": "master-right-output",
       "owner": "creator.ui+creator-engine.html",
       "input": "pointer-rotation",
-      "behavior": "Control contextual adaptativo: conserva trim IN/OUT, edición MIDI y FX; cuando no hay edición activa, desplaza vertical u horizontalmente el contenedor del elemento seleccionado por Lx.",
+      "behavior": "Control maestro derecho. En contexto Sample y fase OUT ajusta el punto final del sample mediante creator.sample.trim.set target=end; en otros contextos controla el parámetro contextual o PUSH ENTER sin sustituir IN.",
       "existingSelector": ".pe",
       "commands": [
         "creator.sample.trim.set",
@@ -320,6 +321,16 @@
           "midi.freeMove",
           "selected-target-is-trim-or-midi"
         ]
+      },
+      "master": true,
+      "sampleMapping": {
+        "label": "OUT",
+        "command": "creator.sample.trim.set",
+        "payload": {
+          "target": "end",
+          "position": "number",
+          "commit": "boolean"
+        }
       }
     },
     "IN": {
@@ -369,10 +380,13 @@
       },
       "Lx": {
         "context": "pattern-edit-or-piano-roll",
-        "position": "left-rail",
+        "position": "left-master-rail",
         "default": "inactive"
       },
-      "Rx": "preserved",
+      "Rx": {
+        "context": "sample-out-and-contextual-master",
+        "position": "right-master-rail"
+      },
       "SHIFT": "preserved"
     }
   },
