@@ -302,3 +302,8 @@ assert.equal(agentRegistry.controls.IN.payload.target, "start");
 assert.deepEqual(agentRegistry.controls.IN.visibility.hideWhen, ["pattern-edit", "piano-open"]);
 assert.equal(agentRegistry.controls.Lx.placement, "left-side-rail");
 assert.equal(agentRegistry.controls.Lx.activation.default, "inactive");
+assert.equal(agentRegistry.controls.Lx.role, "master-left-navigation");
+assert.equal(agentRegistry.controls.Rx.role, "master-right-output");
+assert.equal(agentRegistry.controls.Rx.sampleMapping.payload.target, "end");
+assert.equal(agentRegistry.controls.Rx.master, true);
+
