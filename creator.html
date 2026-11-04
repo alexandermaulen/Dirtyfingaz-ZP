@@ -260,8 +260,7 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
  <div class="hd"><button id="creator-home" class="home-arrow" type="button" aria-label="Volver a la página principal" title="Volver al inicio">←</button><h1>DIRTYFINGAZ <b>Z</b></h1><span class="by">BY TAPES CROMO</span><i class="screw"></i></div>
  <div class="kn" id="kn"></div>
  <div class="mid">
-  <div class="col" id="cl"></div><div></div><div class="col" id="cr"></div>
-  <div class="scr" id="scr">
+   <div class="scr" id="scr">
    <div class="v1">
     <div class="l1"><span>C4:START</span><span>C2:OFF</span><span>C3:END</span></div>
     <canvas id="wv" width="168" height="46"></canvas>
@@ -294,44 +293,12 @@ function bindKnob(el,inf){let a=0,y0=0,a0=0,on=0,lx=0,ly=0,lastPulse=0;const set
  const up=()=>on=0;el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)}
 /* botones */
 const B=(t,cls)=>{const b=mk('div','b '+(cls||''),t);return b};
-function buildAdaptivePanel(side,groups,encoder){
- const root=side==='L'?$('#cl'):$('#cr');root.replaceChildren();root.classList.add('adaptive-side-panel');root.dataset.panel=side;
- const nav=mk('div','panel-group-nav'),primary=mk('div','panel-primary'),secondary=mk('div','panel-secondary');secondary.hidden=true;
- let activeGroup=0,expanded=false,holdTimer=null,held=false,activeOption=null,context='sample';
- const contextFor=()=>{const el=window.__zpLxTarget;if(!el)return 'sample';if(el.matches?.('[data-midi-target],.piano-note,.piano-cell')||el.closest?.('.piano-grid,.piano-tools'))return 'piano';if(el.matches?.('.trim-marker')||el.dataset?.trimTarget)return 'sample';if(el.closest?.('#gr'))return 'pattern';if(/FX|FILTER|RESONATOR|DELAY|ISOLATOR|MFX/i.test(el.textContent||''))return 'fx';return 'sample'};
- const optionsFor=(group)=>{const ctx=contextFor();context=ctx;return (group.contexts?.[ctx]||group.options||[]).map(x=>typeof x==='string'?{label:x,id:x.toLowerCase().replace(/[^a-z0-9]+/g,'-')}:x)};
- const fire=(group,option)=>{activeOption=option.id;root.dataset.activeGroup=group.id;root.dataset.activeOption=option.id;root.dataset.context=context;window.dispatchEvent(new CustomEvent('zp-panel-option-select',{detail:{side,group:group.id,option:option.id,label:option.label,context,mode:'selection-only',protocolVersion:1}}));};
- const render=()=>{const group=groups[activeGroup];nav.replaceChildren();groups.forEach((g,i)=>{const b=B(g.label,'panel-group'+(i===activeGroup?' selected':''));b.dataset.group=g.id;b.setAttribute('role','button');b.tabIndex=0;b.setAttribute('aria-pressed',String(i===activeGroup));b.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();b.click()}});b.addEventListener('pointerdown',()=>{held=false;clearTimeout(holdTimer);holdTimer=setTimeout(()=>{held=true;expanded=true;renderOptions()},420)});['pointerup','pointercancel','pointerleave'].forEach(t=>b.addEventListener(t,()=>clearTimeout(holdTimer)));b.addEventListener('click',()=>{if(held){held=false;return}activeGroup=i;expanded=false;render()});nav.append(b)});
- root.dataset.group=group.id;primary.replaceChildren();secondary.replaceChildren();const opts=optionsFor(group);opts.slice(0,2).forEach(o=>{const b=B(o.label,'panel-option');b.dataset.option=o.id;b.setAttribute('role','button');b.tabIndex=0;b.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();b.click()}});b.addEventListener('click',()=>{fire(group,o);primary.querySelectorAll('.panel-option').forEach(x=>x.classList.toggle('lit',x===b));});primary.append(b)});
- const more=opts.slice(2);if(more.length){const hint=mk('div','panel-hold-hint','HOLD +');primary.append(hint);more.forEach(o=>{const b=B(o.label,'panel-option panel-secondary-option');b.dataset.option=o.id;b.setAttribute('role','button');b.tabIndex=0;b.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();b.click()}});b.addEventListener('click',()=>{fire(group,o);secondary.querySelectorAll('.panel-option').forEach(x=>x.classList.toggle('lit',x===b));});secondary.append(b)})}
- secondary.hidden=!expanded;root.dataset.expanded=String(expanded);
- };
- const renderOptions=()=>{secondary.hidden=!expanded;root.dataset.expanded=String(expanded)};
- root.append(nav,primary,secondary);render();return {root,render,selectContext:()=>{const next=contextFor();if(next!==context){context=next;render()}}};
-}
-const panelDefinitions={
- left:[
-  {id:'L1x',label:'L1x',options:['START','END','PITCH','REVERSE','RESAMPLE','TRANSPOSE'],contexts:{piano:['NOTE','OCTAVE','TRANSPOSE','SCALE','QUANTIZE','VELOCITY'],pattern:['PAD','BANK','PATTERN','DUPLICATE','RESAMPLE','REVERSE']}},
-  {id:'L2x',label:'L2x',options:['CUTOFF','RESONANCE','DRIVE','BITCRUSH','FILTER','SATURATION'],contexts:{piano:['PITCH','VELOCITY','LENGTH','NUDGE','MICROTIME','GATE'],pattern:['TUNE','DECAY','ATTACK','FILTER','PAN','GAIN']}},
-  {id:'L3x',label:'L3x',options:['LFO','ENVELOPE','DEPTH','RATE','SYNC','AUTOMATION'],contexts:{piano:['EXPRESSION','MOD WHEEL','AFTERTOUCH','HUMANIZE','SWING','AUTOMATION'],pattern:['LFO','ENVELOPE','MOD DEPTH','RATE','SYNC','AUTOMATION']}}
- ],
- right:[
-  {id:'R1x',label:'R1x',options:['COMP','LIMITER','GATE','TRANSIENT','ISOLATOR','MULTIBAND']},
-  {id:'R2x',label:'R2x',options:['DELAY','REVERB','STUTTER','LOOPER','BEAT REPEAT','GLITCH']},
-  {id:'R3x',label:'R3x',options:['STEREO','PAN','CHORUS','PHASER','FLANGER','MASTER FX','OUTPUT']}
- ]
-};
-let leftPanel=buildAdaptivePanel('L',panelDefinitions.left),rightPanel=buildAdaptivePanel('R',panelDefinitions.right);
-fetch('./zp-agent-registry.json').then(r=>{if(!r.ok)throw new Error('Registry unavailable');return r.json()}).then(reg=>{const p=reg.panelSystem?.panels;if(p?.left?.length&&p?.right?.length){leftPanel=buildAdaptivePanel('L',p.left);rightPanel=buildAdaptivePanel('R',p.right);leftPanel.root.append(lx);rightPanel.root.append(pe)}}).catch(err=>console.warn('Panel registry fallback:',err.message));
-const refreshPanelContext=()=>{leftPanel.selectContext();rightPanel.selectContext()};
-window.addEventListener('focusin',refreshPanelContext);
-window.addEventListener('zp-panel-context-change',refreshPanelContext);
 function row(cols,tags,btns,cls){const w=mk('div');const tg=mk('div','row tg');tg.style.gridTemplateColumns=cols;
  tags.forEach(([t,n])=>{const s=mk('span','',t);s.style.gridColumn='span '+n;tg.append(s)});
  const r=mk('div','row '+(cls||''));r.style.gridTemplateColumns=cols;
  btns.forEach(b=>{if(typeof b==='string'){const x=B(b);r.append(x)}else r.append(b)});w.append(tg,r);$('#rows').append(w);return r}
-const lx=mk('div','knob lx','<i></i>');lx.dataset.rotor='Lx';lx.setAttribute('role','button');lx.setAttribute('aria-label','Lx: navegación de grupos L1x, L2x y L3x');lx.tabIndex=0;bindKnob(lx,1);$('#cl').append(lx);
-const pe=mk('div','knob pe rx','<i></i>');pe.dataset.rotor='Rx';pe.setAttribute('role','button');pe.setAttribute('aria-label','Rx: control contextual de grupos R1x, R2x y R3x');pe.tabIndex=0;bindKnob(pe,1);$('#cr').append(pe);
+const lx=mk('div','knob lx','<i></i>');lx.dataset.rotor='Lx';lx.setAttribute('role','button');lx.setAttribute('aria-label','Lx: navegación de controles del GUI');lx.tabIndex=0;bindKnob(lx,1);$('.mid').append(lx);
+const pe=mk('div','knob pe rx','<i></i>');pe.dataset.rotor='Rx';pe.setAttribute('role','button');pe.setAttribute('aria-label','Rx: ajuste contextual del área de trabajo');pe.tabIndex=0;bindKnob(pe,1);$('.mid').append(pe);
 row('repeat(6,1fr)',[['PATTERN SEQUENCER',3],['SAMPLE EDIT',3]],
  ['PATTERN<br>SELECT','PATTERN<br>EDIT','RECORD<br>SETTING','START/<br>END','PITCH<br>SPEED','MARK'],'big ra');
 const trimPhaseButton=[...document.querySelectorAll("#rows .b")].find(b=>b.textContent.replace(/\s/g,"")==="START/END");
@@ -480,7 +447,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  window.addEventListener("message",ev=>{const d=ev.data;if(ev.source===frame.contentWindow&&ev.origin===location.origin&&d?.type==="zp-engine-radio-state"&&d.protocolVersion===1&&d.source==="creator.engine"){parent.postMessage({type:"zp-radio-publish-state",protocolVersion:1,source:"creator.ui",state:d.state},location.origin);return}if(ev.source===parent&&ev.origin===location.origin&&d?.type==="zp-radio-state"&&d.protocolVersion===1&&d.source==="radio.gateway"){zpBridgeSend("creator.radio.apply-state",{state:d.state})}});
 
  const norm=s=>(s||"").replace(/<[^>]*>/g,"").replace(/\s+/g,"").toUpperCase();
- const allButtons=()=>[...document.querySelectorAll("#rows .b,#bt .b,#cl .b,#cr .b")];
+ const allButtons=()=>[...document.querySelectorAll("#rows .b,#bt .b")];
  const bind=(label,fn)=>{
   const key=norm(label);
   allButtons().filter(el=>norm(el.textContent)===key&&!el.classList.contains("legacy-physical-button")).forEach(el=>el.addEventListener("click",fn));
