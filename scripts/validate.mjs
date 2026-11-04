@@ -41,9 +41,10 @@ const missing = [...new Set(sent)].filter((command) => !commands.includes(comman
 assert.match(ui, /repeat\(16,minmax\(0,1fr\)\)/, "La GUI debe mostrar 16 pasos");
 assert.match(ui, /s<=16/);
 assert.match(ui, /Math\.min\(15,Number\(cell\.dataset\.s\)\|\|0\)/);
-assert.match(ui, /Math\.floor\(\(cellIndex-1\)\/17\)\+1/);
-assert.match(ui, /Math\.floor\(\(index-1\)\/17\)\+1/);
-assert.equal((ui.match(/Math\.floor\(\((?:cellIndex|index)-1\)\/17\)\+1/g) || []).length, 3, "El mapeo debe cubrir playhead, estado de patrones e interacción");
+assert.match(ui, /Math\.floor\(\(cellIndex-18\)\/17\)\+1/);
+assert.match(ui, /Math\.floor\(\(index-18\)\/17\)\+1/);
+assert.equal((ui.match(/Math\.floor\(\((?:cellIndex|index)-18\)\/17\)\+1/g) || []).length, 3, "El mapeo debe cubrir playhead, estado de patrones e interacción");
+for (let row = 0; row < 9; row++) for (let step = 0; step < 16; step++) { const childIndex = 18 + row * 17 + step; assert.equal(Math.floor((childIndex - 18) / 17) + 1, row + 1, "Pad mapping row " + row + " step " + step); }
 assert.match(ui, /zp-engine-playhead/);
 assert.match(engine, /type:"zp-engine-playhead"/);
 assert.match(engine, /type:"zp-engine-pattern-state"/);
