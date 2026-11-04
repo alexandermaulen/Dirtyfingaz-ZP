@@ -4,9 +4,11 @@
 (function (root) {
   "use strict";
   const DB_NAME = "dirtyfingaz-zp-assets";
-  const DB_VERSION = 1;
+  const DB_VERSION = 2;
   const SAMPLE_STORE = "samples";
   const PROJECT_STORE = "projects";
+  const PROJECT_SAMPLE_STORE = "projectSamples";
+  const DEFAULT_PROJECT_ID = "zp1-default";
   let dbPromise;
 
   function open() {
@@ -18,6 +20,9 @@
         const db = request.result;
         if (!db.objectStoreNames.contains(SAMPLE_STORE)) db.createObjectStore(SAMPLE_STORE, { keyPath: "pad" });
         if (!db.objectStoreNames.contains(PROJECT_STORE)) db.createObjectStore(PROJECT_STORE, { keyPath: "id" });
+        if (!db.objectStoreNames.contains(PROJECT_SAMPLE_STORE)) db.createObjectStore(PROJECT_SAMPLE_STORE, { keyPath: "id" });
+        if (db.objectStoreNames.contains(SAMPLE_STORE)) { const legacy=request.transaction.objectStore(SAMPLE_STORE), cursorRequest=legacy.openCursor(); cursorRequest.onsuccess=function(){const cursor=cursorRequest.result;if(!cursor)return;const item=cursor.value;request.transaction.objectStore(PROJECT_SAMPLE_STORE).put(Object.assign({},item,{id:DEFAULT_PROJECT_ID+":"+Number(item.pad),projectId:DEFAULT_PROJECT_ID}));cursor.continue();}; }
+        if (db.objectStoreNames.contains(PROJECT_STORE)) { const projects=request.transaction.objectStore(PROJECT_STORE), oldProject=projects.get("current"); oldProject.onsuccess=function(){if(oldProject.result&&!projects.get(DEFAULT_PROJECT_ID)){const copy=oldProject.result;copy.id=DEFAULT_PROJECT_ID;projects.put(copy);}}; }
       };
       request.onsuccess = function () { resolve(request.result); };
       request.onerror = function () { dbPromise = null; reject(request.error || new Error("No se pudo abrir la base local")); };
@@ -53,24 +58,27 @@
     return buffer;
   }
 
-  function saveSample(pad, buffer, name, range) {
-    return transact(SAMPLE_STORE, "readwrite", function (store) {
-      return store.put(encodeBuffer(buffer, pad, name, range));
-    });
+  function sampleId(projectId, pad) { return String(projectId || DEFAULT_PROJECT_ID) + ":" + Number(pad); }
+  function saveSample(pad, buffer, name, range, projectId) {
+    const pid = String(projectId || DEFAULT_PROJECT_ID), record = encodeBuffer(buffer, pad, name, range);
+    record.id = sampleId(pid, pad); record.projectId = pid;
+    return transact(PROJECT_SAMPLE_STORE, "readwrite", function (store) { return store.put(record); });
   }
-  function getSamples() {
-    return transact(SAMPLE_STORE, "readonly", function (store) { return store.getAll(); });
+  function getSamples(projectId) {
+    const pid = String(projectId || DEFAULT_PROJECT_ID);
+    return transact(PROJECT_SAMPLE_STORE, "readonly", function (store) { return store.getAll(); })
+      .then(function (records) { return records.filter(function (item) { return item.projectId === pid; }); });
   }
-  function deleteSample(pad) {
-    return transact(SAMPLE_STORE, "readwrite", function (store) { return store.delete(Number(pad)); });
+  function deleteSample(pad, projectId) {
+    return transact(PROJECT_SAMPLE_STORE, "readwrite", function (store) { return store.delete(sampleId(projectId, pad)); });
   }
-  function saveProject(data) {
-    return transact(PROJECT_STORE, "readwrite", function (store) {
-      return store.put({ id: "current", data: data, updatedAt: Date.now() });
-    });
+  function saveProject(data, projectId) {
+    const pid = String(projectId || DEFAULT_PROJECT_ID);
+    return transact(PROJECT_STORE, "readwrite", function (store) { return store.put({ id: pid, data: data, updatedAt: Date.now() }); });
   }
-  function loadProject() {
-    return transact(PROJECT_STORE, "readonly", function (store) { return store.get("current"); }).then(function (record) { return record ? record.data : null; });
+  function loadProject(projectId) {
+    const pid = String(projectId || DEFAULT_PROJECT_ID);
+    return transact(PROJECT_STORE, "readonly", function (store) { return store.get(pid); }).then(function (record) { return record ? record.data : null; });
   }
 
   root.DirtyfingazStorage = Object.freeze({
@@ -81,6 +89,6 @@
     saveProject: saveProject,
     loadProject: loadProject,
     decodeBuffer: decodeBuffer,
-    version: "1.0.0"
+    version: "2.0.0"
   });
 })(window);
