@@ -93,6 +93,11 @@ assert.match(engine, /source:"creator\.engine"/);
 assert.match(engine, /saveProjectSample\(currentProjectId,n,slice,sampleNames\[n\],ranges\[n\]\)/);
 assert.match(engine, /saveProjectSample\(currentProjectId,activePad,samples\[activePad\],sampleNames\[activePad\],ranges\[activePad\]\)/);
 assert.match(engine, /projectDialog\.querySelector\("#zp-project-name"\)\.value=currentProjectName/);
+assert.match(engine, /async function exportProjectFile\(/);
+assert.match(engine, /async function importProjectFile\(/);
+assert.match(engine, /saveProjectSample\(id,item\.pad,buffer,item\.name/);
+assert.match(engine, /async function createProject\(name\)\{await saveSession\(true\)/);
+
 
 assert.match(storage, /DB_VERSION = 2/);
 for (const api of ["saveProjectSample", "getProjectSamples", "listProjects", "deleteProject"]) {
