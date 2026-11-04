@@ -144,6 +144,25 @@ canvas{width:168px;height:46px}
 .scr::after{background:repeating-linear-gradient(0deg,#0005 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#0004 0 1px,transparent 1px 3px),radial-gradient(circle,transparent 55%,#0008)}
 .scr.pr::after{background:repeating-linear-gradient(0deg,#0005 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#0004 0 1px,transparent 1px 3px)}
 .v1,.v2{text-shadow:0 0 3px var(--lcd)}
+
+/* CREATOR LCD UPDATE */
+.l2 .lcd-action{border:1px solid var(--lcd);padding:0 4px;background:#031503;color:var(--lcd);border-radius:3px;cursor:pointer}
+.bpm-wheel{display:inline-flex;align-items:center;justify-content:center;min-width:70px;padding:1px 5px;border:1px solid var(--lcd);border-radius:4px;background:linear-gradient(#173c12,#041504);color:var(--lcd);font:15px/1 VT323,monospace;touch-action:none;user-select:none;cursor:ns-resize}
+.transport-line{height:5px;flex:none;width:100%;border:1px solid #5e9d43;background:#061606;overflow:hidden;border-radius:4px}
+.transport-line i{display:block;height:100%;width:0;background:linear-gradient(90deg,#47e34b,#baff62);box-shadow:0 0 8px #58ff4c;transition:width .045s linear}
+.transport-line.peak i{background:linear-gradient(90deg,#ff8a35,#ff2525);box-shadow:0 0 10px #ff2525}
+.piano-tools{display:flex;align-items:center;justify-content:space-between;gap:4px;flex:none;height:15px;font:10px VT323,monospace}
+.piano-tools button{min-width:24px;height:14px;padding:0 5px;border:1px solid var(--lcd);border-radius:3px;background:#092208;color:var(--lcd);font:12px/1 VT323,monospace}
+.grid-viewport{min-height:0;flex:1;width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--lcd) #031503;-webkit-overflow-scrolling:touch}
+.grid-viewport .gr{width:100%;min-width:100%;transform-origin:left top}
+.grid-viewport::-webkit-scrollbar{height:4px}.grid-viewport::-webkit-scrollbar-thumb{background:var(--lcd)}
+.scr.pr{height:220px!important;margin-top:-110px!important}.scr.pr .v2{padding:6px 8px!important;gap:3px!important}
+.lcd-menu{position:absolute;z-index:8;inset:8px;border:2px solid var(--lcd);border-radius:5px;background:linear-gradient(145deg,#12390e,#020b02 75%);box-shadow:0 0 18px #9aff4a66,inset 0 0 15px #000;display:flex;flex-direction:column;gap:5px;padding:8px;font:14px VT323,monospace}
+.lcd-menu[hidden]{display:none}.lcd-menu header{display:flex;justify-content:space-between;border-bottom:1px solid #9aff4a66;padding-bottom:4px}
+.lcd-menu .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;flex:1}
+.lcd-menu button{border:1px solid var(--lcd);border-radius:3px;background:#092208;color:var(--lcd);font:14px VT323,monospace;padding:3px}
+.lcd-menu button:active{background:var(--lcd);color:#061606}.lcd-menu small{font:9px VT323,monospace;color:#b7e68d;text-align:center}
+@media(max-width:500px){.scr.pr{width:400px!important;max-width:calc(100vw - 24px)!important}.piano-tools{height:14px}}
 </style>
 <style id="zp-engine-frame">#zp-engine{position:fixed!important;left:-10000px!important;top:0!important;width:1px!important;height:1px!important;border:0!important;opacity:0!important;pointer-events:none!important}</style>
 <style id="zp-iphone11-fullscreen">
@@ -195,10 +214,10 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
    <div class="v1">
     <div class="l1"><span>C4:START</span><span>C2:OFF</span><span>C3:END</span></div>
     <canvas id="wv" width="168" height="46"></canvas>
-    <div class="l2"><span>ENC:ZOOM:1X1</span><span>A-3</span><span>M:ISO</span><span class="mn" id="menu">MENU</span></div><i class="mk l"></i><i class="mk r">R</i>
+    <div class="l2"><span>ENC:ZOOM:1X1</span><span>A-3</span><span>M:ISO</span><span class="lcd-action" id="browse">BROWSE</span><span class="mn" id="menu">MENU</span></div><i class="mk l"></i><i class="mk r">R</i>
    </div>
    <div class="v2">
-    <div class="ph"><span id="play">&#9654; PLAY</span><span>BPM:120</span><span id="len">LEN:1/16</span></div>
+    <div class="ph"><span id="play">&#9654; PLAY</span><span id="bpmWheel" class="bpm-wheel">BPM:120</span><span id="len">LEN:1/16</span></div>
     <div class="gr" id="gr"></div>
     <div class="pf">PATTERN EDIT</div>
    </div>
@@ -390,6 +409,39 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  const goHome=()=>parent.postMessage({type:"zp-exit-creator",source:"creator.ui",timestamp:Date.now()} ,location.origin);
  document.getElementById("creator-home")?.addEventListener("click",goHome);
  bind("EXIT",goHome);
+})();
+</script>
+
+<script>
+(()=> {
+ const $=s=>document.querySelector(s),mk=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!==undefined)e.innerHTML=html;return e};
+ const scr=$('#scr'),v2=document.querySelector('.v2'),grid=$('#gr'),bpm=$('#bpmWheel'),menu=$('#menu'),browse=$('#browse');
+ if(!scr||!v2||!grid||!bpm||!menu||!browse)return;
+ const line=mk('div','transport-line'),fill=mk('i');line.append(fill);
+ const tools=mk('div','piano-tools','<strong>PIANO ROLL · 16 STEP</strong><span><button type="button" id="zpZoomOut">−</button> <button type="button" id="zpZoomIn">+</button></span>');
+ const viewport=mk('div','grid-viewport');grid.parentNode.insertBefore(viewport,grid);viewport.append(grid);
+ const ph=v2.querySelector('.ph');v2.insertBefore(line,grid.parentNode);v2.insertBefore(tools,viewport);
+ let zoom=1;const applyZoom=()=>{grid.style.width=(zoom*100)+'%';grid.style.minWidth=(zoom*100)+'%';$('#zpZoomOut').disabled=zoom<=1;$('#zpZoomIn').disabled=zoom>=2.5};
+ $('#zpZoomOut').onclick=()=>{zoom=Math.max(1,+(zoom-.25).toFixed(2));applyZoom()};
+ $('#zpZoomIn').onclick=()=>{zoom=Math.min(2.5,+(zoom+.25).toFixed(2));applyZoom()};applyZoom();
+ let bpmValue=120,lastY=null,remainder=0;
+ const adjustTempo=delta=>{bpmValue=Math.max(40,Math.min(240,bpmValue+delta));bpm.textContent='BPM:'+bpmValue;window.zpBridgeSend?.('creator.bpm.adjust',{delta})};
+ bpm.addEventListener('pointerdown',e=>{lastY=e.clientY;remainder=0;bpm.setPointerCapture(e.pointerId)});
+ bpm.addEventListener('pointermove',e=>{if(lastY===null)return;remainder+=lastY-e.clientY;lastY=e.clientY;const delta=Math.trunc(remainder/5);if(delta){remainder-=delta*5;adjustTempo(delta)}});
+ ['pointerup','pointercancel','lostpointercapture'].forEach(t=>bpm.addEventListener(t,()=>lastY=null));
+ bpm.addEventListener('wheel',e=>{e.preventDefault();adjustTempo(e.deltaY<0?1:-1)},{passive:false});
+ browse.addEventListener('click',()=>window.zpBridgeSend?.('creator.sample.load.request',{}));
+ const audition=mk('span','lcd-action','▶');audition.title='Escuchar muestra del pad';browse.parentNode.insertBefore(audition,browse);audition.addEventListener('click',()=>window.zpBridgeSend?.('creator.sample.preview',{}));
+ const layer=mk('div','lcd-menu');layer.hidden=true;layer.innerHTML='<header><b>DIRTYFINGAZ OS</b><span>LCD / MENU</span></header><div class="menu-grid"><button data-zpmenu="theme">THEME / COLOR</button><button data-zpmenu="display">DISPLAY MODE</button><button data-zpmenu="audio">AUDIO SYSTEM</button><button data-zpmenu="about">SYSTEM INFO</button></div><small id="zpMenuHint">ELIGE UNA OPCIÓN · MENU PARA CERRAR</small>';scr.append(layer);
+ menu.addEventListener('click',()=>{layer.hidden=!layer.hidden});
+ layer.addEventListener('click',e=>{const b=e.target.closest('[data-zpmenu]');if(!b)return;const key=b.dataset.zpmenu,hint=$('#zpMenuHint');if(key==='theme'){const skins=['verde','ambar','cian','rojo'];unit.dataset.skin=skins[(skins.indexOf(unit.dataset.skin)+1)%skins.length];hint.textContent='COLOR ACTUAL: '+unit.dataset.skin.toUpperCase();if(typeof wave==='function')wave()}else if(key==='display')hint.textContent='LCD · SAMPLE / PIANO ROLL';else if(key==='audio')hint.textContent='WEB AUDIO · MASTER BUS · 16 STEP';else hint.textContent='DIRTYFINGAZ ZP · CREATOR OS'});
+ window.addEventListener('message',e=>{
+  if(e.origin!==location.origin||!e.data)return;const d=e.data;
+  if(d.type==='zp-engine-playhead'&&d.protocolVersion===1&&d.source==='creator.engine'){fill.style.width=((d.step+1)/16*100)+'%'}
+  if(d.type==='zp-engine-bpm-state'&&d.protocolVersion===1&&d.source==='creator.engine'){bpmValue=d.bpm;bpm.textContent='BPM:'+bpmValue}
+  if(d.type==='zp-engine-meter'&&d.protocolVersion===1&&d.source==='creator.engine'){line.classList.toggle('peak',d.peak>.82)}
+  if(d.type==='zp-engine-trim-state'&&d.protocolVersion===1&&d.source==='creator.engine'){const c=$('#wv');if(c&&d.transients){const x=c.getContext('2d'),w=c.width,h=c.height;x.save();x.strokeStyle='#ffb34b';x.lineWidth=1.5;d.transients.forEach(p=>{const px=p*w;x.beginPath();x.moveTo(px,2);x.lineTo(px,h-2);x.stroke()});x.restore()}}
+ });
 })();
 </script>
 </body>
