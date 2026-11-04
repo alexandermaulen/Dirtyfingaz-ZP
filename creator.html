@@ -167,7 +167,7 @@ button.on,button.active{background:linear-gradient(180deg,#eaff8a 0%,#b0ee2e 45%
 .system-menu-item{padding:6px 8px;border:1px solid #8eff4b66;background:linear-gradient(90deg,#173f0d,#061b06);font:8px monospace;display:flex;justify-content:space-between}
 .system-menu-item.selected{background:#d8ff4f;color:#092407;box-shadow:0 0 12px #baff4c}
 .system-hint{font:7px monospace;opacity:.8;text-align:center;width:100%}
-.sp-commands{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important;grid-column:1/-1!important}
+.sp-commands{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px!important;grid-column:1/-1!important}
 .sp-commands button{min-height:37px!important;font-size:9px!important}
 .sp-commands button small{font-size:6px}
 .sp-bottom{grid-column:1/-1!important;display:grid!important;grid-template-columns:1fr 1fr 1.4fr 1fr!important;gap:6px!important;align-items:center}
@@ -288,8 +288,8 @@ runtime.register("creator.sample.clear",()=>{delete samples[activePad];delete sa
 runtime.register("creator.pad.mute.toggle",()=>{muted[activePad]=!muted[activePad];muteButton.classList.toggle("on",!!muted[activePad]);updatePadLabels();return {muted:!!muted[activePad]}});
 runtime.register("creator.pad.solo.toggle",()=>{soloed[activePad]=!soloed[activePad];soloButton.classList.toggle("on",!!soloed[activePad]);updatePadLabels();return {solo:!!soloed[activePad]}});
 runtime.register("creator.fx.master.toggle",p=>toggleMasterFx(p.name,masterFxButtons[p.name]));
-runtime.register("creator.fx.sample.delay.toggle",()=>{audio();delayWet.gain.setTargetAtTime(delayWet.gain.value>.01?0:.3,ctx.currentTime,.02);updateScreen();return {delay:delayWet.gain.value>.01}});
-runtime.register("creator.fx.sample.drive.toggle",()=>{audio();sampleDriveOn=!sampleDriveOn;driveAmount(sampleDriveOn?25:0);if(sampleDriveButton)sampleDriveButton.classList.toggle("on",sampleDriveOn);return {drive:sampleDriveOn}});
+runtime.register("creator.fx.sample.delay.toggle",()=>{audio();fxState.delay=delayWet.gain.value<=.01;delayWet.gain.setTargetAtTime(fxState.delay?fxAmount*.65:0,ctx.currentTime,.02);updateScreen();return {delay:delayWet.gain.value>.01}});
+runtime.register("creator.fx.sample.drive.toggle",()=>{audio();sampleDriveOn=!sampleDriveOn;fxState.drive=sampleDriveOn;driveAmount(sampleDriveOn?fxAmount*35:0);if(sampleDriveButton)sampleDriveButton.classList.toggle("on",sampleDriveOn);return {drive:sampleDriveOn}});
 runtime.register("creator.project.save",()=>saveSession());
 runtime.register("creator.export.wav",()=>exportWav());
 runtime.on("command:failed",e=>notify(e.result.error.message));
@@ -338,7 +338,7 @@ function changeValue(delta){
  if(activeTab==="RECORTE"&&samples[activePad]){let r=ranges[activePad]||{start:0,end:1};setTrimValue(valueTarget,r[valueTarget]+delta*.0025);updateValueReadout();return}
  if(activeTab==="EFECTOS"){fxAmount=Math.max(0,Math.min(1,fxAmount+delta*.01));applyFxAmount();return}
 }
-function applyFxAmount(){if(!ctx)return;delayWet.gain.setTargetAtTime(fxAmount*.65,ctx.currentTime,.025);if(fxAmount>.01)fxState.delay=true;fxValueOutput.textContent=Math.round(fxAmount*100)+"%";}
+function applyFxAmount(){if(!ctx){fxValueOutput.textContent=Math.round(fxAmount*100)+"%";return}if(fxState.drive)driveAmount(fxAmount*35);if(fxState.delay)delayWet.gain.setTargetAtTime(fxAmount*.65,ctx.currentTime,.025);fxValueOutput.textContent=Math.round(fxAmount*100)+"%";}
 function enterSystemMenu(){if(!systemMenu){systemMenu=true;menuPage="MAIN";menuIndex=0;activeTab="MUESTRA";updateScreen();return}if(menuPage==="MAIN"){menuPage=["SAMPLE EDIT","PAD SETTINGS","EFFECTS ROUTING","SEQUENCE / PATTERN","SYSTEM / DISPLAY"][menuIndex];menuIndex=0;updateScreen();return}if(menuPage==="SAMPLE EDIT"){activeTab="RECORTE";systemMenu=false;updateScreen();return}if(menuPage==="PAD SETTINGS"){systemMenu=false;activeTab="EFECTOS";updateScreen();return}if(menuPage==="EFFECTS ROUTING"){systemMenu=false;activeTab="EFECTOS";updateScreen();return}if(menuPage==="SEQUENCE / PATTERN"){systemMenu=false;updateScreen();return}if(menuPage==="SYSTEM / DISPLAY"){saveSession();systemMenu=false;updateScreen();return}}
 function exitSystemMenu(){if(systemMenu){if(menuPage!=="MAIN"){menuPage="MAIN";menuIndex=0;updateScreen()}else{systemMenu=false;updateScreen()}}else{activeTab="MUESTRA";updateScreen()}}
 function drawValueWheel(el,label,initial,onValue,extraClass=""){let wrap=$("div","sp-dial"),k=$("div","kb value-wheel"+(extraClass?" "+extraClass:""),"<i></i>"),caption=$("span","",label),out=$("output","",Math.round(initial*100)+"%"),v=initial,y=null,v0=0;const set=x=>{v=Math.max(0,Math.min(1,x));k.firstChild.style.transform="rotate("+(-135+270*v)+"deg)";out.textContent=Math.round(v*100)+"%";onValue(v)};k.addEventListener("pointerdown",e=>{y=e.clientY;v0=v;k.setPointerCapture(e.pointerId)});k.addEventListener("pointermove",e=>{if(y!==null)set(v0+(y-e.clientY)/150)});["pointerup","pointercancel"].forEach(ev=>k.addEventListener(ev,()=>y=null));wrap.append(caption,k,out);return {wrap,set,get:()=>v,output:out};}
