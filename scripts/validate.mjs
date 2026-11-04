@@ -41,6 +41,8 @@ assert.match(engine, /packet\.protocolVersion!==1/);
 assert.match(engine, /zp-engine-ack/);
 assert.match(engine, /zp-engine-error/);
 assert.match(shell, /e\.source!==frame\?\.contentWindow/);
+assert.match(shell, /e\.data\?\.source!=='creator\.engine'/);
+assert.match(engine, /source:"creator\.engine"/);
 assert.match(storage, /DB_VERSION = 2/);
 for (const api of ["saveProjectSample", "getProjectSamples", "listProjects", "deleteProject"]) {
   assert.ok(storage.includes("function " + api), "Storage API faltante: " + api);
