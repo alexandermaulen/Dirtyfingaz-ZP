@@ -142,3 +142,14 @@ Códigos sugeridos: INVALID_INPUT, NOT_FOUND, NOT_READY, PERMISSION_DENIED, PERS
 Una capa está separada cuando puede probarse sin cargar la interfaz; un servicio puede sustituirse sin reescribir el Core; cada control ejecuta un caso de uso identificable; y los estados de error y éxito llegan a la UI de forma explícita.
 
 **Principio rector:** compartir arquitectura, contratos, criterios de calidad y método de trabajo; mantener independientes los productos, sus motores, datos e infraestructura.
+
+
+
+## 8. Paneles adaptativos y perfiles de layout
+
+- zp-layout.js pertenece a GUI/Adapter: administra selección de panel, contexto visual, perfiles y eventos hacia el copiloto.
+- zp-layout.css implementa el dock compacto responsive sin alterar el layout del motor.
+- zp-agent-registry.json es la fuente de verdad de grupos L1x–L3x / R1x–R3x, contextos y política geométrica.
+- La selección de una opción emite zp-panel-option-select; no dispara audio ni escribe parámetros del motor salvo que exista un comando allowlisted y contrato explícito.
+- Perfiles: DEFAULT definido por código y CUSTOM persistido localmente; estrategia HYBRID. Cambio de módulo carga DEFAULT.
+- CM20 mantiene bloqueadas las operaciones geométricas drag/resize hasta definir posicionamiento, alineación, colisiones y límites.
