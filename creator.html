@@ -397,7 +397,7 @@ projectDialog.querySelector("#zp-project-import").onclick=()=>projectDialog.quer
 projectDialog.querySelector("#zp-project-file").onchange=event=>{const file=event.target.files?.[0];event.target.value="";if(file)zpBridgeSend("creator.project.import",{file});};
 
 /* escala adaptable: viewport visual, orientación y áreas seguras */
-const fit=()=>{const vv=window.visualViewport;const w=vv?vv.width:document.documentElement.clientWidth;const h=vv?vv.height:window.innerHeight;const scale=Math.min(w/unit.offsetWidth,h/unit.offsetHeight);unit.style.zoom="1";unit.style.transform="scale("+Math.max(.1,scale)+")";};
+const fit=()=>{const vv=window.visualViewport;const w=vv?vv.width:document.documentElement.clientWidth;const h=vv?vv.height:window.innerHeight;const width=Math.max(1,w);const height=Math.max(1,h);document.documentElement.style.setProperty("--zp-viewport-height",height+"px");document.body.style.height=height+"px";unit.style.width="min(430px,"+width+"px)";unit.style.maxWidth="none";unit.style.zoom="1";unit.style.transform="scale("+Math.max(.1,width/unit.offsetWidth)+")";unit.dataset.viewportFit="full-bleed";};
 fit();addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>setTimeout(fit,300));window.visualViewport?.addEventListener('resize',fit,{passive:true});document.fonts&&document.fonts.ready.then(fit);
 /* perillas */
 [['VOLUME','<span>MIN</span><span>MAX</span>'],['CTRL 1','ATTACK'],['CTRL 2','DECAY'],['CTRL 3','RELEASE']].forEach(([n,s])=>{
