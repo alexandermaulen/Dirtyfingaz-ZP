@@ -262,7 +262,8 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
 .scr.pr{width:min(400px,calc(100% - 18px));height:220px;margin:-110px 0 0;left:50%;transform:translateX(-50%);border-radius:16px}
 .mid>.lx,.mid>.rx{position:absolute;top:auto;bottom:10px;z-index:5;width:54px;height:54px;min-width:54px;min-height:54px;margin:0;flex:none}
 .mid>.lx{left:10px}.mid>.rx{right:10px}
-.mid>.lx{left:10px;right:auto;opacity:1;pointer-events:auto;transition:opacity .16s ease,filter .16s ease}.mid>.lx.context-active{opacity:1;pointer-events:auto;filter:drop-shadow(0 0 5px var(--accent));}\n
+.mid>.lx{left:10px;right:auto;opacity:1;pointer-events:auto;transition:opacity .16s ease,filter .16s ease}.mid>.lx.context-active{opacity:1;pointer-events:auto;filter:drop-shadow(0 0 5px var(--accent));}
+
 
 
 
@@ -611,7 +612,9 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
   knob.addEventListener("pointermove",()=>{
    const raw=getComputedStyle(knob).getPropertyValue("--r").trim();
    const angle=parseFloat(raw)||0,v=Math.max(0,Math.min(1,(angle+135)/270));
-   if(Math.abs(v-last)>.008){last=v;zpBridgeSend("creator.control.set",{name:knobNames[i],value:v});}\n  });\n  knob.addEventListener("pointerup",()=>{const angle=parseFloat(getComputedStyle(knob).getPropertyValue("--r"))||0;const value=Math.max(0,Math.min(1,(angle+135)/270));zpBridgeSend("creator.control.set",{name:knobNames[i],value,commit:true});});
+   if(Math.abs(v-last)>.008){last=v;zpBridgeSend("creator.control.set",{name:knobNames[i],value:v});}
+  });
+  knob.addEventListener("pointerup",()=>{const angle=parseFloat(getComputedStyle(knob).getPropertyValue("--r"))||0;const value=Math.max(0,Math.min(1,(angle+135)/270));zpBridgeSend("creator.control.set",{name:knobNames[i],value,commit:true});});
  });
  const valueEncoder=document.querySelector(".pe");
  const bindTrimEncoder=(encoder,trimTarget)=>{
@@ -623,7 +626,8 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
    if(previous===null){previous=angle;return}
    let delta=angle-previous;previous=angle;if(delta>180)delta-=360;if(delta<-180)delta+=360;if(!delta)return;
    const phase=window.__zpTrimPhase,state=window.__zpTrimRotor;
-   const sampleContext=midContainer.classList.contains("sample-context")&&!midContainer.classList.contains("piano-open");\n   if(!window.__zpPianoEncoderMode&&(phase===3||(phase===1&&sampleContext))){
+   const sampleContext=midContainer.classList.contains("sample-context")&&!midContainer.classList.contains("piano-open");
+   if(!window.__zpPianoEncoderMode&&(phase===3||(phase===1&&sampleContext))){
     if(window.__zpMidiRotorActive)return;
     const target=sampleContext?trimTarget:(phase===3?trimTarget:(state.target||activeTrimTarget)),range=state.range||{start:0,end:1},fineStep=.00005;
     const next=target==="start"?Math.max(0,Math.min(range.end-.0001,range.start+delta*fineStep)):Math.max(range.start+.0001,Math.min(1,range.end+delta*fineStep));
@@ -633,7 +637,9 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
    if(encoder===valueEncoder&&phase!==3&&!window.__zpMidiRotorActive)zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
   });
   ["pointerup","pointercancel"].forEach(type=>encoder.addEventListener(type,()=>{
-   previous=null;if(window.__zpPianoEncoderMode)return;const phase=window.__zpTrimPhase,state=window.__zpTrimRotor,sampleContext=midContainer.classList.contains("sample-context")&&!midContainer.classList.contains("piano-open");\n   if(phase===3||(phase===1&&sampleContext)){\n    const target=sampleContext?trimTarget:(phase===3?trimTarget:(state.target||activeTrimTarget)),range=state.range||{start:0,end:1};
+   previous=null;if(window.__zpPianoEncoderMode)return;const phase=window.__zpTrimPhase,state=window.__zpTrimRotor,sampleContext=midContainer.classList.contains("sample-context")&&!midContainer.classList.contains("piano-open");
+   if(phase===3||(phase===1&&sampleContext)){
+    const target=sampleContext?trimTarget:(phase===3?trimTarget:(state.target||activeTrimTarget)),range=state.range||{start:0,end:1};
     zpBridgeSend("creator.sample.trim.set",{target,position:target==="start"?range.start:range.end,commit:true});
    }
   }));
