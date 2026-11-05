@@ -133,7 +133,7 @@ const AGENT_SYSTEM = [
   "La GUI y el motor están separados. La GUI comunica eventos; el motor ejecuta audio y estado. Respeta el bridge versionado.",
   "Cloudflare coordina API y sesiones; Supabase será persistencia estructurada cuando se apruebe su esquema y RLS.",
   "Puedes recomendar acciones locales registradas, pero no afirmes que las ejecutaste. La interfaz solicita aprobación y valida la allowlist.",
-  "No solicites ni expongas secretos, tokens, claves ni datos personales. No sugieras editar main, fusionar o desplegar producción.",
+  "No solicites ni expongas secretos, tokens, claves ni datos personales. No cambies main, no fusiones ni despliegues producción sin autorización explícita del usuario en esta conversación; si existe, respeta exactamente el alcance autorizado y valida primero.",
   "Para cambios de código, propone un plan y un diff verificable; no inventes que GitHub fue modificado.",
   "Actúas como copiloto de arquitectura y desarrollo de DIRTYFINGAZ ZP. Al retomar una sesión reconstruye rama, SHA, archivos, CI, preview, auditoría y tareas pendientes con evidencia disponible; no inventes continuidad.",
   "La fuente de verdad de controles y parámetros es zp-agent-registry.json. Usa el parámetro seleccionado y su definición JSON para explicar rango, unidad, propietario, comando, payload y dependencias. Si no existe en el registro, declara que falta registrarlo.",
@@ -144,7 +144,7 @@ const AGENT_SYSTEM = [
   "Al componer código, genera bloques separados para JSON, GUI, bridge, engine y validator. Incluye rutas reales, nombres de comandos, validación, límites, ACK/error, persistencia y pruebas. No mezcles snippets de capas distintas.",
   "Nunca uses eval, Function, ejecución arbitraria, acceso libre al repositorio ni comandos no registrados. Los snippets son propuestas para revisión; los cambios de código deben validarse antes de integrarse.",
   "Para aplicar parámetros en vivo, usa únicamente comandos y parámetros presentes en zp-agent-registry.json y confirma que el motor respondió ACK. No afirmes que un cambio se aplicó sólo porque se envió.",
-  "Mantén el desarrollo en feat/hybrid-hardware-ui-system. No modifiques main, no hagas merge, no despliegues producción ni cambies Supabase/esquemas sin autorización explícita."
+  "Reconstruye la rama activa y el SHA desde GitHub en cada sesión; no asumas que una rama histórica sigue vigente. Modificar main, fusionar, desplegar producción o cambiar Supabase/esquemas requiere autorización explícita del usuario en la conversación actual."
 ].join("\n");
 
 async function handleAgentChat(request, env) {
@@ -242,7 +242,7 @@ async function handleAgentChat(request, env) {
 async function handleGithubStatus(request, env) {
   if (request.method !== "GET") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
   if (env.ENVIRONMENT !== "preview") return json({ ok: false, error: "PREVIEW_ONLY" }, 404);
-  const owner = "alexandermaulen", repo = "Dirtyfingaz-ZP", branch = "feat/hybrid-hardware-ui-system";
+  const owner = "alexandermaulen", repo = "Dirtyfingaz-ZP", branch = "main";
   const base = "https://api.github.com/repos/" + owner + "/" + repo;
   const headers = { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "DIRTYFINGAZ-ZP-Agent" };
   const read = async path => {
@@ -250,14 +250,14 @@ async function handleGithubStatus(request, env) {
     if (!response.ok) throw new Error("GITHUB_API_" + response.status);
     return response.json();
   };
-  const [repository, branchData, pullRequest, workflows] = await Promise.allSettled([
+  const [repository, branchData, pullRequests, workflows] = await Promise.allSettled([
     read(""),
     read("/branches/" + encodeURIComponent(branch)),
-    read("/pulls/3"),
+    read("/pulls?state=open&per_page=1"),
     read("/actions/runs?branch=" + encodeURIComponent(branch) + "&per_page=5")
   ]);
   const value = (result, fallback = null) => result.status === "fulfilled" ? result.value : fallback;
-  const repoData = value(repository), branchValue = value(branchData), pr = value(pullRequest), runs = value(workflows);
+  const repoData = value(repository), branchValue = value(branchData), pr = value(pullRequests, [])?.[0] || null, runs = value(workflows);
   if (!repoData && !branchValue) return json({ ok: false, error: "GITHUB_READ_FAILED" }, 502);
   const commit = branchValue?.commit || {};
   return json({
@@ -266,7 +266,7 @@ async function handleGithubStatus(request, env) {
     branch: branchValue ? { name: branchValue.name, sha: commit.sha, commitMessage: commit.commit?.message?.split("\n")[0] || "", committedAt: commit.commit?.committer?.date || null, html_url: commit.html_url } : null,
     pullRequest: pr ? { number: pr.number, title: pr.title, state: pr.state, draft: pr.draft, html_url: pr.html_url, head_sha: pr.head?.sha, base: pr.base?.ref } : null,
     workflowRuns: (runs?.workflow_runs || []).map(run => ({ name: run.name, status: run.status, conclusion: run.conclusion, head_sha: run.head_sha, html_url: run.html_url, created_at: run.created_at })),
-    partial: [repository, branchData, pullRequest, workflows].some(result => result.status === "rejected"),
+    partial: [repository, branchData, pullRequests, workflows].some(result => result.status === "rejected"),
     access: "read-only",
     source: "GitHub REST API"
   });
