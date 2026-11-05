@@ -516,10 +516,10 @@ runtime.register("creator.fx.sample.drive.toggle",()=>{audio();sampleDriveOn=!sa
 runtime.register("creator.fx.sample.reverb.toggle",()=>{const result=toggleMasterFx("reverb",sampleReverbButton);publishRadioState();return result});
 runtime.register("creator.project.save",()=>saveSession());
 runtime.register("creator.envelope.mode.toggle",async()=>{envelopeMode=envelopeMode==="ADSR"?"ADR":"ADSR";await saveSession(true);notify("ENVELOPE · "+envelopeMode);publishRadioState();return {mode:envelopeMode,persisted:true}});
-runtime.register("creator.system.menu.open",()=>{if(!systemMenu){systemMenu=true;menuPage="MAIN";menuIndex=0;activeTab="MUESTRA";updateScreen()}parent.postMessage({type:"zp-engine-system-menu-state",protocolVersion:1,source:"creator.engine",open:systemMenu,page:menuPage,index:menuIndex},location.origin);return {open:systemMenu}});
-runtime.register("creator.system.menu.navigate",p=>{if(!systemMenu)return {open:false};const max=Math.max(0,menuItems().length-1);menuIndex=(menuIndex+Math.trunc(Number(p.delta)||0)+max+1)%(max+1);updateScreen();parent.postMessage({type:"zp-engine-system-menu-state",protocolVersion:1,source:"creator.engine",open:true,page:menuPage,index:menuIndex},location.origin);return {index:menuIndex}});
-runtime.register("creator.system.menu.select",()=>{if(!systemMenu)return {open:false};enterSystemMenu();parent.postMessage({type:"zp-engine-system-menu-state",protocolVersion:1,source:"creator.engine",open:systemMenu,page:menuPage,index:menuIndex},location.origin);return {open:systemMenu,page:menuPage,index:menuIndex}});
-runtime.register("creator.system.menu.close",()=>{systemMenu=false;updateScreen();parent.postMessage({type:"zp-engine-system-menu-state",protocolVersion:1,source:"creator.engine",open:false,page:menuPage,index:menuIndex},location.origin);return {open:false}});
+runtime.register("creator.system.menu.open",()=>{if(!systemMenu){systemMenu=true;menuPage="MAIN";menuIndex=0;activeTab="MUESTRA";updateScreen()}publishSystemMenuState();return {open:systemMenu}});
+runtime.register("creator.system.menu.navigate",p=>{if(!systemMenu)return {open:false};const max=Math.max(0,menuItems().length-1);menuIndex=(menuIndex+Math.trunc(Number(p.delta)||0)+max+1)%(max+1);updateScreen();publishSystemMenuState();return {index:menuIndex}});
+runtime.register("creator.system.menu.select",async()=>{if(!systemMenu)return {open:false};const selected=menuItems()[menuIndex]||"";if(menuPage==="MAIN"&&selected.startsWith("0:")){systemMenu=false;updateScreen();publishSystemMenuState();return {open:false,projectManager:true,projects:await assetStorage.listProjects(),currentProjectId,currentProjectName}}enterSystemMenu();publishSystemMenuState();return {open:systemMenu,page:menuPage,index:menuIndex}});
+runtime.register("creator.system.menu.close",()=>{systemMenu=false;updateScreen();publishSystemMenuState();return {open:false}});
 runtime.register("creator.project.manager.open",()=>openProjectManager());
 runtime.register("creator.project.list",()=>assetStorage.listProjects());
 runtime.register("creator.project.load",async p=>{if(!p.id)throw Object.assign(new Error("Falta el ID del proyecto"),{code:"INVALID_INPUT"});await saveSession(true);return loadSession(p.id)});
@@ -595,6 +595,7 @@ function menuItems(){
  };
  return menus[menuPage]||["SELECT","VALUE"];
 }
+function publishSystemMenuState(){parent.postMessage({type:"zp-engine-system-menu-state",protocolVersion:1,source:"creator.engine",open:systemMenu,page:menuPage,index:menuIndex,items:menuItems()},location.origin)}
 function enterSystemMenu(){
  if(!systemMenu){systemMenu=true;menuPage="MAIN";menuIndex=0;activeTab="MUESTRA";updateScreen();return}
  const selected=menuItems()[menuIndex]||"";
