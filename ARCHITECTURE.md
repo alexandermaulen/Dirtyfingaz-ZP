@@ -162,3 +162,13 @@ Las selecciones de panel usan un evento separado del puerto musical:
 - El iframe Creator lo retransmite al Shell con protocolVersion 1 y origin same-origin.
 - El Shell valida sourceWindow, origin, protocolVersion, requestId y schemaVersion antes de emitir el CustomEvent que consume el copiloto.
 - Este evento no es un comando del AudioEngine. No cambia parámetros musicales ni estado del scheduler.
+
+
+## 10. Puertos y adaptadores de servicios
+
+- `zp-ports.js` implementa los puertos ProjectRepository, WorkerGateway y SupabaseGateway.
+- Creator inyecta ProjectRepository sobre IndexedDB sin cambiar las operaciones existentes del motor.
+- WorkerGateway consulta `/api/health` en el mismo origen desplegado.
+- SupabaseGateway permanece inactivo hasta recibir sesión autenticada y configuración pública; no habilita sincronización ni escrituras por defecto.
+- La PWA incluye el adaptador de puertos en su caché versionada.
+- Contrato y criterios de aceptación: `docs/SERVICE-PORTS-V1.md`.

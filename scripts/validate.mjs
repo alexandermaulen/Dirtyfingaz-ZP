@@ -2,7 +2,7 @@ import fs from "node:fs";
 import assert from "node:assert/strict";
 
 const read = (path) => fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");
-const sources = ["index.html", "creator.html", "creator-engine.html", "sw.js", "zp-core.js", "zp-storage.js", "vendor/lame.min.js", "zp-agent.js", "zp-layout.js"];
+const sources = ["index.html", "creator.html", "creator-engine.html", "sw.js", "zp-core.js", "zp-storage.js", "zp-ports.js", "vendor/lame.min.js", "zp-agent.js", "zp-layout.js"];
 let inlineScripts = 0;
 
 for (const path of sources) {
@@ -237,7 +237,7 @@ assert.match(read("zp-agent-registry.json"), /"key": "trim\.start"/);
 assert.match(read("zp-agent-registry.json"), /"key": "midi\.velocity"/);
 assert.match(radioWorker, /selectedParameter/);
 assert.match(radioWorker, /zp-agent-registry\.json/);
-assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v13/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v14/);
 assert.match(read("sw.js"), /zp-agent-registry\.json/);
 
 assert.match(read("sw.js"), /\.\/zp-agent\.js/);
@@ -330,7 +330,7 @@ assert.match(layoutSystem, /EDIT LAYOUT/, "Debe existir el modo EDIT LAYOUT.");
 assert.match(layoutSystem, /DRAG \/ RESIZE BLOQUEADOS/, "La geometría debe esperar la política del Cuestionario 20.");
 assert.match(layoutSystem, /AUTOSAVE|DUPLICATE|RENAME|DELETE|RESTORE DEFAULT/, "Deben existir operaciones de perfiles.");
 assert.match(shell, /zp-panel-option-select/, "El shell debe validar y retransmitir selecciones del iframe.");
-assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v13/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v14/);
 assert.match(read("sw.js"), /zp-layout\.js/);
 console.log("OK: paneles contextuales, perfiles híbridos y EDIT LAYOUT con CM20 protegido.");
 
@@ -350,3 +350,31 @@ assert.match(layoutSystem, /if\(ctx==="sample"\|\|\(side==="L"&&ctx!=="pattern"&
 assert.match(layoutSystem, /const end=\(\)=>\{clear\(\);start=null\}/, "Un tap normal en Lx/Rx debe conservar el gesto original del encoder.");
 assert.doesNotMatch(layoutSystem, /if\(start&&!moved&&!fired\).*openDock/, "Los taps de IN/OUT no deben abrir docks.");
 assert.match(shell, /data.requestId!==data.payload\?\.requestId/);
+
+
+// Replaceable service ports: IndexedDB remains the operational local repository.
+const portsSource = read("zp-ports.js");
+new Function(portsSource);
+assert.match(engine, /<script src="\.\/zp-ports\.js"><\/script>/);
+assert.match(engine, /DirtyfingazPorts\.create\(\{storage:window\.DirtyfingazStorage\}\)/);
+assert.match(engine, /const assetStorage=servicePorts\.projects/);
+
+// Worker health must be exposed at the public origin, not only inside RadioRoom.
+assert.match(radioWorker, /if \(url\.pathname === "\/api\/creator\/health"\)/, "El Worker principal debe exponer GET /api/creator/health.");
+assert.match(radioWorker, /version: "1\.0\.2"/, "El endpoint de Creator debe publicar la versión del contrato.");
+assert.match(radioWorker, /this\.env\?\.ENVIRONMENT/, "RadioRoom debe leer su entorno desde this.env.");
+assert.match(portsSource, /\/api\/creator\/health/, "El adaptador de Creator debe consultar su endpoint aislado.");
+const radioRoomSource = radioWorker.slice(radioWorker.indexOf("export class RadioRoom"), radioWorker.indexOf("const agentRate"));
+assert.ok(radioRoomSource.length > 0, "Debe poder aislarse el código de RadioRoom.");
+assert.match(radioRoomSource, /this\.env\?\.ENVIRONMENT/, "RadioRoom debe leer su entorno desde this.env.");
+assert.doesNotMatch(radioRoomSource, /environment:\s*env\.ENVIRONMENT\s*\|\|\s*"unknown"/, "RadioRoom no debe referenciar un env inexistente.");
+console.log("OK: health check público del Worker y contexto de Durable Object.");
+
+assert.match(portsSource, /mode = "local-first"/);
+assert.match(portsSource, /SUPABASE_NOT_CONFIGURED/);
+assert.match(portsSource, /AUTH_REQUIRED/);
+assert.match(portsSource, /remoteProjectSync: "disabled-until-identity-and-rls"/);
+assert.match(radioWorker, /url\.pathname === "\/api\/health"/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v14/);
+assert.match(read("sw.js"), /\.\/zp-ports\.js/);
+console.log("OK: puertos reemplazables, IndexedDB local-first y health endpoint.");

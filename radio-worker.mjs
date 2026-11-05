@@ -16,6 +16,20 @@ export class RadioRoom {
 
   async fetch(request) {
     const url = new URL(request.url);
+    if (url.pathname === "/api/health") {
+      if (request.method !== "GET") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+      return json({
+        ok: true,
+        service: "DIRTYFINGAZ ZP RadioRoom",
+        version: "1.0.1",
+        environment: this.env?.ENVIRONMENT || "unknown",
+        services: {
+          assets: Boolean(this.env?.ASSETS),
+          radio: Boolean(this.env?.RADIO_ROOMS),
+          agent: this.env?.ENVIRONMENT === "preview" && this.env?.AI_AGENT_ENABLED === "true" && Boolean(this.env?.AI)
+        }
+      });
+    }
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return json({ ok: false, error: "WEBSOCKET_REQUIRED" }, 426);
     }
@@ -275,6 +289,25 @@ async function handleGithubStatus(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === "/api/creator/health") {
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+      }
+      const payload = {
+        ok: true,
+        service: "DIRTYFINGAZ ZP Creator",
+        version: "1.0.2",
+        environment: env.ENVIRONMENT || "unknown",
+        services: {
+          assets: Boolean(env.ASSETS),
+          radio: Boolean(env.RADIO_ROOMS),
+          agent: env.ENVIRONMENT === "preview" && env.AI_AGENT_ENABLED === "true" && Boolean(env.AI)
+        }
+      };
+      return request.method === "HEAD"
+        ? new Response(null, { status: 200, headers: JSON_HEADERS })
+        : json(payload);
+    }
     if (url.pathname === "/api/agent/health") {
       const enabled = env.ENVIRONMENT === "preview" && env.AI_AGENT_ENABLED === "true" && !!env.AI;
       return json({ ok: enabled, enabled, model: AGENT_MODEL, environment: env.ENVIRONMENT || "unknown" });

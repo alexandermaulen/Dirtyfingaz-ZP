@@ -1,9 +1,6 @@
 name: DIRTYFINGAZ ZP Cloudflare Preview
 
 on:
-  push:
-    branches:
-      - "feat/**"
   workflow_dispatch:
 
 permissions:
@@ -35,10 +32,15 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::notice::Preview not deployed. Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as GitHub Actions repository secrets."
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "reason=missing-token" >> "$GITHUB_OUTPUT"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          elif ! [[ "$CLOUDFLARE_ACCOUNT_ID" =~ ^[a-fA-F0-9]{32}$ ]]; then
+            echo "::warning::CLOUDFLARE_ACCOUNT_ID must be the 32-character Cloudflare Account ID, not an API token."
+            echo "reason=invalid-account-id" >> "$GITHUB_OUTPUT"
             echo "ready=false" >> "$GITHUB_OUTPUT"
           else
+            echo "reason=ready" >> "$GITHUB_OUTPUT"
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -71,10 +73,19 @@ jobs:
 
       - name: Report missing credentials
         if: steps.credentials.outputs.ready != 'true'
+        env:
+          REASON: ${{ steps.credentials.outputs.reason }}
         run: |
           {
             echo "## Cloudflare Preview pendiente"
             echo
-            echo "Agrega CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en Repository secrets."
-            echo "La validación de código sí se ejecutó."
+            if [ "$REASON" = "invalid-account-id" ]; then
+              echo "CLOUDFLARE_ACCOUNT_ID debe ser el Account ID de 32 caracteres hexadecimales de Cloudflare Dashboard > Workers & Pages > Overview. No pegues aquí el API Token."
+            elif [ "$REASON" = "missing-token" ]; then
+              echo "Falta CLOUDFLARE_API_TOKEN en Repository secrets."
+            else
+              echo "Revisa CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en Repository secrets."
+            fi
+            echo
+            echo "La validación de código sí se ejecutó. No se desplegó Preview."
           } >> "$GITHUB_STEP_SUMMARY"
