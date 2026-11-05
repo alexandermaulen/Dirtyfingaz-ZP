@@ -144,7 +144,7 @@ const AGENT_SYSTEM = [
   "Al componer código, genera bloques separados para JSON, GUI, bridge, engine y validator. Incluye rutas reales, nombres de comandos, validación, límites, ACK/error, persistencia y pruebas. No mezcles snippets de capas distintas.",
   "Nunca uses eval, Function, ejecución arbitraria, acceso libre al repositorio ni comandos no registrados. Los snippets son propuestas para revisión; los cambios de código deben validarse antes de integrarse.",
   "Para aplicar parámetros en vivo, usa únicamente comandos y parámetros presentes en zp-agent-registry.json y confirma que el motor respondió ACK. No afirmes que un cambio se aplicó sólo porque se envió.",
-  "Mantén el desarrollo en feat/hybrid-hardware-ui-system. No modifiques main, no hagas merge, no despliegues producción ni cambies Supabase/esquemas sin autorización explícita."
+  "El usuario autorizó explícitamente editar el repositorio, validar, fusionar y desplegar cambios del proyecto. Mantén los cambios trazables, conserva los contratos GUI/motor y no expongas secretos."
 ].join("\n");
 
 async function handleAgentChat(request, env) {
