@@ -312,7 +312,7 @@ assert.match(layoutSystem, /EDIT LAYOUT/, "Debe existir el modo EDIT LAYOUT.");
 assert.match(layoutSystem, /DRAG \/ RESIZE BLOQUEADOS/, "La geometría debe esperar la política del Cuestionario 20.");
 assert.match(layoutSystem, /AUTOSAVE|DUPLICATE|RENAME|DELETE|RESTORE DEFAULT/, "Deben existir operaciones de perfiles.");
 assert.match(shell, /zp-panel-option-select/, "El shell debe validar y retransmitir selecciones del iframe.");
-assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v12/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v13/);
 assert.match(read("sw.js"), /zp-layout\.js/);
 console.log("OK: paneles contextuales, perfiles híbridos y EDIT LAYOUT con CM20 protegido.");
 
@@ -329,7 +329,7 @@ assert.ok(layoutSystem.includes('contextNow()!=="piano"'));
 
 assert.match(layoutSystem, /schemaVersion:1/);
 assert.match(layoutSystem, /requestId/);
-assert.match(layoutSystem, /if\\(ctx==="sample"\\|\\|\\(side==="L"&&ctx!=="pattern"&&ctx!=="piano"\\)\\)return/, "Los paneles no deben interceptar encoders en Sample ni Lx fuera de Pattern/Piano.");
-assert.match(layoutSystem, /const end=\\(\\)=>\\{clear\\(\\);start=null\\}/, "Un tap normal en Lx/Rx debe conservar el gesto original del encoder.");
-assert.doesNotMatch(layoutSystem, /if\\(start&&!moved&&!fired\\).*openDock/, "Los taps de IN/OUT no deben abrir docks.");
+assert.match(layoutSystem, /if\(ctx==="sample"\|\|\(side==="L"&&ctx!=="pattern"&&ctx!=="piano"\)\)return/, "Los paneles no deben interceptar encoders en Sample ni Lx fuera de Pattern/Piano.");
+assert.match(layoutSystem, /const end=\(\)=>\{clear\(\);start=null\}/, "Un tap normal en Lx/Rx debe conservar el gesto original del encoder.");
+assert.doesNotMatch(layoutSystem, /if\(start&&!moved&&!fired\).*openDock/, "Los taps de IN/OUT no deben abrir docks.");
 assert.match(shell, /data.requestId!==data.payload\?\.requestId/);
