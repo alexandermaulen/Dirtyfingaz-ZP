@@ -49,16 +49,16 @@ function bindEncoderHold(selector,side){
  const encoder=document.querySelector(selector);if(!encoder)return;
  let timer=null,start=null,fired=false,moved=false;
  const clear=()=>{if(timer)clearTimeout(timer);timer=null};
- encoder.addEventListener("pointerdown",event=>{clear();start={x:event.clientX,y:event.clientY};fired=false;moved=false;timer=setTimeout(()=>{fired=true;openDock(side,true)},HOLD_MS)});
+ encoder.addEventListener("pointerdown",event=>{clear();start={x:event.clientX,y:event.clientY};fired=false;moved=false;timer=setTimeout(()=>{if(side==="L"&&contextNow()!=="pattern"&&contextNow()!=="piano")return;fired=true;openDock(side,true)},HOLD_MS)});
  encoder.addEventListener("pointermove",event=>{if(!start)return;if(Math.hypot(event.clientX-start.x,event.clientY-start.y)>9){moved=true;clear()}});
- const end=()=>{clear();if(start&&!moved&&!fired)openDock(side,false);start=null};
+ const end=()=>{clear();if(start&&!moved&&!fired){const ctx=contextNow();if(side!=="L"||ctx==="pattern"||ctx==="piano")openDock(side,false)}start=null};
  encoder.addEventListener("pointerup",end);encoder.addEventListener("pointercancel",()=>{clear();start=null});
  encoder.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openDock(side,false)}});
 }
 function setContext(next){
  if(!defaults[next])return;context=next;
  store.activeProfileByContext[context]="DEFAULT";
- if(!store.contextState[context])store.contextState[context]={...defaults[context]};
+ store.contextState[context]={...defaults[context]};
  persist();closeDock();renderMenu();
 }
 function makeCustomFromCurrent(name){
@@ -92,7 +92,10 @@ function renderMenu(){
  const add=(label,fn,cls)=>{const b=button(label,cls);b.addEventListener("click",fn);menu.append(b);return b};
  add("EDIT LAYOUT",enterEdit,"primary");
  add("DEFAULT",()=>{store.activeProfileByContext[context]="DEFAULT";store.contextState[context]={...defaults[context]};persist();closeDock();renderMenu()});
- add("CUSTOM",()=>{ensureCustom();renderMenu()});
+ add("CUSTOM",()=>{const ids=Object.keys(store.customProfiles);if(ids.length)store.activeProfileByContext[context]=ids[ids.length-1];else ensureCustom();persist();renderMenu()});
+ Object.entries(store.customProfiles).forEach(([id,profile])=>add("USE "+profile.name,()=>{store.activeProfileByContext[context]=id;persist();renderMenu()}));
+ add("LEFT PANELS",()=>{menu.hidden=true;openDock("L",false)});
+ add("RIGHT PANELS",()=>{menu.hidden=true;openDock("R",false)});
  const autosave=add("AUTOSAVE "+(store.autosave?"ON":"OFF"),()=>{store.autosave=!store.autosave;persist();renderMenu()});autosave.setAttribute("aria-pressed",String(store.autosave));
  add("DUPLICATE",()=>{const current=activeProfile();const base=current==="DEFAULT"?profileState():store.customProfiles[current]?.layouts?.[context]||profileState();const id="custom-"+Date.now().toString(36);store.customProfiles[id]={name:"CUSTOM COPY",layouts:{[context]:{...base}}};store.activeProfileByContext[context]=id;persist();renderMenu()});
  add("RENAME",()=>{const id=activeProfile();if(id==="DEFAULT")return;const value=window.prompt("Nombre del perfil",store.customProfiles[id]?.name||"CUSTOM");if(value){store.customProfiles[id].name=cleanName(value,"CUSTOM");persist();renderMenu()}});
