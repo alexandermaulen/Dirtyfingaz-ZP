@@ -340,7 +340,7 @@ function driveAmount(v){if(!drive)return;if(v<1){drive.curve=null;return}let a=n
 function toggleMasterFx(name,btn){audio();if(!(name in fxState))throw Object.assign(new Error("Efecto desconocido: "+name),{code:"INVALID_INPUT"});fxState[name]=!fxState[name];btn?.classList.toggle("on",fxState[name]);if(name==="drive"){sampleDriveOn=fxState.drive;sampleDriveButton?.classList.toggle("on",fxState.drive);driveAmount(fxState.drive?fxAmount*35:0)}if(name==="delay")delayWet.gain.setTargetAtTime(fxState.delay?fxAmount*.65:0,ctx.currentTime,.025);if(name==="filter")filterBus.frequency.setTargetAtTime(fxState.filter?1200:18000,ctx.currentTime,.025);if(name==="reverb"){reverbWet.gain.setTargetAtTime(fxState.reverb?fxAmount*.55:0,ctx.currentTime,.025);sampleReverbButton?.classList.toggle("on",fxState.reverb)}return {name,enabled:fxState[name]}}
 function padAllowed(n){let anySolo=Object.values(soloed).some(Boolean);return !muted[n]&&(!anySolo||!!soloed[n])}
 function envelopeFor(n){const e=envelopes[n]||{};return {attack:Math.max(.001,Math.min(2,Number(e.attack)||.01)),decay:Math.max(.005,Math.min(3,Number(e.decay)||.18)),release:Math.max(.005,Math.min(4,Number(e.release)||.2)),sustain:Math.max(0,Math.min(1,Number.isFinite(Number(e.sustain))?Number(e.sustain):.72))}}
-function scheduleAmpEnvelope(g,t,gate,level,n){const e=envelopeFor(n),sustain=envelopeMode==="ADR"?0:e.sustain,hold=Math.max(t+gate,t+e.attack+e.decay),sustainLevel=Math.max(.0001,level*sustain);g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(level,t+e.attack);g.gain.linearRampToValueAtTime(sustainLevel,t+e.attack+e.decay);g.gain.setValueAtTime(sustainLevel,hold);g.gain.exponentialRampToValueAtTime(.0001,hold+e.release);return e}
+function scheduleAmpEnvelope(g,t,gate,level,n){const e=envelopeFor(n),sustain=envelopeMode==="ADR"?.35:e.sustain,hold=Math.max(t+gate,t+e.attack+e.decay),sustainLevel=Math.max(.0001,level*sustain);g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(level,t+e.attack);g.gain.linearRampToValueAtTime(sustainLevel,t+e.attack+e.decay);g.gain.setValueAtTime(sustainLevel,hold);g.gain.exponentialRampToValueAtTime(.0001,hold+e.release);return e}
 function playPad(n,when,options={}){
  let c=audio(),t=when??c.currentTime;if(!padAllowed(n))return;
  const velocity=options.velocity==null?1:Math.max(.01,Math.min(1,Number(options.velocity)/127));
@@ -350,7 +350,7 @@ function playPad(n,when,options={}){
  let g=c.createGain(),f=c.createBiquadFilter();f.type="lowpass";f.frequency.setValueAtTime(Math.max(80,Math.min(20000,padFilter[n]??18000)),t);f.Q.value=.7;f.connect(g);g.connect(master);
  if(samples[n]){
   let src=c.createBufferSource(),r=ranges[n]||{start:0,end:1};src.buffer=samples[n];src.playbackRate.value=Math.pow(2,((padPitch[n]||0)+pitchOffset)/12);src.connect(f);
-  let start=Math.max(0,Math.min(.999,r.start))*src.buffer.duration,end=Math.max(r.start+.015,Math.min(1,r.end))*src.buffer.duration,fullDuration=Math.max(.012,Math.min(src.buffer.duration-start,end-start)),env=envelopeFor(n),gate=gateSeconds==null?fullDuration:gateSeconds,duration=gateSeconds==null?fullDuration:Math.min(fullDuration,gate+env.release);
+  let start=Math.max(0,Math.min(.999,r.start))*src.buffer.duration,end=Math.max(r.start+.015,Math.min(1,r.end))*src.buffer.duration,fullDuration=Math.max(.012,Math.min(src.buffer.duration-start,end-start)),env=envelopeFor(n),gate=gateSeconds==null?Math.max(.01,fullDuration-env.release):gateSeconds,duration=gateSeconds==null?fullDuration:Math.min(fullDuration,gate+env.release);
   scheduleAmpEnvelope(g,t,gate,level,n);src.start(t,start,duration);playbackCursors.push({pad:n,at:t,offset:start,duration,rate:src.playbackRate.value});
   src.onended=()=>{try{src.disconnect();f.disconnect();g.disconnect()}catch(e){}};return
  }
@@ -515,7 +515,7 @@ runtime.register("creator.fx.sample.delay.toggle",()=>{audio();fxState.delay=del
 runtime.register("creator.fx.sample.drive.toggle",()=>{audio();sampleDriveOn=!sampleDriveOn;fxState.drive=sampleDriveOn;driveAmount(sampleDriveOn?fxAmount*35:0);if(sampleDriveButton)sampleDriveButton.classList.toggle("on",sampleDriveOn);publishRadioState();return {drive:sampleDriveOn}});
 runtime.register("creator.fx.sample.reverb.toggle",()=>{const result=toggleMasterFx("reverb",sampleReverbButton);publishRadioState();return result});
 runtime.register("creator.project.save",()=>saveSession());
-runtime.register("creator.envelope.mode.toggle",async()=>{envelopeMode=envelopeMode==="ADSR"?"ADR":"ADSR";await saveSession(true);notify("ENVELOPE · "+envelopeMode);publishRadioState();return {mode:envelopeMode,persisted:true}});
+runtime.register("creator.envelope.mode.toggle",async()=>{envelopeMode=envelopeMode==="ADSR"?"ADR":"ADSR";await saveSession(true);notify("ENVELOPE · "+envelopeMode);publishRadioState();return {mode:envelopeMode,persisted:true}});\nruntime.register("creator.system.menu.open",()=>{if(!systemMenu){systemMenu=true;menuPage="MAIN";menuIndex=0;activeTab="MUESTRA";updateScreen()}parent.postMessage({type:"zp-engine-system-menu-state",protocolVersion:1,source:"creator.engine",open:systemMenu,page:menuPage,index:menuIndex},location.origin);return {open:systemMenu}});\nruntime.register("creator.system.menu.navigate",p=>{if(!systemMenu)return {open:false};const max=Math.max(0,menuItems().length-1);menuIndex=(menuIndex+Math.trunc(Number(p.delta)||0)+max+1)%(max+1);updateScreen();parent.postMessage({type:"zp-engine-system-menu-state",protocolVersion:1,source:"creator.engine",open:true,page:menuPage,index:menuIndex},location.origin);return {index:menuIndex}});\nruntime.register("creator.system.menu.select",()=>{if(!systemMenu)return {open:false};enterSystemMenu();parent.postMessage({type:"zp-engine-system-menu-state",protocolVersion:1,source:"creator.engine",open:systemMenu,page:menuPage,index:menuIndex},location.origin);return {open:systemMenu,page:menuPage,index:menuIndex}});\nruntime.register("creator.system.menu.close",()=>{systemMenu=false;updateScreen();parent.postMessage({type:"zp-engine-system-menu-state",protocolVersion:1,source:"creator.engine",open:false,page:menuPage,index:menuIndex},location.origin);return {open:false}});
 runtime.register("creator.project.manager.open",()=>openProjectManager());
 runtime.register("creator.project.list",()=>assetStorage.listProjects());
 runtime.register("creator.project.load",async p=>{if(!p.id)throw Object.assign(new Error("Falta el ID del proyecto"),{code:"INVALID_INPUT"});await saveSession(true);return loadSession(p.id)});
@@ -571,14 +571,14 @@ const footer=$("div","foot","<span>SP-606 HYBRID OS</span><span>9 PADS</span><sp
 
 function updateValueReadout(){if(valueOutput){let r=ranges[activePad]||{start:0,end:1};valueOutput.textContent=Math.round(r[valueTarget]*100)+"%";if(valueTargetLabel)valueTargetLabel.textContent=(activeTab==="RECORTE"?"RECORTE · "+(valueTarget==="start"?"IN":"OUT"):systemMenu?"SYSTEM MENU":"FX CONTROL");}}
 function changeValue(delta){
- if(systemMenu){let max=(menuPage==="MAIN"?5:4)-1;menuIndex=(menuIndex+delta+max+1)%(max+1);updateScreen();return}
+ if(systemMenu){let max=Math.max(0,menuItems().length-1);menuIndex=(menuIndex+delta+max+1)%(max+1);updateScreen();return}
  if(activeTab==="RECORTE"&&samples[activePad]){let r=ranges[activePad]||{start:0,end:1};setTrimValue(valueTarget,r[valueTarget]+delta*.0025);updateValueReadout();return}
  if(activeTab==="EFECTOS"){fxAmount=Math.max(0,Math.min(1,fxAmount+delta*.01));applyFxAmount();return}
 }
 function applyFxAmount(){if(!ctx){fxValueOutput.textContent=Math.round(fxAmount*100)+"%";if(fxReadout)fxReadout.innerHTML="FX AMOUNT <strong>"+Math.round(fxAmount*100)+"%</strong>";return}if(fxState.drive)driveAmount(fxAmount*35);if(fxState.delay)delayWet.gain.setTargetAtTime(fxAmount*.65,ctx.currentTime,.025);if(fxState.reverb)reverbWet.gain.setTargetAtTime(fxAmount*.55,ctx.currentTime,.025);fxValueOutput.textContent=Math.round(fxAmount*100)+"%";if(fxReadout)fxReadout.innerHTML="FX AMOUNT <strong>"+Math.round(fxAmount*100)+"%</strong>";}
 function menuItems(){
  const menus={
- MAIN:["1:SYSTEM","2:D BEAM SETTING","3:MIDI UTILITY","4:USB AUDIO/MIDI","5:USB MASS STORAGE","6:MASTER LEVEL"],
+ MAIN:["0:PROJECT MANAGER","1:SYSTEM","2:D BEAM SETTING","3:MIDI UTILITY","4:USB AUDIO/MIDI","5:USB MASS STORAGE","6:MASTER LEVEL"],
  SYSTEM:["SYSTEM CONFIG","SYSTEM CTRL","SYSTEM INIT"],
  "SYSTEM CONFIG":["LCD CONTRAST · 07","SAMPLING GRADE · STANDARD","METRO. MODE · OFF","METRONOME LEVEL · 0","PRELOAD PTN · WRITABLE"],
  "SYSTEM CTRL":["FOOT SW ASSIGN · OFF","D BEAM SENS · 64"],
@@ -594,7 +594,7 @@ function menuItems(){
 function enterSystemMenu(){
  if(!systemMenu){systemMenu=true;menuPage="MAIN";menuIndex=0;activeTab="MUESTRA";updateScreen();return}
  const selected=menuItems()[menuIndex]||"";
- if(menuPage==="MAIN"){menuPage=selected.startsWith("1:")?"SYSTEM":selected.startsWith("2:")?"D BEAM SETTING":selected.startsWith("3:")?"MIDI UTILITY":selected.startsWith("4:")?"USB AUDIO/MIDI":selected.startsWith("5:")?"USB MASS STORAGE":"MASTER LEVEL";menuIndex=0;updateScreen();return}
+ if(menuPage==="MAIN"){if(selected.startsWith("0:")){systemMenu=false;updateScreen();openProjectManager();return}menuPage=selected.startsWith("1:")?"SYSTEM":selected.startsWith("2:")?"D BEAM SETTING":selected.startsWith("3:")?"MIDI UTILITY":selected.startsWith("4:")?"USB AUDIO/MIDI":selected.startsWith("5:")?"USB MASS STORAGE":"MASTER LEVEL";menuIndex=0;updateScreen();return}
  if(menuPage==="SYSTEM"){menuPage=["SYSTEM CONFIG","SYSTEM CTRL","SYSTEM INIT"][menuIndex]||"SYSTEM CONFIG";menuIndex=0;updateScreen();return}
  if(menuPage==="SYSTEM CONFIG"||menuPage==="SYSTEM CTRL"){notify("VALUE EDIT · "+selected);return}
  if(menuPage==="SYSTEM INIT"){notify("INIT · CONFIRMAR CON F3");return}
