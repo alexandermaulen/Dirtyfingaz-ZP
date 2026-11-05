@@ -54,60 +54,6 @@
       "description": "Ganancia maestra del motor."
     },
     {
-      "key": "cutoff",
-      "label": "Filtro Cutoff",
-      "module": "Filter",
-      "owner": "engine",
-      "type": "range",
-      "min": 0,
-      "max": 1,
-      "step": 0.001,
-      "default": 0.5,
-      "command": "creator.control.set",
-      "payload": {
-        "name": "cutoff",
-        "value": "$value"
-      },
-      "unit": "normalized",
-      "description": "Frecuencia mapeada de 300 a 18000 Hz."
-    },
-    {
-      "key": "resonance",
-      "label": "Resonancia",
-      "module": "Filter",
-      "owner": "engine",
-      "type": "range",
-      "min": 0,
-      "max": 1,
-      "step": 0.001,
-      "default": 0.25,
-      "command": "creator.control.set",
-      "payload": {
-        "name": "resonance",
-        "value": "$value"
-      },
-      "unit": "normalized",
-      "description": "Q mapeado de 0.1 a 18."
-    },
-    {
-      "key": "drive",
-      "label": "Drive",
-      "module": "FX",
-      "owner": "engine",
-      "type": "range",
-      "min": 0,
-      "max": 1,
-      "step": 0.001,
-      "default": 0.25,
-      "command": "creator.control.set",
-      "payload": {
-        "name": "drive",
-        "value": "$value"
-      },
-      "unit": "normalized",
-      "description": "Cantidad de saturación del motor."
-    },
-    {
       "key": "fx-amount",
       "label": "Cantidad FX",
       "module": "FX",
@@ -214,6 +160,60 @@
       "default": 100,
       "command": null,
       "description": "Velocidad MIDI de la nota seleccionada."
+    },
+    {
+      "key": "attack",
+      "label": "Attack",
+      "module": "Sample Envelope",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.004502251125562782,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "attack",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Attack por PAD, guardado dentro del proyecto."
+    },
+    {
+      "key": "decay",
+      "label": "Decay",
+      "module": "Sample Envelope",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.05843071786310517,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "decay",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Decay por PAD, guardado dentro del proyecto."
+    },
+    {
+      "key": "release",
+      "label": "Release",
+      "module": "Sample Envelope",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.04881101376720901,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "release",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Release por PAD, guardado dentro del proyecto."
     }
   ],
   "developerTemplates": [
@@ -235,9 +235,9 @@
   "project": {
     "name": "DIRTYFINGAZ ZP",
     "repository": "https://github.com/alexandermaulen/Dirtyfingaz-ZP",
-    "developmentBranch": "feat/hybrid-hardware-ui-system",
-    "pullRequest": "https://github.com/alexandermaulen/Dirtyfingaz-ZP/pull/3",
-    "preview": "https://feat-hybrid-hardware-ui-system-dirtyfingaz-zp.alexandermaulen.workers.dev",
+    "developmentBranch": "main",
+    "pullRequest": "https://github.com/alexandermaulen/Dirtyfingaz-ZP/pull/6",
+    "preview": "https://feat-dirtyfingaz-zp-clean-integration-dirtyfingaz-zp.alexandermaulen.workers.dev",
     "architecture": {
       "gui": "creator.html: controls, interaction, visual state and context.",
       "engine": "creator-engine.html: Web Audio, buffers, scheduler, FX, MIDI and authoritative state.",
@@ -249,7 +249,7 @@
       "validator": "scripts/validate.mjs: static syntax and integration contracts."
     },
     "handoff": {
-      "branchPolicy": "Work only on feature branch. Do not modify main or merge without explicit authorization.",
+      "branchPolicy": "El usuario autorizó explícitamente editar GitHub, validar, fusionar y desplegar los cambios de DIRTYFINGAZ ZP. Mantener commits trazables y no tocar producción hasta validar Preview.",
       "parallelTracks": "Keep GUI and engine work coordinated. Define bridge contract before cross-layer changes.",
       "knownFeatures": [
         "9 pads x 16 steps sequencer",
@@ -259,26 +259,29 @@
         "WAV/MP3 export components",
         "Cloudflare Radio Grid"
       ],
-      "supabase": "Connected project exists; do not create tables or alter infrastructure without authorization.",
-      "currentFeature": "Agent v0.3: selected-control glow, parameter inspector, shared JSON registry, live allowlisted apply, and JSON/GUI/BRIDGE/ENGINE/TEST snippet buttons.",
+      "supabase": "Proyecto conectado y activo, pero sin tablas, migraciones ni Edge Functions. Creator mantiene IndexedDB como persistencia local; no inventar sincronización remota hasta cerrar identidad, ownership, RLS y contrato de proyectos.",
+      "currentFeature": "Creator: Lx=IN, Rx=OUT en Sample; CTRL 1/2/3 controlan Attack/Decay/Release por PAD; Utility alterna ADR/ADSR y ambos estados se guardan en el proyecto.",
       "pending": [
-        "Run CI on current SHA",
-        "Test drag/resize, 20% idle opacity, 10-second close and no Safari zoom",
-        "Test parameter apply and engine ACK on iPhone 11",
-        "Verify PWA offline cache"
+        "Validar CI sobre el SHA actual",
+        "Probar IN/OUT con Lx/Rx y persistencia de trim",
+        "Probar ADR/ADSR por PAD y persistencia por proyecto",
+        "Probar navegación PROJECT, patrones y Piano Roll en Safari iOS",
+        "Verificar PWA offline y sincronización futura con Supabase"
       ]
     }
   },
   "controls": {
     "Lx": {
       "label": "Lx",
-      "role": "master-left-navigation",
+      "role": "master-left-sample-in-and-pattern-navigation",
       "owner": "creator.ui",
       "input": "pointer-rotation",
-      "behavior": "Control maestro izquierdo. Inactivo en vista general; se activa al seleccionar/abrir un patrón en Pattern Edit o Piano Roll y navega herramientas/parámetros del patrón sin ejecutarlos.",
+      "behavior": "Control maestro izquierdo. En Sample ajusta IN mediante creator.sample.trim.set target=start; en Pattern/Piano actúa como navegación contextual. No existe un encoder IN adicional.",
       "stepDegrees": 14,
       "wrap": true,
-      "commands": [],
+      "commands": [
+        "creator.sample.trim.set"
+      ],
       "contextEvent": "focusin",
       "mount": ".mid>.lx",
       "placement": "left-side-rail",
@@ -289,17 +292,26 @@
           "pattern-edit-open",
           "piano-roll-open"
         ],
-        "default": "inactive",
+        "default": "sample-in",
         "deactivateOn": "editor-close"
       },
-      "master": true
+      "master": true,
+      "sampleMapping": {
+        "label": "IN",
+        "command": "creator.sample.trim.set",
+        "payload": {
+          "target": "start",
+          "position": "number",
+          "commit": "boolean"
+        }
+      }
     },
     "Rx": {
       "label": "Rx",
       "role": "master-right-output",
       "owner": "creator.ui+creator-engine.html",
       "input": "pointer-rotation",
-      "behavior": "Control maestro derecho. En contexto Sample y fase OUT ajusta el punto final del sample mediante creator.sample.trim.set target=end; en otros contextos controla el parámetro contextual o PUSH ENTER sin sustituir IN.",
+      "behavior": "Control maestro derecho. En Sample ajusta OUT mediante creator.sample.trim.set target=end; en otros contextos controla el parámetro contextual o PUSH ENTER.",
       "existingSelector": ".pe",
       "commands": [
         "creator.sample.trim.set",
@@ -332,30 +344,6 @@
           "commit": "boolean"
         }
       }
-    },
-    "IN": {
-      "label": "IN",
-      "role": "sample-start-encoder",
-      "owner": "creator.ui+creator-engine.html",
-      "input": "pointer-rotation",
-      "behavior": "Control independiente de START/IN, visible sólo en contexto Sample; no sustituye Lx ni Rx y se oculta en Pattern/Piano Edit.",
-      "existingSelector": ".in-encoder",
-      "command": "creator.sample.trim.set",
-      "payload": {
-        "target": "start",
-        "position": "number[0..range.end)",
-        "commit": "boolean"
-      },
-      "mount": ".mid",
-      "placement": "immediately-right-of-Lx",
-      "visibility": {
-        "showWhen": "sample-context",
-        "hideWhen": [
-          "pattern-edit",
-          "piano-open"
-        ]
-      },
-      "persistence": "commit:true"
     }
   },
   "layout": {
@@ -375,8 +363,9 @@
     "contextualControls": {
       "IN": {
         "context": "sample",
-        "position": "right-of-Lx",
-        "independent": true
+        "control": "Lx",
+        "position": "left-master-rail",
+        "independent": false
       },
       "Lx": {
         "context": "pattern-edit-or-piano-roll",
