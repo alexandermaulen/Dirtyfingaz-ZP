@@ -350,7 +350,7 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
  .mid.piano-open .piano-encoder-dock{height:48px;bottom:2px}
 }
 </style>
-</head>
+<link rel="stylesheet" href="./zp-layout.css"></head>
 <body>
 
 <div class="unit" id="unit" data-skin="verde">
@@ -495,7 +495,7 @@ trimPhaseButton?.addEventListener("click",()=>setTrimPhase(window.__zpTrimPhase%
 requestAnimationFrame(()=>requestAnimationFrame(fit));
 /* temas: toca MENU */
 const skins=['verde','ambar','cian','rojo'];
-$('#menu').addEventListener('click',()=>{unit.dataset.skin=skins[(skins.indexOf(unit.dataset.skin)+1)%4];wave()});
+$('#menu').addEventListener('click',()=>window.ZPLayout?.toggleMenu());
 /* piano roll: botón PATTERN EDIT */
 const gr=$('#gr');gr.append(mk('em',''));for(let s=1;s<=16;s++)gr.append(mk('em','',s));
 for(let l=1;l<=9;l++){gr.append(mk('em','',l));for(let s=0;s<16;s++){const c=mk('div','c');c.dataset.s=s;gr.append(c)}}
@@ -833,5 +833,5 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
 })();
 </script>
 <script src="./zp-agent.js" defer></script>
-</body>
+<script src="./zp-layout.js"></script></body>
 </html>
