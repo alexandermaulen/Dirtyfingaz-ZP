@@ -315,3 +315,7 @@ assert.match(shell, /zp-panel-option-select/, "El shell debe validar y retransmi
 assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v12/);
 assert.match(read("sw.js"), /zp-layout\.js/);
 console.log("OK: paneles contextuales, perfiles híbridos y EDIT LAYOUT con CM20 protegido.");
+
+assert.match(layoutSystem, /schemaVersion:1/);
+assert.match(layoutSystem, /requestId/);
+assert.match(shell, /data.requestId!==data.payload\?\.requestId/);
