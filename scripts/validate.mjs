@@ -2,7 +2,7 @@ import fs from "node:fs";
 import assert from "node:assert/strict";
 
 const read = (path) => fs.readFileSync(new URL("../" + path, import.meta.url), "utf8");
-const sources = ["index.html", "creator.html", "creator-engine.html", "sw.js", "zp-core.js", "zp-storage.js", "vendor/lame.min.js", "zp-agent.js", "zp-layout.js"];
+const sources = ["index.html", "creator.html", "creator-engine.html", "sw.js", "zp-core.js", "zp-storage.js", "zp-ports.js", "vendor/lame.min.js", "zp-agent.js", "zp-layout.js"];
 let inlineScripts = 0;
 
 for (const path of sources) {
@@ -350,3 +350,19 @@ assert.match(layoutSystem, /if\(ctx==="sample"\|\|\(side==="L"&&ctx!=="pattern"&
 assert.match(layoutSystem, /const end=\(\)=>\{clear\(\);start=null\}/, "Un tap normal en Lx/Rx debe conservar el gesto original del encoder.");
 assert.doesNotMatch(layoutSystem, /if\(start&&!moved&&!fired\).*openDock/, "Los taps de IN/OUT no deben abrir docks.");
 assert.match(shell, /data.requestId!==data.payload\?\.requestId/);
+
+
+// Replaceable service ports: IndexedDB remains the operational local repository.
+const portsSource = read("zp-ports.js");
+new Function(portsSource);
+assert.match(engine, /<script src="\.\/zp-ports\.js"><\/script>/);
+assert.match(engine, /DirtyfingazPorts\.create\(\{storage:window\.DirtyfingazStorage\}\)/);
+assert.match(engine, /const assetStorage=servicePorts\.projects/);
+assert.match(portsSource, /mode = "local-first"/);
+assert.match(portsSource, /SUPABASE_NOT_CONFIGURED/);
+assert.match(portsSource, /AUTH_REQUIRED/);
+assert.match(portsSource, /remoteProjectSync: "disabled-until-identity-and-rls"/);
+assert.match(radioWorker, /url\.pathname === "\/api\/health"/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v14/);
+assert.match(read("sw.js"), /\.\/zp-ports\.js/);
+console.log("OK: puertos reemplazables, IndexedDB local-first y health endpoint.");
