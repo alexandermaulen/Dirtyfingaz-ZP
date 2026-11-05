@@ -31,7 +31,7 @@
       "No ejecutar código arbitrario desde el agente.",
       "Separar propuesta, validación, aplicación y confirmación.",
       "Los cambios que crucen GUI y motor requieren contrato y pruebas de ambos lados.",
-      "Trabajar sólo en feat/hybrid-hardware-ui-system; nunca modificar main ni hacer merge sin autorización."
+      "Reconstruir siempre la rama activa desde GitHub; modificar main, fusionar o desplegar producción sólo con autorización explícita vigente del usuario."
     ]
   },
   "parameters": [
