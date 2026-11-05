@@ -71,6 +71,9 @@ assert.match(read("zp-agent-registry.json"), /"Rx"/);
 assert.match(agent, /el\.dataset\.rotor==="Lx"/, "El agente debe reconocer Lx como navegación.");
 assert.match(agent, /el\.dataset\.rotor==="Rx"/, "El agente debe reconocer Rx como PUSH ENTER.");
 assert.match(radioWorker, /selectedControl/, "El backend debe recibir la definición del encoder seleccionado.");
+assert.match(radioWorker, /branch = "main"/, "El endpoint de estado debe consultar la rama vigente main.");
+assert.match(radioWorker, /\/pulls\?state=open&per_page=1/, "El estado del agente no debe depender de un PR histórico fijo.");
+assert.doesNotMatch(radioWorker, /feat\/hybrid-hardware-ui-system|\/pulls\/3/, "No deben quedar referencias históricas en el estado GitHub.");
 
 assert.match(ui, /creator\.sample\.trim\.set.*commit:true/, "El rotor debe confirmar la persistencia del recorte.");
 assert.match(engine, /function publishTrimState\(/);
