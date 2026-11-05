@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   preview:
-    name: Publish branch Preview
+    name: Validate and publish isolated Worker Preview
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -25,6 +25,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Validate project contracts
+        run: node scripts/validate.mjs
 
       - name: Check Cloudflare credentials
         id: credentials
@@ -39,21 +42,21 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Validate project contracts
-        if: steps.credentials.outputs.ready == 'true'
-        run: node scripts/validate.mjs
-
-      - name: Publish or update Cloudflare Worker Preview
+      - name: Publish isolated Cloudflare Worker Preview
         if: steps.credentials.outputs.ready == 'true'
         id: publish
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          set -o pipefail
-          PREVIEW_NAME="${GITHUB_REF_NAME//\//-}"
-          npx --yes wrangler@4.135.0 preview --name "$PREVIEW_NAME" --json | tee preview-output.json
-          PREVIEW_URL="$(jq -er '.preview.urls[0]' preview-output.json)"
+          set -euo pipefail
+          PREVIEW_NAME="dirtyfingaz-zp-preview"
+          npx --yes wrangler@4.135.0 deploy --config wrangler.preview.jsonc --name "$PREVIEW_NAME" 2>&1 | tee deploy-output.log
+          PREVIEW_URL="$(grep -Eo 'https://[^[:space:]]+workers\.dev' deploy-output.log | tail -n 1)"
+          if [ -z "$PREVIEW_URL" ]; then
+            echo "::error::Wrangler deployed without returning a workers.dev URL."
+            exit 1
+          fi
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
           {
             echo "## DIRTYFINGAZ ZP Preview"
@@ -61,6 +64,9 @@ jobs:
             echo "Preview URL: $PREVIEW_URL"
             echo
             echo "Commit: $GITHUB_SHA"
+            echo
+            echo "Isolated Worker: $PREVIEW_NAME"
+            echo "Production Worker remains untouched."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Report missing credentials
@@ -70,4 +76,5 @@ jobs:
             echo "## Cloudflare Preview pendiente"
             echo
             echo "Agrega CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en Repository secrets."
+            echo "La validación de código sí se ejecutó."
           } >> "$GITHUB_STEP_SUMMARY"
