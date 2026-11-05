@@ -26,16 +26,40 @@ jobs:
         with:
           node-version: 22
 
-      - name: Check Cloudflare credentials
-        id: credentials
+      - name: Resolve Cloudflare account
+        id: cloudflare
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_ACCOUNT_ID_INPUT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::error::Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID repository secret."
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "::error::Missing CLOUDFLARE_API_TOKEN repository secret."
             exit 1
           fi
+          RAW_ID="$(printf '%s' "${CLOUDFLARE_ACCOUNT_ID_INPUT:-}" | tr -d '[:space:]')"
+          ACCOUNT_ID="$(printf '%s' "$RAW_ID" | grep -Eo '[A-Fa-f0-9]{32}' | head -n1 || true)"
+          if [ -z "$ACCOUNT_ID" ]; then
+            echo "Resolving account through authenticated Cloudflare API..."
+            RESPONSE="$(curl --fail-with-body --silent --show-error -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts?per_page=50")"
+            COUNT="$(printf '%s' "$RESPONSE" | jq '[.result[]? | select(.id | test("^[A-Fa-f0-9]{32}$"))] | length')"
+            if [ "$COUNT" -eq 1 ]; then
+              ACCOUNT_ID="$(printf '%s' "$RESPONSE" | jq -r '.result[] | select(.id | test("^[A-Fa-f0-9]{32}$")) | .id')"
+            elif [ "$COUNT" -gt 1 ]; then
+              echo "::error::Token accesses multiple accounts. Set CLOUDFLARE_ACCOUNT_ID to the intended 32-character account ID."
+              printf '%s' "$RESPONSE" | jq -r '.result[]? | [.name, .id] | @tsv'
+              exit 1
+            else
+              echo "::error::No account resolved. Check token permissions and set CLOUDFLARE_ACCOUNT_ID to the 32-character ID from Cloudflare Dashboard."
+              exit 1
+            fi
+          fi
+          if ! printf '%s' "$ACCOUNT_ID" | grep -Eq '^[A-Fa-f0-9]{32}$'; then
+            echo "::error::Resolved Cloudflare account ID is invalid."
+            exit 1
+          fi
+          echo "account_id=$ACCOUNT_ID" >> "$GITHUB_OUTPUT"
+          echo "Cloudflare account ID format verified."
 
       - name: Validate project contracts
         run: node scripts/validate.mjs
@@ -43,11 +67,10 @@ jobs:
       - name: Deploy isolated preview Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.cloudflare.outputs.account_id }}
         run: |
           set -euo pipefail
-          PREVIEW_NAME="dirtyfingaz-zp-preview"
-          npx --yes wrangler@4.135.0 deploy --name "$PREVIEW_NAME" --var ENVIRONMENT:preview --var AI_AGENT_ENABLED:true
+          npx --yes wrangler@4.135.0 deploy --name "dirtyfingaz-zp-preview" --var ENVIRONMENT:preview --var AI_AGENT_ENABLED:true
 
       - name: Deployment summary
         if: success()
