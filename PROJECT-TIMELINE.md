@@ -158,3 +158,17 @@ Evolucionar Pattern Edit desde la grilla de pads/pasos a un editor MIDI de notas
 - Validador ampliado con contratos MIDI, scheduling, comandos y persistencia.
 - QA real en Safari iOS/iPhone y audio con samples todavía pendiente.
 - main no se modificó y no hubo merge; Supabase permanece fuera del alcance.
+
+
+
+## Implementación de Cuestionarios Maestros · Paneles y perfiles · 2026-11-04
+
+- **Rama:** feat/zp-questionnaire-integration-2026-11-04.
+- **Baseline:** feat/zp-master-implementation-roadmap HEAD 5c40f6e4a4db604d080ef1842df414ebeda9375d; CI SUCCESS observado en run [41937058125](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41937058125).
+- **Archivos nuevos:** zp-layout.js, zp-layout.css.
+- **Archivos modificados:** creator.html, index.html, sw.js, zp-agent-registry.json, scripts/validate.mjs, ARCHITECTURE.md, docs/MASTER-QUESTIONNAIRE-V3-AGENT.md, docs/CUESTIONARIO-MAESTRO-DIRTYFINGAZ-ZP.md.
+- **Implementado:** dock lateral híbrido L1x–L3x/R1x–R3x; selección por tap; expansión por hold 420 ms; evento contextual validado hacia el copiloto; menú FUNCTION/MENU; THEME/COLOR; perfiles DEFAULT/CUSTOM y operaciones AUTOSAVE/DUPLICATE/RENAME/DELETE/RESTORE DEFAULT; EDIT LAYOUT con SAVE/CANCEL; persistencia local HYBRID; caché PWA v12.
+- **Contrato:** las opciones de panel emiten zp-panel-option-select y no envían comandos al engine. GUI y engine continúan separados.
+- **CM20:** sigue pendiente; drag/resize geométrico bloqueados hasta seleccionar posicionamiento, alineación, colisiones y límites.
+- **Validación:** pendiente ejecutar el CI del nuevo HEAD y revisar logs. No se afirma QA físico Safari/iPhone ni deploy Cloudflare.
+- **Gobierno:** main no se modifica, no hay merge ni despliegue de producción.
