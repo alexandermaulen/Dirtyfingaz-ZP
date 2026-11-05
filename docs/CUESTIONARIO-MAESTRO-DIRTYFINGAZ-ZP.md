@@ -226,3 +226,41 @@ Una función sólo pasa a `VERIFICADA` cuando:
 - Supabase dirtyfingaz-os sigue sin tablas/migraciones/Edge Functions y no está confirmado como backend de ZP. No se modificó.
 - No se migra a Java; TypeScript se incorpora gradualmente para contratos/servicios.
 - Fuente canónica y plan por fases: [MASTER-QUESTIONNAIRE-V3-AGENT.md](../MASTER-QUESTIONNAIRE-V3-AGENT.md).
+
+
+
+## Consolidación de respuestas de Cuestionarios Maestros · 4 noviembre 2026
+
+**Estado general:** Cuestionarios 01–19 confirmados por el usuario. La recuperación disponible no conserva el detalle literal completo de 01, 07, 09 y 10; no se rellenan por inferencia. Cuestionario 20 sigue pendiente.
+
+### Respuestas confirmadas recuperadas
+
+- **CM02 · superficies/módulos:** selección inicial de 16 PADs, Step Sequencer, Piano Roll, Sample Editor, Synth Editor, Mixer, Browser y Arrangement. La cantidad de PADs fue corregida posteriormente a **9 uniformes**, decisión vigente.
+- **CM03 · navegación:** pestañas superiores, mantener PAD presionado, Lx contextual, menú desplegable y botones físicos dedicados. Dirección visual vigente: LCD Nokia 1990 + lenguaje digital inspirado en Mega Man X4, sin personajes.
+- **CM04 · funciones:** SHIFT, UNDO/REDO, COPY/PASTE, QUANTIZE, NOTE REPEAT, ERASE, PAD BANK, OCTAVE, OVERDUB y FUNCTION/MENU.
+- **CM05 · comportamiento PAD:** Velocity, Pressure/Hold, Multitouch, Sample Trigger, Note Trigger, Pattern Trigger, Scene/Clip Launch y comportamiento contextual inteligente.
+- **CM06 · feedback PAD:** sistema híbrido LCD + neón; estados activo/inactivo, intensidad de velocity, PAD seleccionado, reproducción, grabación y color según tipo de sonido.
+- **CM08 · PAD dock:** posición inferior, adaptación desplegable, visibilidad persistente, orientación vertical y reglas de uniformidad, orden estable y ausencia de solapamiento.
+- **CM11 · información PAD:** waveform como jerarquía principal; mantener visibles número, nombre, waveform, tipo, velocity, banco, color y estado; actualizar waveform, velocity y estado en tiempo real.
+- **CM12 · lenguaje visual:** tipografía híbrida, tamaño equilibrado, waveform híbrida e indicadores combinados de color, LED, borde y pixel; sin modificaciones adicionales.
+- **CM13 · indicadores:** velocity en barra + número; Pressure/Hold por presión; selección por borde; feedback mediante flash, pulso, onda y pixel; sin modificaciones adicionales.
+- **CM14 · PADs:** ubicación inferior, expansión desplegable, persistencia, orientación vertical y distribución uniforme, ordenada y sin solapamiento.
+- **CM15 · adaptación:** módulo compacto; dock, scroll, header, touch, overflow y transition; combinar reajuste automático con desplazamiento independiente.
+- **CM16 · jerarquía:** paneles; priorizar panel activo, preservar valores/ajustes y ofrecer acceso rápido a secundarios; sin modificaciones adicionales.
+- **CM17 · navegación de paneles:** tabs; panel activo resaltado; resize, remember, drag y restore; reorganización sólo al activar EDIT LAYOUT.
+- **CM18 · edición de layout:** activar desde menú; herramientas drag, resize, save y cancel; salir automáticamente después de guardar; sin modificaciones adicionales.
+- **CM19 · perfiles:** persistencia HYBRID; perfiles DEFAULT/CUSTOM; AUTOSAVE, DUPLICATE, RENAME y DELETE; al cambiar de módulo cargar DEFAULT; sin modificaciones adicionales.
+
+### Datos aún no recuperados literalmente
+
+- **CM01, CM07, CM09 y CM10:** constan dentro del conjunto 01–19 confirmado, pero la fuente disponible no devuelve sus opciones/comentarios exactos. Se mantienen registrados como confirmados con detalle pendiente de recuperación, sin inventar valores.
+
+### Cuestionario Maestro 20 · pendiente
+
+Faltan decisiones explícitas para:
+- Posicionamiento: FREE / GRID / HYBRID / ZONES.
+- Alineación: selección pendiente.
+- Colisiones: PREVENT / PUSH / ALLOW / MANUAL.
+- Límites: CONTAINED / PARTIAL / FREE.
+
+No activar drag/resize geométrico hasta que estas cuatro reglas queden confirmadas. La interfaz puede conservar navegación por tabs, selección de grupos, opciones contextuales y perfiles híbridos sin ejecutar comandos del motor.
