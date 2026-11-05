@@ -358,6 +358,14 @@ new Function(portsSource);
 assert.match(engine, /<script src="\.\/zp-ports\.js"><\/script>/);
 assert.match(engine, /DirtyfingazPorts\.create\(\{storage:window\.DirtyfingazStorage\}\)/);
 assert.match(engine, /const assetStorage=servicePorts\.projects/);
+
+// Worker health must be exposed at the public origin, not only inside RadioRoom.
+assert.match(radioWorker, /if \(url\.pathname === "\/api\/health"\)/, "El Worker principal debe exponer GET /api/health.");
+assert.match(radioWorker, /version: "1\.0\.1"/, "El endpoint raíz debe publicar la versión del contrato.");
+assert.match(radioWorker, /this\.env\?\.ENVIRONMENT/, "RadioRoom debe leer su entorno desde this.env.");
+assert.doesNotMatch(radioWorker, /environment: env\.ENVIRONMENT \|\| "unknown"/, "RadioRoom no debe referenciar un env inexistente.");
+console.log("OK: health check público del Worker y contexto de Durable Object.");
+
 assert.match(portsSource, /mode = "local-first"/);
 assert.match(portsSource, /SUPABASE_NOT_CONFIGURED/);
 assert.match(portsSource, /AUTH_REQUIRED/);
