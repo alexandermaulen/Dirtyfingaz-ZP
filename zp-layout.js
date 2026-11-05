@@ -49,9 +49,9 @@ function bindEncoderHold(selector,side){
  const encoder=document.querySelector(selector);if(!encoder)return;
  let timer=null,start=null,fired=false,moved=false;
  const clear=()=>{if(timer)clearTimeout(timer);timer=null};
- encoder.addEventListener("pointerdown",event=>{clear();start={x:event.clientX,y:event.clientY};fired=false;moved=false;timer=setTimeout(()=>{if(side==="L"&&contextNow()!=="pattern"&&contextNow()!=="piano")return;fired=true;openDock(side,true)},HOLD_MS)});
+ encoder.addEventListener("pointerdown",event=>{clear();start={x:event.clientX,y:event.clientY};fired=false;moved=false;timer=setTimeout(()=>{const ctx=contextNow();if(ctx==="sample"||(side==="L"&&ctx!=="pattern"&&ctx!=="piano"))return;fired=true;openDock(side,true)},HOLD_MS)});
  encoder.addEventListener("pointermove",event=>{if(!start)return;if(Math.hypot(event.clientX-start.x,event.clientY-start.y)>9){moved=true;clear()}});
- const end=()=>{clear();if(start&&!moved&&!fired){const ctx=contextNow();if(side!=="L"||ctx==="pattern"||ctx==="piano")openDock(side,false)}start=null};
+ const end=()=>{clear();start=null};
  encoder.addEventListener("pointerup",end);encoder.addEventListener("pointercancel",()=>{clear();start=null});
  encoder.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openDock(side,false)}});
 }
