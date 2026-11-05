@@ -16,6 +16,20 @@ export class RadioRoom {
 
   async fetch(request) {
     const url = new URL(request.url);
+    if (url.pathname === "/api/health") {
+      if (request.method !== "GET") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+      return json({
+        ok: true,
+        service: "DIRTYFINGAZ ZP",
+        version: "1.0.0",
+        environment: env.ENVIRONMENT || "unknown",
+        services: {
+          assets: Boolean(env.ASSETS),
+          radio: Boolean(env.RADIO_ROOMS),
+          agent: env.ENVIRONMENT === "preview" && env.AI_AGENT_ENABLED === "true" && Boolean(env.AI)
+        }
+      });
+    }
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return json({ ok: false, error: "WEBSOCKET_REQUIRED" }, 426);
     }
