@@ -299,7 +299,15 @@ assert.match(ui, /creator\.envelope\.mode\.toggle/);
 assert.match(engine, /function scheduleAmpEnvelope\(/);
 assert.match(engine, /envelopeMode==="ADR"\?\.35:e\.sustain/);
 assert.match(engine, /envelopes,envelopeMode/);
-assert.match(engine, /payload\.name==="attack"|\["attack","decay","release"\]/);\nassert.match(ui, /const projectMenu=mk/);\nassert.match(ui, /creator\.system\.menu\.navigate/);\nassert.match(ui, /zp-project-dialog/);\nassert.match(engine, /creator\.system\.menu\.open/);\nassert.match(engine, /creator\.system\.menu\.select/);\nassert.match(engine, /creator\.project\.rename/);\nassert.match(engine, /creator\.project\.export/);\nassert.match(engine, /creator\.project\.import/);
+assert.match(engine, /payload\.name==="attack"|\["attack","decay","release"\]/);
+assert.match(ui, /const projectMenu=mk/);
+assert.match(ui, /creator\.system\.menu\.navigate/);
+assert.match(ui, /zp-project-dialog/);
+assert.match(engine, /creator\.system\.menu\.open/);
+assert.match(engine, /creator\.system\.menu\.select/);
+assert.match(engine, /creator\.project\.rename/);
+assert.match(engine, /creator\.project\.export/);
+assert.match(engine, /creator\.project\.import/);
 
 
 
