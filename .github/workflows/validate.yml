@@ -56,13 +56,13 @@ jobs:
             echo "::error::CLOUDFLARE_ACCOUNT_ID is invalid (received ${ACCOUNT_ID_LENGTH} characters after whitespace normalization). Copy the 32-character Account ID from Cloudflare Dashboard > Workers & Pages > Overview. Do not use the Zone ID or API Token."
             exit 1
           fi
-          echo "account_id=$ACCOUNT_ID" >> "$GITHUB_OUTPUT"
       - name: Publish isolated Worker Preview
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ steps.cloudflare_credentials.outputs.account_id }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
+          export CLOUDFLARE_ACCOUNT_ID="$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]')"
           PREVIEW_NAME="dirtyfingaz-zp-preview"
           npx --yes wrangler@4.135.0 deploy --config wrangler.preview.jsonc --name "$PREVIEW_NAME" 2>&1 | tee deploy-output.log
           PREVIEW_URL="$(grep -Eo 'https://[^[:space:]]+workers\.dev' deploy-output.log | tail -n 1)"
