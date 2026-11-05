@@ -230,7 +230,7 @@ assert.match(read("zp-agent-registry.json"), /"key": "trim\.start"/);
 assert.match(read("zp-agent-registry.json"), /"key": "midi\.velocity"/);
 assert.match(radioWorker, /selectedParameter/);
 assert.match(radioWorker, /zp-agent-registry\.json/);
-assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v11/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v12/);
 assert.match(read("sw.js"), /zp-agent-registry\.json/);
 
 assert.match(read("sw.js"), /\.\/zp-agent\.js/);
