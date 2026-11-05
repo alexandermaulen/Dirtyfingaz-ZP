@@ -316,6 +316,17 @@ assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v12/);
 assert.match(read("sw.js"), /zp-layout\.js/);
 console.log("OK: paneles contextuales, perfiles híbridos y EDIT LAYOUT con CM20 protegido.");
 
+assert.equal(agentRegistry.layoutPolicy.status, "pending-user-decision");
+assert.equal(agentRegistry.layoutPolicy.geometryEditingEnabled, false);
+assert.equal(agentRegistry.layoutPolicy.questionnaire, "CM20");
+assert.equal(agentRegistry.layoutProfiles.persistence, "HYBRID");
+assert.equal(agentRegistry.layoutProfiles.moduleChange, "LOAD_DEFAULT");
+assert.deepEqual(agentRegistry.layoutProfiles.types, ["DEFAULT", "CUSTOM"]);
+assert.doesNotMatch(layoutSystem, /zpBridgeSend\\s*\\(/, "Los paneles no deben ejecutar comandos musicales directamente.");
+assert.match(layoutSystem, /contextNow\\(\\)===\"pattern\"/);
+assert.match(layoutSystem, /contextNow\\(\\)===\"piano\"/);
+
+
 assert.match(layoutSystem, /schemaVersion:1/);
 assert.match(layoutSystem, /requestId/);
 assert.match(shell, /data.requestId!==data.payload\?\.requestId/);
