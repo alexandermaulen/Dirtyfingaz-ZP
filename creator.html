@@ -531,6 +531,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  window.addEventListener("message",ev=>{
   if(ev.source!==frame.contentWindow||ev.origin!==location.origin||!ev.data)return;
   const data=ev.data;
+  if(data.type==="zp-engine-system-menu-state"&&data.protocolVersion===1&&data.source==="creator.engine"){window.__zpSystemMenuOpen=!!data.open;window.dispatchEvent(new CustomEvent("zp-system-menu-state",{detail:data}));return}
   if(data.type==="zp-engine-ready"&&data.protocolVersion===1){ready=true;while(queue.length)sendPacket(queue.shift());dispatch("zp-engine-ready",data);return}
   if(data.type==="zp-engine-ack"||data.type==="zp-engine-error"){
    const item=pending.get(data.requestId);
@@ -577,8 +578,9 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  bind("DEL",()=>zpBridgeSend("creator.sample.clear"));
  bind("LOOP",()=>zpBridgeSend("creator.loop.toggle"));
  bind("DJFXLOOPER",()=>zpBridgeSend("creator.loop.toggle"));
- bind("PROJECT",()=>zpBridgeSend("creator.project.manager.open"));
+ bind("PROJECT",()=>zpBridgeSend("creator.system.menu.open"));
  bind("UTILITY",()=>zpBridgeSend("creator.envelope.mode.toggle"));
+ bind("PUSHENTER",()=>{if(window.__zpSystemMenuOpen)zpBridgeSend("creator.system.menu.select")});
  bind("IMPORT/EXPORT",()=>zpBridgeSend("creator.project.manager.open"));
  bind("PADSETTING",()=>zpBridgeSend("creator.pad.mute.toggle"));
  bind("EFXSETTING",()=>zpBridgeSend("creator.fx.master.toggle",{name:"reverb"}));
@@ -625,6 +627,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
    const angle=parseFloat(getComputedStyle(encoder).getPropertyValue("--r"))||0;
    if(previous===null){previous=angle;return}
    let delta=angle-previous;previous=angle;if(delta>180)delta-=360;if(delta<-180)delta+=360;if(!delta)return;
+   if(window.__zpSystemMenuOpen&&encoder===valueEncoder){const steps=Math.trunc(delta/14);if(steps)zpBridgeSend("creator.system.menu.navigate",{delta:steps});return;}
    const phase=window.__zpTrimPhase,state=window.__zpTrimRotor;
    const sampleContext=midContainer.classList.contains("sample-context")&&!midContainer.classList.contains("piano-open");
    if(!window.__zpPianoEncoderMode&&(phase===3||(phase===1&&sampleContext))){
