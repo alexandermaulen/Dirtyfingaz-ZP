@@ -522,6 +522,9 @@ runtime.register("creator.system.menu.select",async()=>{if(!systemMenu)return {o
 runtime.register("creator.system.menu.close",()=>{systemMenu=false;updateScreen();publishSystemMenuState();return {open:false}});
 runtime.register("creator.project.manager.open",()=>openProjectManager());
 runtime.register("creator.project.list",()=>assetStorage.listProjects());
+runtime.register("creator.project.rename",async p=>{currentProjectName=String(p.name||currentProjectName).trim().slice(0,80)||currentProjectName;await saveSession(true);return {id:currentProjectId,name:currentProjectName}});
+runtime.register("creator.project.export",()=>exportProjectFile());
+runtime.register("creator.project.import",p=>{if(!(p.file instanceof File))throw Object.assign(new Error("Archivo de proyecto requerido"),{code:"INVALID_INPUT"});return importProjectFile(p.file)});
 runtime.register("creator.project.load",async p=>{if(!p.id)throw Object.assign(new Error("Falta el ID del proyecto"),{code:"INVALID_INPUT"});await saveSession(true);return loadSession(p.id)});
 runtime.register("creator.project.create",p=>createProject(p.name));
 runtime.register("creator.project.delete",async p=>{if(!p.id||p.id===currentProjectId)throw Object.assign(new Error("Guarda o cambia de proyecto antes de eliminarlo"),{code:"INVALID_INPUT"});await assetStorage.deleteProject(p.id);return {deleted:p.id}});
