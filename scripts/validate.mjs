@@ -361,8 +361,9 @@ assert.match(engine, /const assetStorage=servicePorts\.projects/);
 
 // Worker health must be exposed at the public origin, not only inside RadioRoom.
 assert.match(radioWorker, /if \(url\.pathname === "\/api\/health"\)/, "El Worker principal debe exponer GET /api/health.");
-assert.match(radioWorker, /version: "1\.0\.1"/, "El endpoint raíz debe publicar la versión del contrato.");
+assert.match(radioWorker, /version: "1\.0\.2"/, "El endpoint de Creator debe publicar la versión del contrato.");
 assert.match(radioWorker, /this\.env\?\.ENVIRONMENT/, "RadioRoom debe leer su entorno desde this.env.");
+assert.match(portsSource, /\/api\/creator\/health/, "El adaptador de Creator debe consultar su endpoint aislado.");
 assert.doesNotMatch(radioWorker, /environment: env\.ENVIRONMENT \|\| "unknown"/, "RadioRoom no debe referenciar un env inexistente.");
 console.log("OK: health check público del Worker y contexto de Durable Object.");
 
