@@ -172,3 +172,15 @@ Evolucionar Pattern Edit desde la grilla de pads/pasos a un editor MIDI de notas
 - **CM20:** sigue pendiente; drag/resize geométrico bloqueados hasta seleccionar posicionamiento, alineación, colisiones y límites.
 - **Validación:** pendiente ejecutar el CI del nuevo HEAD y revisar logs. No se afirma QA físico Safari/iPhone ni deploy Cloudflare.
 - **Gobierno:** main no se modifica, no hay merge ni despliegue de producción.
+
+
+
+## Cierre de validación del paquete de paneles · 2026-11-05
+
+- HEAD de la rama: 17f695a33a4e0583a26c4d1c09c0d3b906c5b058.
+- GitHub Actions validation: SUCCESS, run [41940311307](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41940311307).
+- Comparación contra main: 228 commits ahead, 0 behind. main permanece intacta.
+- Workflow Cloudflare Preview: [run 41940311347](https://github.com/alexandermaulen/Dirtyfingaz-ZP/actions/runs/41940311347) completó correctamente, pero no desplegó: faltan los repository secrets CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID. El paso de validación/publicación fue omitido por la condición de credenciales.
+- El workflow de Preview ahora escucha pushes a feat/** y crea nombres de preview separados por rama. No usa wrangler deploy y no modifica producción.
+- QA físico Safari/iPhone 11: pendiente. CI PASS no equivale a prueba táctil ni de audio real.
+- CM20 sigue pendiente; geometría drag/resize permanece bloqueada.
