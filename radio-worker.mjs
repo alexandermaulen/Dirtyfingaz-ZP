@@ -242,7 +242,7 @@ async function handleAgentChat(request, env) {
 async function handleGithubStatus(request, env) {
   if (request.method !== "GET") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
   if (env.ENVIRONMENT !== "preview") return json({ ok: false, error: "PREVIEW_ONLY" }, 404);
-  const owner = "alexandermaulen", repo = "Dirtyfingaz-ZP", branch = "feat/hybrid-hardware-ui-system";
+  const owner = "alexandermaulen", repo = "Dirtyfingaz-ZP", branch = "main";
   const base = "https://api.github.com/repos/" + owner + "/" + repo;
   const headers = { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "DIRTYFINGAZ-ZP-Agent" };
   const read = async path => {
@@ -253,7 +253,7 @@ async function handleGithubStatus(request, env) {
   const [repository, branchData, pullRequest, workflows] = await Promise.allSettled([
     read(""),
     read("/branches/" + encodeURIComponent(branch)),
-    read("/pulls/3"),
+    read("/pulls/6"),
     read("/actions/runs?branch=" + encodeURIComponent(branch) + "&per_page=5")
   ]);
   const value = (result, fallback = null) => result.status === "fulfilled" ? result.value : fallback;
