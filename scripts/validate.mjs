@@ -230,7 +230,7 @@ assert.match(read("zp-agent-registry.json"), /"key": "trim\.start"/);
 assert.match(read("zp-agent-registry.json"), /"key": "midi\.velocity"/);
 assert.match(radioWorker, /selectedParameter/);
 assert.match(radioWorker, /zp-agent-registry\.json/);
-assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v12/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v13/);
 assert.match(read("sw.js"), /zp-agent-registry\.json/);
 
 assert.match(read("sw.js"), /\.\/zp-agent\.js/);
@@ -329,4 +329,7 @@ assert.ok(layoutSystem.includes('contextNow()!=="piano"'));
 
 assert.match(layoutSystem, /schemaVersion:1/);
 assert.match(layoutSystem, /requestId/);
+assert.match(layoutSystem, /if\\(ctx==="sample"\\|\\|\\(side==="L"&&ctx!=="pattern"&&ctx!=="piano"\\)\\)return/, "Los paneles no deben interceptar encoders en Sample ni Lx fuera de Pattern/Piano.");
+assert.match(layoutSystem, /const end=\\(\\)=>\\{clear\\(\\);start=null\\}/, "Un tap normal en Lx/Rx debe conservar el gesto original del encoder.");
+assert.doesNotMatch(layoutSystem, /if\\(start&&!moved&&!fired\\).*openDock/, "Los taps de IN/OUT no deben abrir docks.");
 assert.match(shell, /data.requestId!==data.payload\?\.requestId/);
