@@ -169,7 +169,7 @@ canvas{width:168px;height:46px}
 .lcd-menu[hidden]{display:none}.lcd-menu header{display:flex;justify-content:space-between;border-bottom:1px solid #9aff4a66;padding-bottom:4px}
 .lcd-menu .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;flex:1}
 .lcd-menu button{border:1px solid var(--lcd);border-radius:3px;background:#092208;color:var(--lcd);font:14px VT323,monospace;padding:3px}
-.lcd-menu button:active{background:var(--lcd);color:#061606}.lcd-menu small{font:9px VT323,monospace;color:#b7e68d;text-align:center}
+.lcd-menu button:active{background:var(--lcd);color:#061606}.lcd-menu small{font:9px VT323,monospace;color:#b7e68d;text-align:center}.lcd-menu .menu-list{display:flex;flex-direction:column;gap:3px;min-height:0;flex:1;overflow:hidden}.lcd-menu .menu-item{padding:3px 6px;border:1px solid #9aff4a55;color:#b7e68d;font:13px/1.1 VT323,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lcd-menu .menu-item.selected{background:var(--lcd);color:var(--scr);border-color:#fff;text-shadow:none;box-shadow:0 0 10px var(--lcd)}.zp-project-dialog{width:min(92vw,410px);max-height:88dvh;padding:0;border:1px solid #8ad94c;border-radius:14px;background:#071707;color:#eaffd1;box-shadow:0 18px 70px #000d}.zp-project-dialog::backdrop{background:#000b;backdrop-filter:blur(5px)}.zp-project-panel{display:flex;flex-direction:column;gap:9px;padding:14px;font:11px monospace}.zp-project-panel header{display:flex;justify-content:space-between;align-items:center;color:#d8ff4f;font-size:14px}.zp-project-panel label,.zp-project-panel small{color:#a9d98b}.zp-project-panel select,.zp-project-panel input{width:100%;min-height:36px;border:1px solid #467a34;border-radius:6px;background:#020b02;color:#eaffd1;padding:7px;font:12px monospace}.zp-project-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.zp-project-actions button,.zp-project-close{min-height:36px;border:1px solid #72a94a;border-radius:6px;background:linear-gradient(#20551a,#092509);color:#eaffd1;font:bold 10px monospace}
 @media(max-width:500px){.scr.pr{width:400px!important;max-width:calc(100vw - 24px)!important}.piano-tools{height:14px}}
 
 .piano-vel{display:flex;align-items:center;gap:2px;font:10px VT323,monospace;color:var(--lcd);white-space:nowrap}.piano-vel input{width:36px;height:12px;margin:0;accent-color:var(--lcd)}
@@ -379,6 +379,23 @@ body{background:#041a06;touch-action:none}html,body{overscroll-behavior:none;ove
 <script>
 const $=s=>document.querySelector(s),unit=$('#unit'),scr=$('#scr');
 const mk=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const projectMenu=mk("div","lcd-menu");projectMenu.hidden=true;projectMenu.innerHTML="<header><b>DIRTYFINGAZ ZP</b><span>PROJECT / MENU</span></header><div class=\"menu-list\"></div><small>RX: NAVEGAR · PUSH ENTER: SELECCIONAR</small>";scr.append(projectMenu);
+const projectDialog=mk("dialog","zp-project-dialog");projectDialog.innerHTML="<form method=\"dialog\" class=\"zp-project-panel\"><header><strong>PROJECT MANAGER</strong><button class=\"zp-project-close\" value=\"cancel\">×</button></header><label>PROYECTOS GUARDADOS</label><select id=\"zp-project-select\" size=\"5\"></select><label>NOMBRE DEL PROYECTO</label><input id=\"zp-project-name\" maxlength=\"80\" value=\"Proyecto nuevo\"><div class=\"zp-project-actions\"><button type=\"button\" id=\"zp-project-new\">NEW PROJECT</button><button type=\"button\" id=\"zp-project-save\">SAVE</button><button type=\"button\" id=\"zp-project-load\">LOAD</button><button type=\"button\" id=\"zp-project-delete\">DELETE</button><button type=\"button\" id=\"zp-project-export\">EXPORT JSON</button><button type=\"button\" id=\"zp-project-import\">IMPORT JSON</button></div><input id=\"zp-project-file\" type=\"file\" accept=\"application/json,.json\" hidden><small id=\"zp-project-status\">INDEXEDDB · PROJECTS / SAMPLES</small></form>";document.body.append(projectDialog);
+let projectCurrentId="current";
+const projectSelect=projectDialog.querySelector("#zp-project-select"),projectName=projectDialog.querySelector("#zp-project-name"),projectStatus=projectDialog.querySelector("#zp-project-status");
+const renderProjectList=(items,currentId,name)=>{projectCurrentId=currentId||"current";projectSelect.replaceChildren();(Array.isArray(items)?items:[]).forEach(item=>{const option=document.createElement("option");option.value=item.id;option.textContent=item.name+(item.id===projectCurrentId?" · ACTUAL":"");projectSelect.append(option)});if(![...projectSelect.options].some(option=>option.value===projectCurrentId)){const option=document.createElement("option");option.value=projectCurrentId;option.textContent=(name||"Proyecto actual")+" · ACTUAL";projectSelect.prepend(option)}projectSelect.value=projectCurrentId;projectName.value=name||"";projectDialog.querySelector("#zp-project-delete").disabled=projectSelect.value===projectCurrentId||projectSelect.value==="current";};
+const refreshProjects=()=>zpBridgeSend("creator.project.list",{});
+window.addEventListener("zp-system-menu-state",event=>{const d=event.detail||{};window.__zpSystemMenuOpen=!!d.open;projectMenu.hidden=!d.open;if(!d.open)return;const list=projectMenu.querySelector(".menu-list");list.replaceChildren();(Array.isArray(d.items)?d.items:[]).forEach((item,index)=>{const row=mk("div","menu-item"+(index===d.index?" selected":""));row.textContent=String(item);list.append(row)});});
+window.addEventListener("zp-engine-result",event=>{const d=event.detail||{},data=d.result?.data;if(d.command==="creator.system.menu.select"&&data?.projectManager){renderProjectList(data.projects,data.currentProjectId,data.currentProjectName);projectDialog.showModal();}else if(d.command==="creator.project.list"){renderProjectList(data,projectCurrentId,projectName.value);projectStatus.textContent="INDEXEDDB · "+(Array.isArray(data)?data.length:0)+" PROYECTOS";}else if(["creator.project.create","creator.project.load","creator.project.delete","creator.project.save","creator.project.rename","creator.project.import"].includes(d.command)){refreshProjects();if(data?.name)projectName.value=data.name;}});
+projectSelect.addEventListener("change",()=>{projectDialog.querySelector("#zp-project-delete").disabled=projectSelect.value===projectCurrentId||projectSelect.value==="current";});
+projectDialog.querySelector("#zp-project-new").onclick=()=>zpBridgeSend("creator.project.create",{name:projectName.value});
+projectDialog.querySelector("#zp-project-save").onclick=()=>{zpBridgeSend("creator.project.rename",{name:projectName.value});zpBridgeSend("creator.project.save",{});};
+projectDialog.querySelector("#zp-project-load").onclick=()=>{if(projectSelect.value)zpBridgeSend("creator.project.load",{id:projectSelect.value});};
+projectDialog.querySelector("#zp-project-delete").onclick=()=>{if(projectSelect.value&&projectSelect.value!==projectCurrentId)zpBridgeSend("creator.project.delete",{id:projectSelect.value});};
+projectDialog.querySelector("#zp-project-export").onclick=()=>zpBridgeSend("creator.project.export",{});
+projectDialog.querySelector("#zp-project-import").onclick=()=>projectDialog.querySelector("#zp-project-file").click();
+projectDialog.querySelector("#zp-project-file").onchange=event=>{const file=event.target.files?.[0];event.target.value="";if(file)zpBridgeSend("creator.project.import",{file});};
+
 /* escala adaptable: viewport visual, orientación y áreas seguras */
 const fit=()=>{const vv=window.visualViewport;const w=vv?vv.width:document.documentElement.clientWidth;const h=vv?vv.height:window.innerHeight;const scale=Math.min(w/unit.offsetWidth,h/unit.offsetHeight);unit.style.zoom="1";unit.style.transform="scale("+Math.max(.1,scale)+")";};
 fit();addEventListener('resize',fit,{passive:true});addEventListener('orientationchange',()=>setTimeout(fit,300));window.visualViewport?.addEventListener('resize',fit,{passive:true});document.fonts&&document.fonts.ready.then(fit);
@@ -572,7 +589,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  if(oldPlay){const play=oldPlay.cloneNode(true);oldPlay.replaceWith(play);play.addEventListener("click",()=>zpBridgeSend("creator.transport.toggle"));}
  bind("REC",()=>zpBridgeSend("creator.record.toggle"));
  bind("RECORDSETTING",()=>zpBridgeSend("creator.record.toggle"));
- document.querySelectorAll(".tg span").forEach(tag=>{const label=norm(tag.textContent);if(label==="CHOP")tag.addEventListener("click",()=>zpBridgeSend("creator.sample.chop"));if(label==="SAMPLEEDIT")tag.addEventListener("click",()=>zpBridgeSend("creator.sample.load.request"));});
+ document.querySelectorAll(".tg span").forEach(tag=>{const label=norm(tag.textContent);if(label==="CHOP")tag.addEventListener("click",()=>zpBridgeSend("creator.sample.chop"));if(label==="SAMPLEEDIT")tag.addEventListener("click",()=>zpBridgeSend("creator.sample.load.request"));if(label==="PUSHENTER")tag.addEventListener("click",()=>{if(window.__zpSystemMenuOpen)zpBridgeSend("creator.system.menu.select")});});
  
  
  bind("DEL",()=>zpBridgeSend("creator.sample.clear"));
@@ -620,14 +637,14 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  });
  const valueEncoder=document.querySelector(".pe");
  const bindTrimEncoder=(encoder,trimTarget)=>{
-  let previous=null;
-  encoder.addEventListener("pointerdown",()=>{previous=parseFloat(getComputedStyle(encoder).getPropertyValue("--r"))||0});
+  let previous=null,menuRemainder=0;
+  encoder.addEventListener("pointerdown",()=>{previous=parseFloat(getComputedStyle(encoder).getPropertyValue("--r"))||0;menuRemainder=0});
   encoder.addEventListener("pointermove",()=>{
    if(window.__zpPianoEncoderMode)return;
    const angle=parseFloat(getComputedStyle(encoder).getPropertyValue("--r"))||0;
    if(previous===null){previous=angle;return}
    let delta=angle-previous;previous=angle;if(delta>180)delta-=360;if(delta<-180)delta+=360;if(!delta)return;
-   if(window.__zpSystemMenuOpen&&encoder===valueEncoder){const steps=Math.trunc(delta/14);if(steps)zpBridgeSend("creator.system.menu.navigate",{delta:steps});return;}
+   if(window.__zpSystemMenuOpen&&encoder===valueEncoder){menuRemainder+=delta;const steps=Math.trunc(menuRemainder/14);if(steps){menuRemainder-=steps*14;zpBridgeSend("creator.system.menu.navigate",{delta:steps});}return;}
    const phase=window.__zpTrimPhase,state=window.__zpTrimRotor;
    const sampleContext=midContainer.classList.contains("sample-context")&&!midContainer.classList.contains("piano-open");
    if(!window.__zpPianoEncoderMode&&(phase===3||(phase===1&&sampleContext))){
@@ -640,7 +657,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
    if(encoder===valueEncoder&&phase!==3&&!window.__zpMidiRotorActive)zpBridgeSend("creator.control.set",{name:"fx-amount",value:Math.max(0,Math.min(1,(angle+135)/270))});
   });
   ["pointerup","pointercancel"].forEach(type=>encoder.addEventListener(type,()=>{
-   previous=null;if(window.__zpPianoEncoderMode)return;const phase=window.__zpTrimPhase,state=window.__zpTrimRotor,sampleContext=midContainer.classList.contains("sample-context")&&!midContainer.classList.contains("piano-open");
+   previous=null;if(window.__zpPianoEncoderMode)return;if(window.__zpSystemMenuOpen&&encoder===valueEncoder)return;const phase=window.__zpTrimPhase,state=window.__zpTrimRotor,sampleContext=midContainer.classList.contains("sample-context")&&!midContainer.classList.contains("piano-open");
    if(phase===3||(phase===1&&sampleContext)){
     const target=sampleContext?trimTarget:(phase===3?trimTarget:(state.target||activeTrimTarget)),range=state.range||{start:0,end:1};
     zpBridgeSend("creator.sample.trim.set",{target,position:target==="start"?range.start:range.end,commit:true});
