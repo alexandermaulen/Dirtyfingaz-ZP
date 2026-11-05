@@ -20,13 +20,13 @@ export class RadioRoom {
       if (request.method !== "GET") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
       return json({
         ok: true,
-        service: "DIRTYFINGAZ ZP",
-        version: "1.0.0",
+        service: "DIRTYFINGAZ ZP RadioRoom",
+        version: "1.0.1",
         environment: this.env?.ENVIRONMENT || "unknown",
         services: {
-          assets: Boolean(env.ASSETS),
-          radio: Boolean(env.RADIO_ROOMS),
-          agent: env.ENVIRONMENT === "preview" && env.AI_AGENT_ENABLED === "true" && Boolean(env.AI)
+          assets: Boolean(this.env?.ASSETS),
+          radio: Boolean(this.env?.RADIO_ROOMS),
+          agent: this.env?.ENVIRONMENT === "preview" && this.env?.AI_AGENT_ENABLED === "true" && Boolean(this.env?.AI)
         }
       });
     }
