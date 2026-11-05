@@ -14,7 +14,7 @@ const cleanName=(value,fallback)=>String(value||fallback).replace(/[<>]/g,"").tr
 const safeParse=value=>{try{return JSON.parse(value)}catch{return null}};
 const readStore=()=>{try{const value=safeParse(localStorage.getItem(STORE_KEY));if(value&&value.version===1)return value}catch{}return {version:1,autosave:true,customProfiles:{},activeProfileByContext:{},contextState:{}}};
 let store=readStore(),registry=null,context="sample",activeSide="L",expanded=false,layoutEditing=false,editSnapshot=null;
-const emit=(name,detail)=>{window.dispatchEvent(new CustomEvent(name,{detail}));try{parent.postMessage({type:name,protocolVersion:1,source:"creator.ui",detail},location.origin)}catch{}};
+const emit=(name,detail)=>{const packet={type:name,protocolVersion:1,source:"creator.ui",requestId:detail.requestId,timestamp:detail.timestamp,payload:detail};window.dispatchEvent(new CustomEvent(name,{detail}));try{parent.postMessage(packet,location.origin)}catch{}};
 const persist=()=>{try{localStorage.setItem(STORE_KEY,JSON.stringify(store));return true}catch(error){console.warn("ZP layout storage:",error);return false}};
 const contextNow=()=>mid.classList.contains("piano-open")?"piano":document.querySelector("#scr")?.classList.contains("pr")?"pattern":"sample";
 const activeProfile=()=>store.activeProfileByContext[context]||"DEFAULT";
@@ -40,7 +40,7 @@ function renderDock(){
  const label=document.createElement("div");label.className="zp-panel-context";label.textContent=current?.id+" · "+(expanded?"SECONDARY OPTIONS":"SELECTED GROUP");
  const options=document.createElement("div");options.className="zp-panel-options";options.hidden=!expanded;
  const contextual=current?.contexts?.[context]||current?.options||[];
- contextual.forEach(option=>{const item=button(option);item.addEventListener("click",()=>{const detail={side,group:current.id,option,context,module:"Creator",padId:document.querySelector("#zp-pad-config")?.dataset.padId||null,profile:activeProfile(),timestamp:new Date().toISOString()};emit("zp-panel-option-select",detail);closeDock()});options.append(item)});
+ contextual.forEach(option=>{const item=button(option);item.addEventListener("click",()=>{const timestamp=new Date().toISOString();const requestId="panel-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);const detail={schemaVersion:1,requestId,side,group:current.id,option,context,module:"Creator",padId:document.querySelector("#zp-pad-config")?.dataset.padId||null,profile:activeProfile(),timestamp};emit("zp-panel-option-select",detail);closeDock()});options.append(item)});
  const foot=document.createElement("div");foot.className="zp-panel-foot";foot.textContent=expanded?"SELECCIÓN CONTEXTUAL · SIN COMANDO DE MOTOR":"MANTÉN Lx/Rx 420 ms PARA EXPANDIR";
  dock.append(head,tabs,label,options,foot);dock.hidden=false;
 }
