@@ -1,5 +1,13 @@
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" };
 
+// Orígenes externos autorizados a abrir salas de radio (sitio estático en GitHub Pages).
+const RADIO_ALLOWED_ORIGINS = ["https://alexandermaulen.github.io"];
+
+function radioOriginAllowed(origin, requestUrl) {
+  const parsed = new URL(origin).origin;
+  return parsed === requestUrl.origin || RADIO_ALLOWED_ORIGINS.includes(parsed);
+}
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
 }
@@ -23,7 +31,7 @@ export class RadioRoom {
     const origin = request.headers.get("Origin");
     if (origin) {
       try {
-        if (new URL(origin).origin !== url.origin) return json({ ok: false, error: "ORIGIN_DENIED" }, 403);
+        if (!radioOriginAllowed(origin, url)) return json({ ok: false, error: "ORIGIN_DENIED" }, 403);
       } catch {
         return json({ ok: false, error: "INVALID_ORIGIN" }, 403);
       }
