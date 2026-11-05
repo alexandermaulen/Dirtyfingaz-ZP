@@ -282,22 +282,24 @@ assert.equal(agentRegistry.trimControl.phases["3"].encoder.Rx,"trim.end");
 
  
 
-// Contextual encoders: Lx left rail activation and IN Sample-only control.
-assert.ok(ui.includes("knob in-encoder"));
-assert.ok(ui.includes("sample-context:not(.piano-open)"));
-assert.ok(ui.includes("midContainer.classList.toggle('sample-context',!scr.classList.contains('pr'))"));
-assert.ok(ui.includes("setLxContext(!!window.__zpPianoEncoderMode)"));
+// Contextual masters: Lx=IN and Rx=OUT in Sample, with no ghost IN encoder.
+assert.ok(ui.includes("$('.mid').classList.add('sample-context')"));
+assert.ok(ui.includes("sampleContext=midContainer.classList.contains(\"sample-context\")"));
+assert.ok(ui.includes("setLxContext(true)"));
 assert.ok(ui.includes('zpBridgeSend("creator.sample.trim.set",{target:"start"'));
-assert.equal(agentRegistry.controls.IN.role, "sample-start-encoder");
-assert.equal(agentRegistry.controls.IN.command, "creator.sample.trim.set");
-assert.equal(agentRegistry.controls.IN.payload.target, "start");
-assert.deepEqual(agentRegistry.controls.IN.visibility.hideWhen, ["pattern-edit", "piano-open"]);
-assert.equal(agentRegistry.controls.Lx.placement, "left-side-rail");
-assert.equal(agentRegistry.controls.Lx.activation.default, "inactive");
-assert.equal(agentRegistry.controls.Lx.role, "master-left-navigation");
+assert.doesNotMatch(ui, /in-encoder|id="menu"/);
+assert.equal(agentRegistry.controls.Lx.sampleMapping.payload.target, "start");
+assert.equal(agentRegistry.controls.Lx.activation.default, "sample-in");
+assert.equal(agentRegistry.controls.Lx.role, "master-left-sample-in-and-pattern-navigation");
 assert.equal(agentRegistry.controls.Rx.role, "master-right-output");
 assert.equal(agentRegistry.controls.Rx.sampleMapping.payload.target, "end");
 assert.equal(agentRegistry.controls.Rx.master, true);
+assert.match(ui, /const knobNames=\["master","attack","decay","release"\]/);
+assert.match(ui, /creator\.envelope\.mode\.toggle/);
+assert.match(engine, /function scheduleAmpEnvelope\(/);
+assert.match(engine, /envelopeMode==="ADR"\?0:e\.sustain/);
+assert.match(engine, /envelopes,envelopeMode/);
+assert.match(engine, /payload\.name==="attack"|\["attack","decay","release"\]/);
 
 
 
