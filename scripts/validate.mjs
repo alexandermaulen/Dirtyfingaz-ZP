@@ -322,7 +322,7 @@ assert.equal(agentRegistry.layoutPolicy.questionnaire, "CM20");
 assert.equal(agentRegistry.layoutProfiles.persistence, "HYBRID");
 assert.equal(agentRegistry.layoutProfiles.moduleChange, "LOAD_DEFAULT");
 assert.deepEqual(agentRegistry.layoutProfiles.types, ["DEFAULT", "CUSTOM"]);
-assert.doesNotMatch(layoutSystem, /zpBridgeSend\\s*\\(/, "Los paneles no deben ejecutar comandos musicales directamente.");
+assert.equal(layoutSystem.includes("zpBridgeSend("), false, "Los paneles no deben ejecutar comandos musicales directamente.");
 assert.match(layoutSystem, /contextNow\\(\\)!==\"pattern\"/);
 assert.match(layoutSystem, /contextNow\\(\\)!==\"piano\"/);
 
