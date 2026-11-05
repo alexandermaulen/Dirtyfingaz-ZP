@@ -3,35 +3,35 @@
   "project": "DIRTYFINGAZ ZP",
   "repository": "alexandermaulen/Dirtyfingaz-ZP",
   "approved_level": "C",
-  "operating_branch": "feat/zp-master-implementation-roadmap",
-  "allowed_branch_pattern": "feat/*",
+  "operating_branch": "feat/mission-anchor-pages-main",
+  "allowed_branch_pattern": "feat/mission-anchor-pages-main",
   "protected_targets": {
     "main": {
-      "source_changes": "deny",
+      "source_changes": "deny_for_agents",
       "direct_push": "deny",
       "ref_updates": "deny",
-      "merge": "deny",
-      "pull_request_target": "review_only",
+      "merge": "manual_owner_approval_only",
+      "pull_request_target": "allowed_after_validation_and_review",
       "settings_changes": "deny_without_separate_authorization"
     }
   },
   "allowed_actions": [
     "read_repository",
-    "write_feature_branches",
-    "create_feature_branches",
-    "modify_github_actions_workflows",
+    "write_only_mission_branch",
     "run_validation_workflows",
     "create_or_update_pull_requests",
-    "deploy_preview_only_when_cloudflare_credentials_are_authorized"
+    "review_gui_engine_contracts"
   ],
   "denied_actions": [
-    "merge_pull_requests",
     "write_main",
-    "deploy_production",
+    "merge_pull_requests_without_owner_approval",
+    "deploy_cloudflare_or_other_workers",
+    "deploy_to_non_pages_targets",
     "read_or_export_secrets",
     "modify_cloudflare_production_routes_or_dns",
     "modify_supabase",
-    "modify_other_projects_or_repositories"
+    "modify_other_projects_or_repositories",
+    "delete_unreviewed_branches_or_files"
   ],
   "logical_agents": [
     {
@@ -40,7 +40,7 @@
       "mode": "orchestrator",
       "permissions": [
         "read_repository",
-        "write_feature_branches",
+        "write_only_mission_branch",
         "create_or_update_pull_requests"
       ],
       "responsibilities": [
@@ -62,7 +62,7 @@
       "runtime": "logical_role_not_separately_provisioned",
       "permissions": [
         "read_repository",
-        "write_feature_branches"
+        "write_only_mission_branch"
       ],
       "owned_areas": [
         "index.html",
@@ -79,7 +79,7 @@
       "runtime": "logical_role_not_separately_provisioned",
       "permissions": [
         "read_repository",
-        "write_feature_branches"
+        "write_only_mission_branch"
       ],
       "owned_areas": [
         "creator-engine.html",
@@ -92,24 +92,27 @@
       ]
     },
     {
-      "id": "infrastructure-specialist",
+      "id": "pages-release-steward",
       "runtime": "logical_role_not_separately_provisioned",
       "permissions": [
         "read_repository",
-        "write_feature_branches",
-        "modify_github_actions_workflows",
-        "preview_deploy_when_authorized"
+        "run_validation_workflows"
       ],
       "owned_areas": [
-        ".github/workflows/**",
-        "wrangler.jsonc",
-        "radio-worker.mjs",
-        "scripts/**"
+        ".github/workflows/deploy-pages.yml",
+        ".github/workflows/validate.yml",
+        ".github/workflows/cloudflare-preview.yml"
       ],
       "restrictions": [
-        "preview_only",
-        "no_production_secrets",
-        "no_main"
+        "no_cloudflare",
+        "no_wrangler",
+        "no_preview_deployment",
+        "no_production_settings",
+        "no_secrets"
+      ],
+      "responsibilities": [
+        "verify GitHub Pages release path",
+        "validate CI status"
       ]
     },
     {
@@ -136,7 +139,7 @@
       "runtime": "logical_role_not_separately_provisioned",
       "permissions": [
         "read_repository",
-        "write_feature_branches"
+        "write_only_mission_branch"
       ],
       "owned_areas": [
         "*.md",
@@ -158,8 +161,8 @@
     "github": {
       "connected": true,
       "current_connector_permission": "Allow all actions",
-      "project_scope": "feature branches and PRs only",
-      "note": "Self-imposed policy does not technically override GitHub app permissions."
+      "project_scope": "single repository; single mission branch; PR to main",
+      "note": "All mission writes stay on feat/mission-anchor-pages-main and flow to main through an owner-reviewed PR."
     },
     "notion": {
       "connected": true,
@@ -168,13 +171,8 @@
     },
     "cloudflare": {
       "connected_plugin": false,
-      "deployment_path": "GitHub Actions + Wrangler",
-      "required_authorization": [
-        "Cloudflare account ID",
-        "scoped API token stored as GitHub Actions secret",
-        "preview Worker/environment"
-      ],
-      "status": "pending_user_cloudflare_setup"
+      "use": "prohibited for this mission",
+      "deployment_path": "disabled"
     },
     "supabase": {
       "connected": true,
@@ -184,10 +182,14 @@
     }
   },
   "deployment_policy": {
-    "preview": "allowed after scoped Cloudflare credentials and preview target are configured",
-    "production": "denied",
+    "canonical_url": "https://alexandermaulen.github.io/Dirtyfingaz-ZP/",
+    "target": "GitHub Pages",
+    "source_branch": "main",
+    "preview": "disabled",
+    "cloudflare": "disabled",
+    "production": "GitHub Pages only, triggered by push to main",
     "secrets": "never exposed to agents or printed in logs",
-    "workflow_trigger": "manual preview deployment until credential and target verification is complete"
+    "workflow_trigger": "deploy-pages.yml on main"
   },
   "integration_contract": {
     "gui_and_engine": "separate ownership; coordinate shared protocol before cross-layer changes",
@@ -213,5 +215,48 @@
     "repository_rulesets": [],
     "note": "main settings were not changed; this policy is declarative until repository protection is separately configured.",
     "active_development_branch": "feat/zp-master-implementation-roadmap"
+  },
+  "mission_anchor": {
+    "name": "DIRTYFINGAZ ZP · GitHub Pages · Creator GUI + Audio Engine · una sola fuente de verdad",
+    "canonical_application_url": "https://alexandermaulen.github.io/Dirtyfingaz-ZP/",
+    "repository": "alexandermaulen/Dirtyfingaz-ZP",
+    "production_branch": "main",
+    "deployment_target": "GitHub Pages",
+    "scope": "Only this application and this repository",
+    "prohibited_destinations": [
+      "other repositories",
+      "other projects",
+      "Cloudflare Workers or previews",
+      "Supabase",
+      "alternate production URLs"
+    ],
+    "architecture": [
+      "index.html: application shell",
+      "creator.html: Creator GUI",
+      "creator-engine.html: audio engine",
+      "zp-core.js and zp-storage.js: core runtime and persistence"
+    ],
+    "workflow": "Single active implementation branch feat/mission-anchor-pages-main; pull request to main; GitHub Pages publishes main only.",
+    "gui_engine_rule": "Keep GUI and audio engine ownership separate; define and validate explicit bridge contracts before cross-layer changes.",
+    "validation": [
+      "node scripts/validate.mjs",
+      "GUI/engine bridge contract checks",
+      "GitHub Pages deployment status",
+      "manual Safari iPhone QA when interaction changes"
+    ],
+    "change_control": "No branch deletion, file deletion, production setting changes, or unrelated infrastructure changes without a separate explicit review."
+  },
+  "repository_state_observed_2026_11_05": {
+    "active_mission_branch": "feat/mission-anchor-pages-main",
+    "note": "Branch created from main for the authorized consolidation. Verify protection enforcement separately; declarative policy is not a GitHub permission boundary."
+  },
+  "legacy_infrastructure": {
+    "wrangler_configs": [
+      "wrangler.jsonc",
+      "wrangler.preview.jsonc"
+    ],
+    "status": "legacy files retained for traceability; not authorized for use or modification in this mission",
+    "worker_source": "radio-worker.mjs",
+    "deployment": "disabled; GitHub Pages is the sole release target"
   }
 }
