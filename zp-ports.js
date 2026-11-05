@@ -46,7 +46,7 @@
         if (typeof request !== "function" || !locationRef || !locationRef.origin) {
           throw portError("NETWORK_UNAVAILABLE", "No hay transporte HTTP disponible.");
         }
-        const response = await request(new URL("/api/health", locationRef.origin), {
+        const response = await request(new URL("/api/creator/health", locationRef.origin), {
           method: "GET",
           headers: { "Accept": "application/json" },
           credentials: "same-origin"
