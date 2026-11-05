@@ -651,5 +651,72 @@
         }
       ]
     }
+  },
+  "layoutPolicy": {
+    "version": "1.0.0",
+    "status": "pending-user-decision",
+    "questionnaire": "CM20",
+    "positioning": {
+      "selected": null,
+      "allowed": [
+        "FREE",
+        "GRID",
+        "HYBRID",
+        "ZONES"
+      ]
+    },
+    "alignment": {
+      "selected": null,
+      "allowed": []
+    },
+    "collisions": {
+      "selected": null,
+      "allowed": [
+        "PREVENT",
+        "PUSH",
+        "ALLOW",
+        "MANUAL"
+      ]
+    },
+    "bounds": {
+      "selected": null,
+      "allowed": [
+        "CONTAINED",
+        "PARTIAL",
+        "FREE"
+      ]
+    },
+    "geometryEditingEnabled": false,
+    "blockedOperations": [
+      "panel-drag",
+      "panel-resize",
+      "snap",
+      "collision-resolution",
+      "bounds-clamping"
+    ],
+    "reason": "No activar geometría editable hasta registrar las cuatro decisiones del Cuestionario Maestro 20."
+  },
+  "layoutProfiles": {
+    "version": "1.0.0",
+    "persistence": "HYBRID",
+    "defaultSource": "registry",
+    "customStorage": "localStorage",
+    "types": [
+      "DEFAULT",
+      "CUSTOM"
+    ],
+    "operations": [
+      "AUTOSAVE",
+      "DUPLICATE",
+      "RENAME",
+      "DELETE",
+      "RESTORE_DEFAULT",
+      "SAVE",
+      "CANCEL"
+    ],
+    "moduleChange": "LOAD_DEFAULT",
+    "autosaveDefault": true,
+    "owner": "creator.gui",
+    "note": "Los perfiles guardan preferencias de panel y layout; no contienen estado musical ni AudioBuffer."
   }
 }
