@@ -2,7 +2,7 @@
 
 > **Actualización V3 vigente:** el diseño aprobado del copiloto, sus contratos y el orden de ejecución están consolidados en [MASTER-QUESTIONNAIRE-V3-AGENT.md](../MASTER-QUESTIONNAIRE-V3-AGENT.md). Este documento conserva la base original y sus preguntas abiertas.
 Versión: 1.0 · Estado: base de arquitectura para completar en pruebas
-Rama de trabajo: `feat/hybrid-hardware-ui-system`
+Rama de trabajo vigente: `feat/dirtyfingaz-zp-clean-integration`
 
 > Objetivo: mantener una especificación viva que conecte producto, GUI, motor de audio, almacenamiento local, Cloudflare, Supabase, seguridad, IA contextual y pruebas. Las respuestas deben convertirse en contratos verificables, no en preferencias aisladas.
 
@@ -231,6 +231,8 @@ Una función sólo pasa a `VERIFICADA` cuando:
 
 ## Consolidación de respuestas de Cuestionarios Maestros · 4 noviembre 2026
 
+**Base de integración vigente:** `main` actualizado con PR #4 y PR #5. Esta rama limpia parte de ese `main`; la rama antigua no es base de integración.
+
 **Estado general:** Cuestionarios 01–19 confirmados por el usuario. La recuperación disponible no conserva el detalle literal completo de 01, 07, 09 y 10; no se rellenan por inferencia. Cuestionario 20 sigue pendiente.
 
 ### Respuestas confirmadas recuperadas
@@ -248,8 +250,10 @@ Una función sólo pasa a `VERIFICADA` cuando:
 - **CM15 · adaptación:** módulo compacto; dock, scroll, header, touch, overflow y transition; combinar reajuste automático con desplazamiento independiente.
 - **CM16 · jerarquía:** paneles; priorizar panel activo, preservar valores/ajustes y ofrecer acceso rápido a secundarios; sin modificaciones adicionales.
 - **CM17 · navegación de paneles:** tabs; panel activo resaltado; resize, remember, drag y restore; reorganización sólo al activar EDIT LAYOUT.
+- **CM06 · estética de los 9 PADs:** híbrido LCD + neón; indicadores activo/inactivo, velocity, PAD seleccionado, reproducción, grabación y color por tipo de sonido.
 - **CM18 · edición de layout:** activar desde menú; herramientas drag, resize, save y cancel; salir automáticamente después de guardar; sin modificaciones adicionales.
 - **CM19 · perfiles:** persistencia HYBRID; perfiles DEFAULT/CUSTOM; AUTOSAVE, DUPLICATE, RENAME y DELETE; al cambiar de módulo cargar DEFAULT; sin modificaciones adicionales.
+- **Reglas de Creator confirmadas en conversaciones posteriores:** nueve PADs uniformes; IN a la izquierda y OUT a la derecha como controles maestros en contexto Sample; CTRL 1 Attack, CTRL 2 Decay, CTRL 3 Release; ADR/ADSR seleccionable desde Utility y guardado por proyecto. FUNCTION/MENU/PIANO no se abre automáticamente, sólo desde PROJECT. El agente flotante debe ser compacto, centrado, translúcido, 80% de opacidad, estética CRT/pixel y LED rojo.
 
 ### Datos aún no recuperados literalmente
 

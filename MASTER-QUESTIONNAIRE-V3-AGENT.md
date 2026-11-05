@@ -1,6 +1,6 @@
 # MASTER QUESTIONNAIRE V3 · DIRTYFINGAZ ZP
 Estado: especificación viva de desarrollo · Corte: 2026-11-04
-Rama autorizada: `feat/hybrid-hardware-ui-system`
+Rama de integración vigente: `feat/dirtyfingaz-zp-clean-integration`
 
 Este documento consolida las elecciones ya entregadas, decisiones de arquitectura, estado verificable y preguntas que todavía bloquean la beta. Las selecciones del usuario no se deben volver a preguntar como si estuvieran pendientes.
 
