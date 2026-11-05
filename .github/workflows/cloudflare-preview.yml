@@ -3,14 +3,14 @@ name: DIRTYFINGAZ ZP Cloudflare Preview
 on:
   push:
     branches:
-      - "feat/zp-master-implementation-roadmap"
+      - "feat/**"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: dirtyfingaz-zp-preview
+  group: dirtyfingaz-zp-preview-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -51,7 +51,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -o pipefail
-          npx --yes wrangler@4.135.0 preview --name zp-roadmap --json | tee preview-output.json
+          PREVIEW_NAME="${GITHUB_REF_NAME//\//-}"
+          npx --yes wrangler@4.135.0 preview --name "$PREVIEW_NAME" --json | tee preview-output.json
           PREVIEW_URL="$(jq -er '.preview.urls[0]' preview-output.json)"
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
           {
