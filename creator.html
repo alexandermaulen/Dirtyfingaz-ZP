@@ -598,7 +598,7 @@ document.querySelectorAll('.tg span').forEach(s=>{const t=s.textContent;if(['UND
  bind("PROJECT",()=>zpBridgeSend("creator.system.menu.open"));
  bind("UTILITY",()=>zpBridgeSend("creator.envelope.mode.toggle"));
  bind("PUSHENTER",()=>{if(window.__zpSystemMenuOpen)zpBridgeSend("creator.system.menu.select")});
- bind("IMPORT/EXPORT",()=>zpBridgeSend("creator.project.manager.open"));
+ bind("IMPORT/EXPORT",()=>{refreshProjects();projectDialog.showModal()});
  bind("PADSETTING",()=>zpBridgeSend("creator.pad.mute.toggle"));
  bind("EFXSETTING",()=>zpBridgeSend("creator.fx.master.toggle",{name:"reverb"}));
  bind("FILTERDRIVE",()=>zpBridgeSend("creator.fx.master.toggle",{name:"drive"}));
