@@ -289,14 +289,14 @@ async function handleGithubStatus(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === "/api/health") {
+    if (url.pathname === "/api/creator/health") {
       if (request.method !== "GET" && request.method !== "HEAD") {
         return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
       }
       const payload = {
         ok: true,
-        service: "DIRTYFINGAZ ZP",
-        version: "1.0.1",
+        service: "DIRTYFINGAZ ZP Creator",
+        version: "1.0.2",
         environment: env.ENVIRONMENT || "unknown",
         services: {
           assets: Boolean(env.ASSETS),
