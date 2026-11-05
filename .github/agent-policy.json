@@ -40,7 +40,7 @@
       "mode": "orchestrator",
       "permissions": [
         "read_repository",
-        "write_feature_branches",
+        "write_only_mission_branch",
         "create_or_update_pull_requests"
       ],
       "responsibilities": [
@@ -62,7 +62,7 @@
       "runtime": "logical_role_not_separately_provisioned",
       "permissions": [
         "read_repository",
-        "write_feature_branches"
+        "write_only_mission_branch"
       ],
       "owned_areas": [
         "index.html",
@@ -79,7 +79,7 @@
       "runtime": "logical_role_not_separately_provisioned",
       "permissions": [
         "read_repository",
-        "write_feature_branches"
+        "write_only_mission_branch"
       ],
       "owned_areas": [
         "creator-engine.html",
@@ -92,24 +92,27 @@
       ]
     },
     {
-      "id": "infrastructure-specialist",
+      "id": "pages-release-steward",
       "runtime": "logical_role_not_separately_provisioned",
       "permissions": [
         "read_repository",
-        "write_feature_branches",
-        "modify_github_actions_workflows",
-        "preview_deploy_when_authorized"
+        "run_validation_workflows"
       ],
       "owned_areas": [
-        ".github/workflows/**",
-        "wrangler.jsonc",
-        "radio-worker.mjs",
-        "scripts/**"
+        ".github/workflows/deploy-pages.yml",
+        ".github/workflows/validate.yml",
+        ".github/workflows/cloudflare-preview.yml"
       ],
       "restrictions": [
-        "preview_only",
-        "no_production_secrets",
-        "no_main"
+        "no_cloudflare",
+        "no_wrangler",
+        "no_preview_deployment",
+        "no_production_settings",
+        "no_secrets"
+      ],
+      "responsibilities": [
+        "verify GitHub Pages release path",
+        "validate CI status"
       ]
     },
     {
@@ -136,7 +139,7 @@
       "runtime": "logical_role_not_separately_provisioned",
       "permissions": [
         "read_repository",
-        "write_feature_branches"
+        "write_only_mission_branch"
       ],
       "owned_areas": [
         "*.md",
@@ -159,7 +162,7 @@
       "connected": true,
       "current_connector_permission": "Allow all actions",
       "project_scope": "single repository; single mission branch; PR to main",
-      "note": "Self-imposed policy does not technically override GitHub app permissions."
+      "note": "All mission writes stay on feat/mission-anchor-pages-main and flow to main through an owner-reviewed PR."
     },
     "notion": {
       "connected": true,
@@ -246,5 +249,14 @@
   "repository_state_observed_2026_11_05": {
     "active_mission_branch": "feat/mission-anchor-pages-main",
     "note": "Branch created from main for the authorized consolidation. Verify protection enforcement separately; declarative policy is not a GitHub permission boundary."
+  },
+  "legacy_infrastructure": {
+    "wrangler_configs": [
+      "wrangler.jsonc",
+      "wrangler.preview.jsonc"
+    ],
+    "status": "legacy files retained for traceability; not authorized for use or modification in this mission",
+    "worker_source": "radio-worker.mjs",
+    "deployment": "disabled; GitHub Pages is the sole release target"
   }
 }
