@@ -217,3 +217,26 @@ Para cada hito registrar fecha/hora, SHA, archivos, contrato afectado, pruebas, 
 - No se han añadido tablas ni migraciones Supabase. El agente aún no consulta Supabase.
 - No se ha desplegado el Worker desde esta intervención; la IA remota permanece sin QA real hasta probar /api/agent/chat en el Preview.
 - Último cambio de backend: 5f66918aa851c7d3df6b517feb2e3d2145b0eae8.
+
+
+
+## Implementación de paneles y perfiles · 4 noviembre 2026
+
+### Decisiones aplicadas
+- CM17: tabs, panel activo, recordar, resize/drag y restaurar; reorganización disponible únicamente desde EDIT LAYOUT.
+- CM18: EDIT LAYOUT se activa desde FUNCTION/MENU; SAVE y CANCEL; cerrar automáticamente al guardar.
+- CM19: persistencia HYBRID con DEFAULT/CUSTOM, AUTOSAVE, DUPLICATE, RENAME y DELETE; al cambiar de módulo se carga DEFAULT.
+- El dock contextual utiliza L1x–L3x y R1x–R3x desde el registro JSON. Tap selecciona grupo; mantener Lx/Rx durante 420 ms expande opciones secundarias.
+- La selección de opciones emite zp-panel-option-select hacia el copiloto; no ejecuta comandos del motor por sí sola.
+
+### CM20 protegido
+Posicionamiento, alineación, colisiones y límites siguen sin selección. El modo EDIT LAYOUT, perfiles y controles SAVE/CANCEL quedan implementados; el movimiento y resize geométrico se mantienen bloqueados hasta completar CM20. No inferir FREE/GRID/HYBRID/ZONES ni políticas de colisión o límites.
+
+### Contratos y archivos
+- GUI: creator.html, zp-layout.js, zp-layout.css.
+- Registro: zp-agent-registry.json.
+- Copiloto: zp-agent.js, recibe la selección contextual retransmitida por index.html.
+- Motor: creator-engine.html no recibe comandos por seleccionar opciones de panel. El contrato de audio permanece intacto.
+- PWA: sw.js cachea los nuevos assets con versión dirtyfingaz-zp-shell-v12.
+
+La implementación es independiente del motor musical y no modifica AudioContext, scheduler, samples ni persistencia de proyectos.
