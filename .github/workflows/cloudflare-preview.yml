@@ -1,10 +1,6 @@
 name: DIRTYFINGAZ ZP Cloudflare Preview
 
 on:
-  push:
-    branches:
-      - "feat/**"
-      - "integration/**"
   workflow_dispatch:
 
 permissions:

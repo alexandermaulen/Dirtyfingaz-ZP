@@ -23,3 +23,56 @@ jobs:
           node-version: 22
       - name: Validate JavaScript and Creator contracts
         run: node scripts/validate.mjs
+
+  preview:
+    name: Publish isolated Cloudflare Preview
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout validated commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate exact commit before deploy
+        run: node scripts/validate.mjs
+      - name: Check Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Missing CLOUDFLARE_API_TOKEN repository secret."
+            exit 1
+          elif ! [[ "$CLOUDFLARE_ACCOUNT_ID" =~ ^[a-fA-F0-9]{32}$ ]]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID must be the 32-character Cloudflare Account ID."
+            exit 1
+          fi
+      - name: Publish isolated Worker Preview
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          PREVIEW_NAME="dirtyfingaz-zp-preview"
+          npx --yes wrangler@4.135.0 deploy --config wrangler.preview.jsonc --name "$PREVIEW_NAME" 2>&1 | tee deploy-output.log
+          PREVIEW_URL="$(grep -Eo 'https://[^[:space:]]+workers\.dev' deploy-output.log | tail -n 1)"
+          if [ -z "$PREVIEW_URL" ]; then
+            echo "::error::Wrangler did not return a workers.dev Preview URL."
+            exit 1
+          fi
+          echo "PREVIEW_URL=$PREVIEW_URL" >> "$GITHUB_ENV"
+          echo "Preview URL: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+      - name: Smoke test Creator health endpoint
+        run: |
+          set -euo pipefail
+          for attempt in {1..10}; do
+            if curl --fail --silent --show-error "$PREVIEW_URL/api/creator/health" -o health.json; then
+              break
+            fi
+            sleep 3
+          done
+          node -e 'const fs=require("fs");const h=JSON.parse(fs.readFileSync("health.json","utf8"));if(h.ok!==true||h.service!=="DIRTYFINGAZ ZP Creator"||h.version!=="1.0.2")process.exit(1);console.log("Creator Preview health OK:",h)'
