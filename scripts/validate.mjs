@@ -303,8 +303,8 @@ assert.equal(agentRegistry.controls.Rx.master, true);
 
 // DIRTYFINGAZ ZP · Questionnaire panel/profile implementation
 const layoutSystem = read("zp-layout.js");
-assert.match(ui, /zp-layout\\.css/, "Creator debe cargar el sistema de paneles.");
-assert.match(ui, /zp-layout\\.js/, "Creator debe cargar el controlador de layout.");
+assert.match(ui, /zp-layout\.css/, "Creator debe cargar el sistema de paneles.");
+assert.match(ui, /zp-layout\.js/, "Creator debe cargar el controlador de layout.");
 assert.match(layoutSystem, /HOLD_MS=420/, "Los paneles deben respetar el hold de 420 ms.");
 assert.match(layoutSystem, /zp-panel-option-select/, "Las opciones contextuales deben emitir un evento tipado.");
 assert.match(layoutSystem, /STORE_KEY="dirtyfingaz-zp-layout-v1"/, "Los perfiles deben persistir localmente.");
@@ -313,5 +313,5 @@ assert.match(layoutSystem, /DRAG \/ RESIZE BLOQUEADOS/, "La geometría debe espe
 assert.match(layoutSystem, /AUTOSAVE|DUPLICATE|RENAME|DELETE|RESTORE DEFAULT/, "Deben existir operaciones de perfiles.");
 assert.match(shell, /zp-panel-option-select/, "El shell debe validar y retransmitir selecciones del iframe.");
 assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v12/);
-assert.match(read("sw.js"), /zp-layout\\.js/);
+assert.match(read("sw.js"), /zp-layout\.js/);
 console.log("OK: paneles contextuales, perfiles híbridos y EDIT LAYOUT con CM20 protegido.");
