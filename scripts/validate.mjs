@@ -323,8 +323,7 @@ assert.equal(agentRegistry.layoutProfiles.persistence, "HYBRID");
 assert.equal(agentRegistry.layoutProfiles.moduleChange, "LOAD_DEFAULT");
 assert.deepEqual(agentRegistry.layoutProfiles.types, ["DEFAULT", "CUSTOM"]);
 assert.equal(layoutSystem.includes("zpBridgeSend("), false, "Los paneles no deben ejecutar comandos musicales directamente.");
-assert.ok(layoutSystem.includes('contextNow()!=="pattern"'));
-assert.ok(layoutSystem.includes('contextNow()!=="piano"'));
+assert.ok(layoutSystem.includes('ctx==="sample"||(side==="L"&&ctx!=="pattern"&&ctx!=="piano")'), "El hold de panel respeta el contexto Sample y Lx.");
 
 
 assert.match(layoutSystem, /schemaVersion:1/);
