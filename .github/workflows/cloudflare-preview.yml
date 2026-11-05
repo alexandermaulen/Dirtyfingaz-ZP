@@ -1,0 +1,73 @@
+name: DIRTYFINGAZ ZP Cloudflare Preview
+
+on:
+  push:
+    branches:
+      - "feat/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dirtyfingaz-zp-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Publish branch Preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check Cloudflare credentials
+        id: credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::notice::Preview not deployed. Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as GitHub Actions repository secrets."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate project contracts
+        if: steps.credentials.outputs.ready == 'true'
+        run: node scripts/validate.mjs
+
+      - name: Publish or update Cloudflare Worker Preview
+        if: steps.credentials.outputs.ready == 'true'
+        id: publish
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -o pipefail
+          PREVIEW_NAME="${GITHUB_REF_NAME//\//-}"
+          npx --yes wrangler@4.135.0 preview --name "$PREVIEW_NAME" --json | tee preview-output.json
+          PREVIEW_URL="$(jq -er '.preview.urls[0]' preview-output.json)"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          {
+            echo "## DIRTYFINGAZ ZP Preview"
+            echo
+            echo "Preview URL: $PREVIEW_URL"
+            echo
+            echo "Commit: $GITHUB_SHA"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Report missing credentials
+        if: steps.credentials.outputs.ready != 'true'
+        run: |
+          {
+            echo "## Cloudflare Preview pendiente"
+            echo
+            echo "Agrega CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en Repository secrets."
+          } >> "$GITHUB_STEP_SUMMARY"

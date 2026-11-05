@@ -91,6 +91,7 @@ async function joinRadioRoom(button){leaveRadioRoom(false);const roomName=button
 document.querySelectorAll('.room-join').forEach(button=>{const room=button.closest('.room');if(room)room.dataset.roomId=button.dataset.room.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');button.addEventListener('click',()=>joinRadioRoom(button))});
 document.getElementById('leaveRoom')?.addEventListener('click',()=>leaveRadioRoom(true));
 window.addEventListener('message',event=>{const creatorFrame=document.getElementById('creator-frame');const data=event.data;if(event.source!==creatorFrame?.contentWindow||event.origin!==location.origin||data?.type!=='zp-radio-publish-state'||data.protocolVersion!==1||data.source!=='creator.ui')return;window.zpRadioBroadcastState(data.state)});
+window.addEventListener('message',event=>{const creatorFrame=document.getElementById('creator-frame'),data=event.data;if(event.source!==creatorFrame?.contentWindow||event.origin!==location.origin||data?.type!=='zp-panel-option-select'||data.protocolVersion!==1||data.source!=='creator.ui'||typeof data.requestId!=='string'||!data.requestId||data.requestId!==data.payload?.requestId||data.payload?.schemaVersion!==1||typeof data.payload?.option!=='string')return;window.dispatchEvent(new CustomEvent('zp-panel-option-select',{detail:data.payload}));});
 window.addEventListener('pagehide',()=>leaveRadioRoom(false));
 
 if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}

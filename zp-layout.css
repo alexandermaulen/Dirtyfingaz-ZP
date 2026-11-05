@@ -1,0 +1,29 @@
+#zp-panel-dock{position:absolute;z-index:80;top:8px;bottom:8px;width:132px;max-width:38%;display:flex;flex-direction:column;gap:6px;padding:7px;background:linear-gradient(180deg,#0b2508f5,#041404f7);border:1px solid #9bff50;border-radius:8px;box-shadow:0 8px 24px #000d,0 0 14px #8cff3b55;color:#d8ff4f;pointer-events:auto;touch-action:pan-y;backdrop-filter:blur(8px)}
+#zp-panel-dock[hidden]{display:none!important}
+#zp-panel-dock[data-side="L"]{left:4px}
+#zp-panel-dock[data-side="R"]{right:4px}
+.zp-panel-head{display:flex;align-items:center;justify-content:space-between;gap:4px;font:800 9px/1.2 "Courier New",monospace;letter-spacing:.08em}
+.zp-panel-close{width:24px;height:24px;min-height:24px!important;padding:0!important;font-size:12px!important}
+.zp-panel-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+.zp-panel-tabs button,.zp-panel-options button{min-width:0;min-height:30px;padding:4px 2px!important;border:1px solid #477c32!important;border-radius:3px!important;background:linear-gradient(#174411,#092108)!important;color:#cfff79!important;font:800 8px/1.1 "Courier New",monospace!important;overflow-wrap:anywhere}
+.zp-panel-tabs button[aria-pressed="true"]{background:linear-gradient(#dfff8a,#9bdf35)!important;color:#092006!important;box-shadow:0 0 10px #b5ff55aa!important}
+.zp-panel-context{font:700 7px/1.2 "Courier New",monospace;color:#8ebd7b;letter-spacing:.1em}
+.zp-panel-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;overflow:auto;min-height:0;overscroll-behavior:contain;scrollbar-width:thin}
+.zp-panel-options[hidden]{display:none!important}
+.zp-panel-options button{min-height:34px!important}
+.zp-panel-options button:active{filter:brightness(1.5)}
+.zp-panel-foot{margin-top:auto;padding-top:5px;border-top:1px solid #315b28;font:7px/1.3 "Courier New",monospace;color:#8ebd7b}
+#zp-layout-menu{position:absolute;z-index:100;right:8px;top:48px;width:min(260px,calc(100% - 16px));padding:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;background:#041404f7;border:1px solid #9bff50;border-radius:7px;box-shadow:0 8px 24px #000e;color:#d8ff4f}
+#zp-layout-menu[hidden]{display:none!important}
+.zp-layout-menu-title{grid-column:1/-1;font:900 10px/1.2 "Courier New",monospace;letter-spacing:.12em;padding:2px 0 5px;border-bottom:1px solid #315b28}
+#zp-layout-menu button,.zp-layout-toolbar button{min-height:32px;padding:5px!important;border:1px solid #477c32!important;border-radius:3px!important;background:#0b2508!important;color:#cfff79!important;font:800 8px/1.1 "Courier New",monospace!important}
+#zp-layout-menu button.primary,.zp-layout-toolbar button.primary{background:#b9f65a!important;color:#092006!important}
+#zp-layout-menu button[aria-pressed="true"]{border-color:#dfff8a!important;box-shadow:inset 0 0 0 1px #dfff8a}
+.zp-layout-status{grid-column:1/-1;padding:6px;border:1px dashed #5c803b;font:7px/1.4 "Courier New",monospace;color:#b9d8a7}
+.zp-layout-toolbar{position:absolute;z-index:101;left:50%;bottom:8px;transform:translateX(-50%);display:flex;gap:5px;padding:6px;background:#041404f5;border:1px solid #9bff50;border-radius:5px;box-shadow:0 5px 18px #000c}
+.zp-layout-toolbar[hidden]{display:none!important}
+#unit.layout-edit-mode{outline:2px dashed #dfff8a;outline-offset:-5px}
+#unit.layout-edit-mode .zp-layout-edit-target{outline:1px dashed #dfff8a;outline-offset:2px}
+.zp-layout-blocked{font:7px/1.35 "Courier New",monospace;color:#ffc36c}
+@media(max-width:380px){#zp-panel-dock{width:118px;max-width:36%;padding:5px}.zp-panel-tabs button{font-size:7px!important}.zp-panel-options button{font-size:7px!important}}
+@media(max-height:700px){#zp-panel-dock{top:3px;bottom:3px}.zp-panel-options button{min-height:28px!important}}

@@ -1,0 +1,85 @@
+#zp-agent-launcher{touch-action:manipulation;-webkit-tap-highlight-color:transparent;position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:99990;border:1px solid #a8ff35;background:#071407;color:#c5ff45;border-radius:999px;padding:10px 14px;font:800 12px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 5px 24px #000a;letter-spacing:.04em}
+#zp-agent-window{touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:opacity .18s ease;opacity:.2;position:fixed;z-index:99999;right:14px;bottom:72px;width:min(370px,calc(100vw - 20px));height:min(520px,72dvh);min-width:260px;min-height:250px;max-width:calc(100vw - 12px);max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px);display:flex;flex-direction:column;resize:none;overflow:hidden;background:#071307;color:#d5ffbd;border:1px solid #8bcf47;border-radius:12px;box-shadow:0 14px 55px #000d,inset 0 0 24px #a8ff350d;font:13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-transform:none}
+#zp-agent-window[hidden],#zp-agent-launcher[hidden]{display:none!important}
+#zp-agent-window.engaged,#zp-agent-window:focus-within,#zp-agent-window.maximized{opacity:1}
+#zp-agent-window.minimized{opacity:.2}
+#zp-agent-head{touch-action:none;-webkit-user-select:none;user-select:none}
+#zp-agent-resize{touch-action:none;-webkit-user-select:none;user-select:none}
+#zp-agent-window button{touch-action:manipulation;min-height:32px}
+#zp-agent-input{font-size:16px;touch-action:manipulation}
+#zp-agent-window.minimized{height:42px!important;min-height:42px;resize:none}
+#zp-agent-window.maximized{inset:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));width:auto!important;height:auto!important;max-width:none;max-height:none;resize:none}
+#zp-agent-window *{box-sizing:border-box;text-transform:none;user-select:text;-webkit-user-select:text}
+#zp-agent-head{height:42px;min-height:42px;display:flex;align-items:center;gap:8px;padding:0 9px;background:linear-gradient(90deg,#18340e,#0a1b08);border-bottom:1px solid #355d25;cursor:move;touch-action:none;user-select:none}
+#zp-agent-head strong{font-size:12px;letter-spacing:.06em;color:#c5ff45;flex:1}
+#zp-agent-context{font-size:10px;color:#a8c998;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#zp-agent-head button{width:27px;height:26px;border:1px solid #52783b;border-radius:5px;background:#0b1d08;color:#d5ffbd;font-size:15px;line-height:1}
+#zp-agent-body{display:flex;flex:1;min-height:0;flex-direction:column}
+#zp-agent-log{flex:1;min-height:0;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain}
+.zp-agent-msg{max-width:94%;padding:8px 10px;border:1px solid #294b20;border-radius:8px;background:#0c1d0a;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
+.zp-agent-msg.user{align-self:flex-end;background:#182b12;border-color:#52783b;color:#e7ffd9}
+.zp-agent-msg.assistant{align-self:flex-start}
+.zp-agent-msg.system{align-self:center;color:#a8c998;font-size:10px;border-style:dashed}
+#zp-agent-actions{display:flex;flex-wrap:wrap;gap:6px;padding:7px 9px;border-top:1px solid #294b20}
+#zp-agent-actions button,.zp-agent-confirm button{border:1px solid #557b38;border-radius:6px;background:#10250b;color:#c5ff45;padding:7px 9px;font-size:11px}
+.zp-agent-confirm{display:flex;gap:6px;margin-top:8px}
+.zp-agent-confirm button:first-child{background:#c5ff45;color:#101a08;font-weight:800}
+#zp-agent-form{display:flex;gap:7px;padding:9px;border-top:1px solid #355d25}
+#zp-agent-input{flex:1;min-width:0;min-height:38px;border:1px solid #456b31;border-radius:7px;background:#020a02;color:#e7ffd9;padding:8px 10px;font:13px -apple-system,BlinkMacSystemFont,sans-serif;outline:none}
+#zp-agent-input:focus{border-color:#c5ff45}
+#zp-agent-send{border:0;border-radius:7px;background:#c5ff45;color:#101a08;padding:0 13px;font-weight:900}
+#zp-agent-status{padding:0 10px 7px;color:#86a77d;font-size:10px}
+@media(max-width:420px){#zp-agent-window{right:8px;bottom:62px;width:calc(100vw - 16px);height:min(470px,68dvh)}#zp-agent-window.maximized{inset:max(6px,env(safe-area-inset-top)) 6px max(6px,env(safe-area-inset-bottom)) 6px}#zp-agent-context{max-width:34%}}
+@media(prefers-reduced-motion:reduce){#zp-agent-window{scroll-behavior:auto}}
+
+#zp-agent-resize{position:absolute;right:2px;bottom:2px;width:20px;height:20px;border:0;background:transparent;color:#9dcc73;font-size:13px;line-height:1;touch-action:none;cursor:nwse-resize;padding:0}
+#zp-agent-window.minimized #zp-agent-resize{display:none}
+#zp-agent-window.maximized #zp-agent-resize{display:none}
+
+/* Inspector contextual y herramientas de composición del agente */
+#zp-agent-inspector{margin:0 9px 7px;padding:8px;border:1px solid #355d25;border-radius:8px;background:#091807;display:flex;flex-direction:column;gap:6px;max-height:112px;overflow:auto}
+.zp-agent-inspector-head{display:flex;flex-direction:column;gap:2px;min-width:0}
+#zp-agent-param-title{font-size:12px;color:#d7ffad;overflow-wrap:anywhere}
+#zp-agent-param-meta{font-size:10px;color:#9eb98b;overflow-wrap:anywhere}
+.zp-agent-param-control{display:flex;align-items:center;gap:7px}
+#zp-agent-param-range{flex:1;min-width:0;accent-color:#c5ff45;touch-action:pan-x}
+#zp-agent-param-value{min-width:42px;color:#d7ffad;font-variant-numeric:tabular-nums;font-size:11px}
+#zp-agent-param-apply{border:1px solid #83b54b;border-radius:5px;background:#c5ff45;color:#101a08;padding:6px 9px;font-size:11px;font-weight:800}
+#zp-agent-param-apply:disabled{opacity:.35}
+#zp-agent-devtools{margin:0 9px 7px;border:1px solid #355d25;border-radius:8px;background:#071307;max-height:42%;overflow:auto}
+#zp-agent-devtools summary{padding:8px;color:#c5ff45;font-size:10px;font-weight:800;letter-spacing:.04em;cursor:pointer;touch-action:manipulation}
+.zp-agent-dev-buttons,.zp-agent-dev-actions{display:flex;flex-wrap:wrap;gap:5px;padding:0 7px 7px}
+.zp-agent-dev-buttons button,.zp-agent-dev-actions button{border:1px solid #557b38;border-radius:5px;background:#10250b;color:#c5ff45;padding:6px 8px;font-size:10px;touch-action:manipulation}
+#zp-agent-code{display:block;width:calc(100% - 14px);margin:0 7px 7px;min-height:90px;max-height:180px;resize:vertical;border:1px solid #456b31;border-radius:6px;background:#020a02;color:#e7ffd9;padding:8px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;touch-action:pan-y;user-select:text;-webkit-user-select:text}
+#zp-agent-window textarea{font-size:16px}
+.zp-agent-target-active{outline:2px solid #c5ff45!important;outline-offset:3px!important;filter:drop-shadow(0 0 5px #c5ff45)!important;animation:zpAgentTargetPulse 1.2s ease-in-out infinite alternate;}
+@keyframes zpAgentTargetPulse{from{box-shadow:0 0 3px #c5ff45}to{box-shadow:0 0 13px #c5ff45,0 0 22px #80ff39}}
+@media(max-width:420px){#zp-agent-inspector{max-height:105px}#zp-agent-devtools{max-height:38%}#zp-agent-code{min-height:78px}}
+
+
+/* Lx/Rx: encoders de navegación y ajuste contextual, ahora integrados al borde inferior del display. */
+.lx,.rx{position:absolute;touch-action:none;user-select:none;-webkit-user-select:none}
+.lx::before,.rx::before{position:absolute;left:50%;top:-12px;transform:translateX(-50%);font:800 9px/1 ui-monospace,monospace;letter-spacing:.08em;color:var(--lcd);text-shadow:0 0 5px var(--lcd)}
+.lx::before{content:'Lx'}
+.rx::before{content:'Rx'}
+.lx.lx-active{filter:drop-shadow(0 0 8px var(--lcd))}
+.lx-active{outline:2px solid var(--lcd)!important;outline-offset:2px;box-shadow:0 0 10px var(--lcd)!important}
+.zp-value-tick{animation:zpValueTick .12s ease-out 1;transform-origin:center}
+@keyframes zpValueTick{0%{transform:translate3d(0,0,0)}25%{transform:translate3d(-1px,0,0)}50%{transform:translate3d(1px,0,0)}75%{transform:translate3d(-.5px,0,0)}100%{transform:translate3d(0,0,0)}}
+@media(prefers-reduced-motion:reduce){.zp-value-tick{animation:none}}
+/* START/END: tres fases de interacción. */
+.trim-marker.phase-locked{opacity:.42;pointer-events:none;filter:grayscale(1)}
+.unit[data-trim-phase="2"] .trim-marker{opacity:1;pointer-events:auto;filter:none}
+.unit[data-trim-phase="3"] .trim-marker{opacity:.4;pointer-events:none}
+/* Agente contextual: estados de inactividad y controles de GitHub. */
+#zp-agent-window.idle-warning{border-color:#c5ff45;box-shadow:0 0 0 1px #c5ff4540,0 14px 55px #000d}
+#zp-agent-window.idle-fade{animation:zpAgentFade40 2.2s ease-in-out forwards;pointer-events:none}
+@keyframes zpAgentFade40{0%{opacity:1;filter:none}100%{opacity:.4;filter:saturate(.65)}}
+#zp-agent-window.idle-curtain{transform-origin:top center;animation:zpAgentCurtain .62s steps(5,end) forwards;pointer-events:none}
+@keyframes zpAgentCurtain{0%{opacity:.4;clip-path:inset(0 0 0 0);transform:scaleY(1) skewX(0);filter:none}22%{clip-path:inset(0 0 18% 0);transform:translateX(-2px) scaleY(.82) skewX(-1deg);filter:hue-rotate(35deg)}48%{clip-path:inset(0 0 52% 0);transform:translateX(2px) scaleY(.48) skewX(1deg);filter:contrast(1.5)}76%{clip-path:inset(0 0 82% 0);transform:translateX(-1px) scaleY(.18);filter:hue-rotate(-25deg)}100%{opacity:0;clip-path:inset(0 0 100% 0);transform:translateX(0) scaleY(0);filter:none}}
+#zp-agent-github{margin:0 9px 7px;border:1px solid #355d25;border-radius:8px;background:#071307;max-height:34%;overflow:auto;flex:none}
+#zp-agent-github summary{padding:8px;color:#c5ff45;font-size:10px;font-weight:800;letter-spacing:.04em;cursor:pointer}
+.zp-agent-github-actions{display:flex;flex-wrap:wrap;gap:5px;padding:0 7px 7px}
+.zp-agent-github-actions button{border:1px solid #557b38;border-radius:5px;background:#10250b;color:#c5ff45;padding:6px 8px;font-size:10px;min-height:30px!important}
+#zp-agent-github-result{padding:0 8px 8px;color:#a8c998;font:10px/1.45 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){#zp-agent-window.idle-fade,#zp-agent-window.idle-curtain{animation-duration:.01ms;animation-iteration-count:1}}

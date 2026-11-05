@@ -1,0 +1,722 @@
+{
+  "version": "1.0.0",
+  "app": "DIRTYFINGAZ ZP",
+  "architecture": {
+    "gui": {
+      "file": "creator.html",
+      "owner": "Interacción, controles, feedback visual, navegación, contexto seleccionado."
+    },
+    "engine": {
+      "file": "creator-engine.html",
+      "owner": "AudioContext, AudioBuffer, scheduler, parámetros efectivos, estado musical y persistencia."
+    },
+    "bridge": {
+      "protocolVersion": 1,
+      "owner": "Mensajes GUI↔motor con source, requestId, ACK/error y timeout."
+    },
+    "storage": {
+      "file": "zp-storage.js",
+      "owner": "IndexedDB y aislamiento por proyecto."
+    },
+    "worker": {
+      "file": "radio-worker.mjs",
+      "owner": "API contextual del agente y servicios Radio Grid."
+    },
+    "serviceWorker": {
+      "file": "sw.js",
+      "owner": "Caché offline y actualización de assets."
+    },
+    "rules": [
+      "No duplicar estado autoritativo del motor en GUI.",
+      "No ejecutar código arbitrario desde el agente.",
+      "Separar propuesta, validación, aplicación y confirmación.",
+      "Los cambios que crucen GUI y motor requieren contrato y pruebas de ambos lados.",
+      "Trabajar sólo en feat/hybrid-hardware-ui-system; nunca modificar main ni hacer merge sin autorización."
+    ]
+  },
+  "parameters": [
+    {
+      "key": "master",
+      "label": "Volumen maestro",
+      "module": "Master / Mixer",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.75,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "master",
+        "value": "$value"
+      },
+      "unit": "linear",
+      "description": "Ganancia maestra del motor."
+    },
+    {
+      "key": "cutoff",
+      "label": "Filtro Cutoff",
+      "module": "Filter",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.5,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "cutoff",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Frecuencia mapeada de 300 a 18000 Hz."
+    },
+    {
+      "key": "resonance",
+      "label": "Resonancia",
+      "module": "Filter",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.25,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "resonance",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Q mapeado de 0.1 a 18."
+    },
+    {
+      "key": "drive",
+      "label": "Drive",
+      "module": "FX",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.25,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "drive",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Cantidad de saturación del motor."
+    },
+    {
+      "key": "fx-amount",
+      "label": "Cantidad FX",
+      "module": "FX",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.001,
+      "default": 0.25,
+      "command": "creator.control.set",
+      "payload": {
+        "name": "fx-amount",
+        "value": "$value"
+      },
+      "unit": "normalized",
+      "description": "Cantidad global del bloque FX."
+    },
+    {
+      "key": "trim.start",
+      "label": "Sample IN",
+      "module": "Sample Editor",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.00005,
+      "default": 0,
+      "command": "creator.sample.trim.set",
+      "payload": {
+        "target": "start",
+        "position": "$value",
+        "commit": true
+      },
+      "unit": "normalized",
+      "description": "Punto inicial del sample. Debe permanecer antes de OUT."
+    },
+    {
+      "key": "trim.end",
+      "label": "Sample OUT",
+      "module": "Sample Editor",
+      "owner": "engine",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 0.00005,
+      "default": 1,
+      "command": "creator.sample.trim.set",
+      "payload": {
+        "target": "end",
+        "position": "$value",
+        "commit": true
+      },
+      "unit": "normalized",
+      "description": "Punto final del sample. Debe permanecer después de IN."
+    },
+    {
+      "key": "midi.step",
+      "label": "MIDI Step",
+      "module": "Piano Roll",
+      "owner": "engine",
+      "type": "integer",
+      "min": 0,
+      "max": 15,
+      "step": 1,
+      "default": 0,
+      "command": null,
+      "description": "Posición de nota dentro del patrón. Requiere selección de nota y API MIDI dedicada."
+    },
+    {
+      "key": "midi.pitch",
+      "label": "MIDI Pitch",
+      "module": "Piano Roll",
+      "owner": "engine",
+      "type": "integer",
+      "min": 0,
+      "max": 127,
+      "step": 1,
+      "default": 60,
+      "command": null,
+      "description": "Altura MIDI de la nota seleccionada."
+    },
+    {
+      "key": "midi.length",
+      "label": "MIDI Length",
+      "module": "Piano Roll",
+      "owner": "engine",
+      "type": "integer",
+      "min": 1,
+      "max": 16,
+      "step": 1,
+      "default": 1,
+      "command": null,
+      "description": "Duración de nota en pasos."
+    },
+    {
+      "key": "midi.velocity",
+      "label": "MIDI Velocity",
+      "module": "Piano Roll",
+      "owner": "engine",
+      "type": "integer",
+      "min": 1,
+      "max": 127,
+      "step": 1,
+      "default": 100,
+      "command": null,
+      "description": "Velocidad MIDI de la nota seleccionada."
+    }
+  ],
+  "developerTemplates": [
+    "json",
+    "gui",
+    "bridge",
+    "engine",
+    "test"
+  ],
+  "workflow": [
+    "Inspectar control y leer contexto observado.",
+    "Resolver parámetro en este registro JSON.",
+    "Consultar backend con módulo, valor, proyecto y contrato.",
+    "Generar propuesta o snippet, nunca ejecutar eval.",
+    "Validar allowlist y precondiciones.",
+    "Aplicar sólo parámetros live con comando explícito y ACK del motor.",
+    "Para código, copiar/exportar el snippet y preparar cambios separados GUI/engine/validator."
+  ],
+  "project": {
+    "name": "DIRTYFINGAZ ZP",
+    "repository": "https://github.com/alexandermaulen/Dirtyfingaz-ZP",
+    "developmentBranch": "feat/hybrid-hardware-ui-system",
+    "pullRequest": "https://github.com/alexandermaulen/Dirtyfingaz-ZP/pull/3",
+    "preview": "https://feat-hybrid-hardware-ui-system-dirtyfingaz-zp.alexandermaulen.workers.dev",
+    "architecture": {
+      "gui": "creator.html: controls, interaction, visual state and context.",
+      "engine": "creator-engine.html: Web Audio, buffers, scheduler, FX, MIDI and authoritative state.",
+      "bridge": "Versioned GUI-engine messages with protocolVersion, requestId, ACK/error and timeout.",
+      "storage": "zp-storage.js: IndexedDB and per-project sample isolation.",
+      "worker": "radio-worker.mjs: agent API and Radio Grid.",
+      "agent": "zp-agent.js: contextual inspector, allowlisted parameter application and code snippet composer.",
+      "registry": "zp-agent-registry.json: parameter schemas, ranges, commands and ownership.",
+      "validator": "scripts/validate.mjs: static syntax and integration contracts."
+    },
+    "handoff": {
+      "branchPolicy": "Work only on feature branch. Do not modify main or merge without explicit authorization.",
+      "parallelTracks": "Keep GUI and engine work coordinated. Define bridge contract before cross-layer changes.",
+      "knownFeatures": [
+        "9 pads x 16 steps sequencer",
+        "Piano Roll with MIDI editing and microtiming",
+        "IN/OUT trim with fine PUSH ENTER and persistence",
+        "Multi-project IndexedDB storage",
+        "WAV/MP3 export components",
+        "Cloudflare Radio Grid"
+      ],
+      "supabase": "Connected project exists; do not create tables or alter infrastructure without authorization.",
+      "currentFeature": "Agent v0.3: selected-control glow, parameter inspector, shared JSON registry, live allowlisted apply, and JSON/GUI/BRIDGE/ENGINE/TEST snippet buttons.",
+      "pending": [
+        "Run CI on current SHA",
+        "Test drag/resize, 20% idle opacity, 10-second close and no Safari zoom",
+        "Test parameter apply and engine ACK on iPhone 11",
+        "Verify PWA offline cache"
+      ]
+    }
+  },
+  "controls": {
+    "Lx": {
+      "label": "Lx",
+      "role": "master-left-navigation",
+      "owner": "creator.ui",
+      "input": "pointer-rotation",
+      "behavior": "Control maestro izquierdo. Inactivo en vista general; se activa al seleccionar/abrir un patrón en Pattern Edit o Piano Roll y navega herramientas/parámetros del patrón sin ejecutarlos.",
+      "stepDegrees": 14,
+      "wrap": true,
+      "commands": [],
+      "contextEvent": "focusin",
+      "mount": ".mid>.lx",
+      "placement": "left-side-rail",
+      "adaptive": true,
+      "activation": {
+        "trigger": [
+          "pattern-selected",
+          "pattern-edit-open",
+          "piano-roll-open"
+        ],
+        "default": "inactive",
+        "deactivateOn": "editor-close"
+      },
+      "master": true
+    },
+    "Rx": {
+      "label": "Rx",
+      "role": "master-right-output",
+      "owner": "creator.ui+creator-engine.html",
+      "input": "pointer-rotation",
+      "behavior": "Control maestro derecho. En contexto Sample y fase OUT ajusta el punto final del sample mediante creator.sample.trim.set target=end; en otros contextos controla el parámetro contextual o PUSH ENTER sin sustituir IN.",
+      "existingSelector": ".pe",
+      "commands": [
+        "creator.sample.trim.set",
+        "creator.control.set"
+      ],
+      "mount": ".mid>.rx",
+      "placement": "right-side-rail",
+      "adaptive": true,
+      "scrollFallback": {
+        "enabled": true,
+        "source": "window.__zpLxTarget",
+        "axisPriority": [
+          "y",
+          "x"
+        ],
+        "step": "proportional-to-rotation",
+        "disabledWhen": [
+          "trim.active",
+          "midi.freeMove",
+          "selected-target-is-trim-or-midi"
+        ]
+      },
+      "master": true,
+      "sampleMapping": {
+        "label": "OUT",
+        "command": "creator.sample.trim.set",
+        "payload": {
+          "target": "end",
+          "position": "number",
+          "commit": "boolean"
+        }
+      }
+    },
+    "IN": {
+      "label": "IN",
+      "role": "sample-start-encoder",
+      "owner": "creator.ui+creator-engine.html",
+      "input": "pointer-rotation",
+      "behavior": "Control independiente de START/IN, visible sólo en contexto Sample; no sustituye Lx ni Rx y se oculta en Pattern/Piano Edit.",
+      "existingSelector": ".in-encoder",
+      "command": "creator.sample.trim.set",
+      "payload": {
+        "target": "start",
+        "position": "number[0..range.end)",
+        "commit": "boolean"
+      },
+      "mount": ".mid",
+      "placement": "immediately-right-of-Lx",
+      "visibility": {
+        "showWhen": "sample-context",
+        "hideWhen": [
+          "pattern-edit",
+          "piano-open"
+        ]
+      },
+      "persistence": "commit:true"
+    }
+  },
+  "layout": {
+    "encoderPlacement": "sides",
+    "behavior": "adaptive",
+    "spacing": "compact",
+    "mount": {
+      "Lx": ".mid>.lx",
+      "Rx": ".mid>.rx"
+    },
+    "responsiveSizes": {
+      "default": "50px",
+      "narrow": "46px",
+      "shortViewport": "42px"
+    },
+    "notes": "Lx/Rx se montan como controles maestros dentro de .mid y ocupan raíles laterales del módulo. Al abrir Piano Roll, la GUI los reubica temporalmente en el dock inferior; el bridge y el estado del motor permanecen independientes.",
+    "contextualControls": {
+      "IN": {
+        "context": "sample",
+        "position": "right-of-Lx",
+        "independent": true
+      },
+      "Lx": {
+        "context": "pattern-edit-or-piano-roll",
+        "position": "left-master-rail",
+        "default": "inactive"
+      },
+      "Rx": {
+        "context": "sample-out-and-contextual-master",
+        "position": "right-master-rail"
+      },
+      "SHIFT": "preserved"
+    }
+  },
+  "trimControl": {
+    "version": "1.0.0",
+    "phases": {
+      "1": {
+        "name": "select",
+        "label": "Selección IN/OUT",
+        "color": "#A5E8B0",
+        "touch": "single-target",
+        "encoder": {
+          "Lx": "navigation",
+          "Rx": "selected-target-adjust"
+        },
+        "description": "Un marcador activo por vez; la selección se refleja en waveform y LCD."
+      },
+      "2": {
+        "name": "multitouch",
+        "label": "Touch libre",
+        "color": "#E9A044",
+        "touch": "dual-independent",
+        "encoder": {
+          "Lx": "navigation",
+          "Rx": "context-scroll"
+        },
+        "description": "IN y OUT pueden moverse simultáneamente con dos punteros táctiles independientes."
+      },
+      "3": {
+        "name": "encoder",
+        "label": "Control Lx/Rx",
+        "color": "#E53935",
+        "touch": "locked",
+        "encoder": {
+          "Lx": "trim.start",
+          "Rx": "trim.end"
+        },
+        "description": "Touch bloqueado; Lx controla IN y Rx controla OUT directamente."
+      }
+    },
+    "cycle": [
+      1,
+      2,
+      3
+    ],
+    "stateOwner": "creator.ui",
+    "valueOwner": "creator-engine.html",
+    "command": "creator.sample.trim.set",
+    "persistence": "commit:true",
+    "led": "trim-phase-led"
+  },
+  "panelSystem": {
+    "version": "1.0.0",
+    "presentation": "hybrid",
+    "activation": "hold",
+    "dock": "side",
+    "interaction": {
+      "tap": "select-group",
+      "holdMs": 420,
+      "hold": "expand-secondary-options",
+      "optionTap": "select-option-only"
+    },
+    "ownership": {
+      "gui": "creator.html",
+      "registry": "zp-agent-registry.json",
+      "agent": "zp-agent.js",
+      "engine": "creator-engine.html"
+    },
+    "executionPolicy": "Panel option selection emits zp-panel-option-select for contextual agent/UI handling only. It does not send engine commands unless an option is explicitly mapped to an existing allowlisted command and approved by the engine contract.",
+    "contexts": [
+      "sample",
+      "piano",
+      "pattern",
+      "fx",
+      "master"
+    ],
+    "panels": {
+      "left": [
+        {
+          "id": "L1x",
+          "label": "L1x",
+          "options": [
+            "START",
+            "END",
+            "PITCH",
+            "REVERSE",
+            "RESAMPLE",
+            "TRANSPOSE"
+          ],
+          "contexts": {
+            "piano": [
+              "NOTE",
+              "OCTAVE",
+              "TRANSPOSE",
+              "SCALE",
+              "QUANTIZE",
+              "VELOCITY"
+            ],
+            "pattern": [
+              "PAD",
+              "BANK",
+              "PATTERN",
+              "DUPLICATE",
+              "RESAMPLE",
+              "REVERSE"
+            ]
+          }
+        },
+        {
+          "id": "L2x",
+          "label": "L2x",
+          "options": [
+            "CUTOFF",
+            "RESONANCE",
+            "DRIVE",
+            "BITCRUSH",
+            "FILTER",
+            "SATURATION"
+          ],
+          "contexts": {
+            "piano": [
+              "PITCH",
+              "VELOCITY",
+              "LENGTH",
+              "NUDGE",
+              "MICROTIME",
+              "GATE"
+            ],
+            "pattern": [
+              "TUNE",
+              "DECAY",
+              "ATTACK",
+              "FILTER",
+              "PAN",
+              "GAIN"
+            ]
+          }
+        },
+        {
+          "id": "L3x",
+          "label": "L3x",
+          "options": [
+            "LFO",
+            "ENVELOPE",
+            "DEPTH",
+            "RATE",
+            "SYNC",
+            "AUTOMATION"
+          ],
+          "contexts": {
+            "piano": [
+              "EXPRESSION",
+              "MOD WHEEL",
+              "AFTERTOUCH",
+              "HUMANIZE",
+              "SWING",
+              "AUTOMATION"
+            ],
+            "pattern": [
+              "LFO",
+              "ENVELOPE",
+              "MOD DEPTH",
+              "RATE",
+              "SYNC",
+              "AUTOMATION"
+            ]
+          }
+        }
+      ],
+      "right": [
+        {
+          "id": "R1x",
+          "label": "R1x",
+          "options": [
+            "COMP",
+            "LIMITER",
+            "GATE",
+            "TRANSIENT",
+            "ISOLATOR",
+            "MULTIBAND"
+          ],
+          "contexts": {
+            "piano": [
+              "NOTE DYNAMICS",
+              "VELOCITY",
+              "GATE",
+              "ACCENT",
+              "HUMANIZE",
+              "LIMITER"
+            ],
+            "pattern": [
+              "BUS COMP",
+              "PAD GATE",
+              "TRANSIENT",
+              "ISOLATOR",
+              "MULTIBAND",
+              "LIMITER"
+            ]
+          }
+        },
+        {
+          "id": "R2x",
+          "label": "R2x",
+          "options": [
+            "DELAY",
+            "REVERB",
+            "STUTTER",
+            "LOOPER",
+            "BEAT REPEAT",
+            "GLITCH"
+          ],
+          "contexts": {
+            "piano": [
+              "NOTE DELAY",
+              "ARPEGGIATOR",
+              "QUANTIZE",
+              "SWING",
+              "HUMANIZE",
+              "STUTTER"
+            ],
+            "pattern": [
+              "SYNC DELAY",
+              "BEAT REPEAT",
+              "LOOPER",
+              "STUTTER",
+              "GLITCH",
+              "REVERSE"
+            ]
+          }
+        },
+        {
+          "id": "R3x",
+          "label": "R3x",
+          "options": [
+            "STEREO",
+            "PAN",
+            "CHORUS",
+            "PHASER",
+            "FLANGER",
+            "MASTER FX",
+            "OUTPUT"
+          ],
+          "contexts": {
+            "piano": [
+              "PAN",
+              "STEREO",
+              "CHORUS",
+              "REVERB SEND",
+              "OUTPUT",
+              "MASTER FX"
+            ],
+            "pattern": [
+              "STEREO WIDTH",
+              "PAN",
+              "CHORUS",
+              "PHASER",
+              "FLANGER",
+              "MASTER FX",
+              "OUTPUT"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "layoutPolicy": {
+    "version": "1.0.0",
+    "status": "pending-user-decision",
+    "questionnaire": "CM20",
+    "positioning": {
+      "selected": null,
+      "allowed": [
+        "FREE",
+        "GRID",
+        "HYBRID",
+        "ZONES"
+      ]
+    },
+    "alignment": {
+      "selected": null,
+      "allowed": []
+    },
+    "collisions": {
+      "selected": null,
+      "allowed": [
+        "PREVENT",
+        "PUSH",
+        "ALLOW",
+        "MANUAL"
+      ]
+    },
+    "bounds": {
+      "selected": null,
+      "allowed": [
+        "CONTAINED",
+        "PARTIAL",
+        "FREE"
+      ]
+    },
+    "geometryEditingEnabled": false,
+    "blockedOperations": [
+      "panel-drag",
+      "panel-resize",
+      "snap",
+      "collision-resolution",
+      "bounds-clamping"
+    ],
+    "reason": "No activar geometría editable hasta registrar las cuatro decisiones del Cuestionario Maestro 20."
+  },
+  "layoutProfiles": {
+    "version": "1.0.0",
+    "persistence": "HYBRID",
+    "defaultSource": "registry",
+    "customStorage": "localStorage",
+    "types": [
+      "DEFAULT",
+      "CUSTOM"
+    ],
+    "operations": [
+      "AUTOSAVE",
+      "DUPLICATE",
+      "RENAME",
+      "DELETE",
+      "RESTORE_DEFAULT",
+      "SAVE",
+      "CANCEL"
+    ],
+    "moduleChange": "LOAD_DEFAULT",
+    "autosaveDefault": true,
+    "owner": "creator.gui",
+    "note": "Los perfiles guardan preferencias de panel y layout; no contienen estado musical ni AudioBuffer."
+  }
+}

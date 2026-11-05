@@ -175,3 +175,272 @@ Esta auditoría es estática. No declara éxito de reproducción, rendimiento, c
 ### Regla de actualización
 - Este corte es una fotografía verificable, no una declaración de que todas las funciones estén terminadas.
 - En cada nuevo hito actualizar SHA, CI, despliegue, pruebas de dispositivo y estado de Supabase por separado.
+
+
+## 10. Registro consolidado de incidencias y cadena de reparación · 2026-11-04 13:40 CLT
+
+Este registro consolida causas raíz distintas. Las ejecuciones duplicadas de GitHub Actions se cuentan como reintentos del mismo fallo, no como defectos independientes.
+
+| ID | Incidencia / causa raíz | Eslabón afectado | Estado | Evidencia / reparación |
+|---|---|---|---|---|
+| CI-01 | Expresión regular inválida al extraer scripts HTML en el validador | CI / parser de scripts | Corregido | Sustituida por recorrido con `indexOf`; posteriormente se eliminó una llave sobrante que provocaba `Unexpected token 'else'`. |
+| BR-01 | El motor emitía `source:"creator.engine"` y el shell esperaba `creator.ui` | Bridge motor → shell | Corregido | El shell acepta el emisor real del motor y el validador exige ambos lados del contrato. |
+| DATA-01 | Chops se guardaban en el proyecto por defecto, no en `currentProjectId` | Samples → IndexedDB / proyectos | Corregido | Escritura mediante `saveProjectSample(currentProjectId,...)`. |
+| DATA-02 | El cambio de rango IN/OUT sólo actualizaba memoria | Trim → persistencia | Corregido | Guardado al finalizar `pointerup` / `pointercancel`; prueba estática añadida. |
+| DATA-03 | El nombre visible del Project Manager podía quedar desincronizado al cargar | Project Manager → GUI | Corregido | Sincronización del campo `#zp-project-name` en refresh y LOAD. |
+| SEQ-01 | Cálculo de fila/pad incorrecto en grid de 16 pasos | GUI secuenciador → padId del motor | Corregido | Mapeo por índice real de celda: `Math.floor((index-1)/17)+1`. |
+| CI-02 | Test del secuenciador comprobaba una fórmula antigua | Validador → contrato del secuenciador | Corregido | Aserciones actualizadas para las tres rutas: playhead, patrón e interacción. |
+| RADIO-01 | El motor creaba `MediaStreamDestination`, pero no exponía `zpGetBroadcastStream` | Audio master Creator → Radio Grid / WebRTC | Corregido en código; QA pendiente | Getter publicado en `window`; Actions run 41869055940 terminó PASS. Falta prueba real entre dos dispositivos y Safari iOS. |
+
+### Eslabones con riesgo residual
+
+1. **Creator GUI ↔ motor:** validar en navegador real todos los comandos, estados ACK/error, pads 1–9 y 16 pasos.
+2. **Audio master ↔ Radio Grid:** confirmar que el stream contiene el bus master del Creator, no el micrófono de respaldo; validar autoplay, permisos y reconexión iOS.
+3. **Trim ↔ IndexedDB ↔ proyecto:** cambiar IN/OUT, cambiar de proyecto, recargar y comprobar aislamiento de muestras y rangos.
+4. **Render WAV/MP3:** probar OfflineAudioContext real en Safari, duración, canales, sample rate, bit depth, encoder MP3 y descarga del archivo completo.
+5. **Durable Objects / Worker:** comprobar deploy Wrangler, binding SQLite, WebSocket, persistencia room-state, presencia, señalización y TURN cuando corresponda.
+6. **PWA / responsive:** probar instalación, offline, cache versioning, safe areas, orientación y pantalla completa desde iPhone 11 en adelante.
+7. **Supabase:** sigue separado. No aplicar cambios ni mezclar con `dirtyfingaz-os`; definir esquema/RLS y migraciones sólo después de aprobar el diseño de datos.
+
+### Estado CI y GitHub verificado
+
+- Rama de desarrollo `feat/hybrid-hardware-ui-system`: HEAD `c02b8539e12a3db319d228e9fae4e06f4b1d449b`.
+- GitHub Actions run `41869055940`: job `validate` completado con **success** para ese SHA.
+- Los fallos anteriores observados fueron en el mismo paso de validación y se agrupan por causa raíz en la tabla; no son ocho defectos distintos.
+- GitHub informa que PR #3 fue fusionado a `main` con merge commit `53b9151b96979da980bd446fa7dbb9f3c3cf3886`. Esta fusión no fue ejecutada por esta intervención. No se realizarán nuevas fusiones ni cambios directos a `main` sin instrucción explícita.
+- El corte anterior de la sección 9 queda como evidencia histórica; no debe usarse como estado actual.
+
+### Política de colaboración de agentes, modelos y complementos
+
+- Los conectores disponibles pueden trabajar sobre el repositorio sólo con los permisos de la cuenta/conexión vinculada; no pueden otorgar por sí solos permisos a identidades de agentes o servicios no especificadas.
+- Recomendación por defecto: escritura limitada a ramas `feat/*`, revisión por PR y CI obligatorio; `main` protegido y sin escritura directa para agentes.
+- Alternativas a aprobar: (A) lectura y diagnóstico solamente; (B) escritura en ramas de trabajo y PR, sin merge; (C) escritura amplia del repositorio, reservada a identidades concretas y con alcance explícito.
+- No se conceden permisos de administrador, secretos, producción, Supabase ni despliegue por defecto. La autorización debe identificar el agente/servicio y el nivel exacto.
+
+## 11. Creator · pantalla LCD, waveform y controles de edición · 2026-11-04
+
+### Contrato GUI ↔ motor aplicado
+- GUI (creator.html) conserva el bridge versionado zp-engine-command con source, protocolVersion, requestId, ACK y error.
+- Motor (creator-engine.html) conserva la propiedad de buffers, análisis, reproducción, tempo y persistencia. La GUI sólo presenta telemetría y solicita acciones.
+- El pad activo reproduce el mismo AudioBuffer y el mismo rango IN/OUT utilizado por el waveform editor.
+
+### Funciones añadidas
+| ID | Función | GUI | Motor | Estado CI |
+|---|---|---|---|---|
+| WAVE-01 | Análisis de forma de onda y detección de transientes | Marcadores sobre waveform LCD | Peak local por bins; lista normalizada de transientes | PASS estático |
+| WAVE-02 | Slicing automático por transientes | Acción TRNS en LCD | Divide sample en segmentos y guarda en pads vacíos del proyecto actual | PASS estático |
+| WAVE-03 | Audition del sample del pad | Acción de preview | creator.sample.preview usa el mismo pad/sample/rango | PASS estático |
+| BPM-01 | Rueda vertical de tempo | Drag vertical y rueda | creator.bpm.adjust, límites 40–240 y publicación de estado | PASS estático |
+| SEQ-02 | Transporte visual | Barra de progreso sincronizada a los 16 pasos | Mensajes de playhead desde scheduler | PASS estático |
+| METER-01 | Alerta de peak | Barra cambia a rojo al superar 0.82 | Medición del pico del bus master y telemetría periódica | PASS estático |
+| PIANO-01 | Zoom y desplazamiento | Zoom +/- y scroll horizontal | Patrón de 16 pasos sin mutar los datos guardados | PASS estático |
+| PIANO-02 | Herramientas de edición | DRAW/SELECT, SNAP 1/16–1/8–1/4 y CLEAR; zoom - a la izquierda y + a la derecha | Cuantización limitada al step válido 0–15; selección de fila no altera el patrón | PASS estático |
+| LCD-01 | Menú del sistema | Overlay dentro del LCD; tema sólo desde THEME/COLOR | No cambia el motor de audio | PASS estático |
+| SAMPLE-01 | Browse | Abre selector de archivos del motor | File picker existente | PASS estático |
+
+### Evidencia de integración
+- Rama: feat/hybrid-hardware-ui-system.
+- HEAD de código actualizado: 19da29f90ae514c2cde0a05e54583893b23a548b.
+- GitHub Actions run 41875733973: SUCCESS para ese SHA.
+- Archivos modificados: creator.html, creator-engine.html.
+- Se corrigieron dos separadores de línea literales que impedían compilar los scripts inline; el SHA final pasó la validación JavaScript y Creator contracts.
+
+### Límites y riesgos no certificados
+1. El umbral 0.82 es una señal visual de pico digital del bus, no un medidor calibrado de dBFS ni un detector de clipping verdadero.
+2. La detección de transientes es heurística por máximos locales. Requiere prueba con kicks, breaks, material tonal y samples con ruido.
+3. El slicing automático usa pads vacíos; si no hay espacio, limita la cantidad de cortes y no sobrescribe muestras existentes.
+4. El scroll/zoom y la rueda BPM requieren QA táctil en Safari iOS.
+5. La grilla actual continúa siendo un editor de patrones por pad/step. Un Piano Roll MIDI completo con pitch, duración de nota y velocity por evento sigue pendiente.
+6. No se verificó despliegue Cloudflare para este SHA ni se probó render/sonido real en iPhone.
+
+### Próxima secuencia recomendada
+- P1: probar la interacción de cada control y ACK/error en Safari.
+- P2: validar transientes, slicing, preview y persistencia por projectId.
+- P3: calibrar el medidor de peak con RMS/peak hold y una referencia de nivel.
+- P4: evolucionar la grilla actual a Piano Roll con pitch/length/velocity sin romper el modelo de patrones existente.
+- Mantener main y Supabase fuera del alcance; no hacer merge.
+
+
+## 12. Piano Roll MIDI · implementación de eventos editables · 2026-11-04
+
+### Contrato
+- GUI: creator.html presenta 24 filas visibles (dos octavas), 16 pasos temporales, notas movibles y redimensionables, cuantización y control de velocity.
+- Motor: creator-engine.html administra pianoData por banco y pad, valida los eventos, agenda la reproducción y guarda los datos en el snapshot del proyecto.
+- Mensajería: creator.piano.note.upsert / creator.piano.note.delete / creator.piano.notes.clear; retorno de estado por zp-engine-piano-state.
+- Evento MIDI interno: id, step, pitch, length y velocity. Límites: step 0–15, pitch 36–96, length 1–(16-step), velocity 1–127.
+
+### Pruebas estáticas añadidas
+- scripts/validate.mjs comprueba presencia de Piano Roll, controles de velocity, gestos de drag/resize, comandos registrados, scheduler MIDI y snapshot persistente.
+- CI para el último commit de GUI (b7363a6ef234c823de3194ccda5e22f444ff3c0a) quedó en cola al corte de esta bitácora: run 41878177445.
+- SHA de motor que incorpora la reproducción de notas y la persistencia: 5a22793de89abb9aa0d8a73e7f90cc064bcac48c.
+- Commit del validador MIDI: 3880a00536bcd51ac031548a43a946282d075853.
+
+### Riesgos / QA pendiente
+1. Confirmar que el drag/resize responde en Safari iOS con pointer capture y scroll táctil.
+2. Escuchar samples con pitch variable y verificar que velocity se aplica una sola vez al nivel final.
+3. Comprobar gates de longitud para samples largos y sonidos sintetizados.
+4. Probar guardado, recarga, cambio de banco/pad, duplicación de eventos y recuperación de proyectos antiguos.
+5. El editor tiene rango visible de dos octavas; OCT-/OCT+ desplaza el rango, sin transposición destructiva de los eventos.
+6. La compatibilidad MIDI externa (MIDI IN/OUT, clock sync y export MIDI estándar) no está implementada en esta etapa.
+
+### Estado de seguridad de cambios
+- Sólo rama feat/hybrid-hardware-ui-system.
+- No modificar main, no merge, no desplegar producción.
+- Supabase dirtyfingaz-os continúa independiente y fuera del alcance.
+
+
+### Revisión de estabilidad adicional
+- El estado MIDI ya no se retransmite desde refreshSteps en cada tick; sólo se publica al cambiar nota, pad, banco o proyecto.
+- Pointer capture se conserva sobre el elemento de nota durante el drag; la selección visual no reemplaza el nodo capturado.
+- Longitud de nota limitada al espacio restante hasta el final de los 16 pasos.
+- Mensajes de telemetría LCD/Piano Roll validados por origen y ventana del iframe del motor.
+- Song Mode publica el banco activo al avanzar, manteniendo sincronizada la vista de notas.
+
+
+## 13. Cuestionario maestro y agente contextual local · 2026-11-04
+
+### Documentación incorporada
+- `docs/CUESTIONARIO-MAESTRO-DIRTYFINGAZ-ZP.md`: especificación maestra de producto, arquitectura, motor, datos, Cloudflare/Supabase, agente, seguridad, calidad y beta.
+- `docs/ARQUITECTURA-AGENTE-CONTEXTUAL.md`: contrato de contexto, catálogo de acciones, niveles de permisos, arquitectura objetivo y pruebas de aceptación.
+
+### Agente contextual v0.1
+- Se incorporó `zp-agent.js` y `zp-agent.css` en Creator.
+- Ventana flotante con arrastre táctil, minimizar, maximizar/restaurar, resize y cierre; launcher para reabrir.
+- Captura contexto desde controles enfocados/pulsados: etiqueta, módulo, identificador DOM y metadatos explícitos si existen.
+- Diccionario local de pads/samples, trim, Piano Roll, secuenciador, FX, proyectos, render, Radio Grid y tempo.
+- Catálogo allowlist: detener, play/pause, abrir selector de muestras, guardar proyecto (con confirmación) y abrir Project Manager.
+- El agente escucha eventos de ACK/error/timeout del bridge y comunica el resultado real.
+- No hace llamadas remotas, no ejecuta texto arbitrario y no modifica archivos GitHub. No es todavía un LLM remoto; es la base contextual y de acciones deterministas.
+- Los recursos se precargan en PWA; caché actualizada a `dirtyfingaz-zp-shell-v8`.
+
+### Corrección adicional del secuenciador
+- La estructura real de `#gr` contiene 17 elementos antes de la primera fila de celdas: esquina superior + 16 encabezados de pasos; cada fila añade etiqueta + 16 celdas.
+- Se unificaron los tres cálculos de padId (playhead, estado de patrón e interacción) a `Math.floor((index-18)/17)+1`.
+- Se añadió una prueba de las 9 filas × 16 pasos contra los índices reales del grid.
+- La causa del CI fallido era que la aserción exigía tres ocurrencias de una fórmula mientras la ruta de patrón utilizaba una fórmula equivalente distinta. La inspección del DOM permitió normalizar las tres rutas y añadir prueba de los 144 casos.
+
+### Evidencia GitHub
+- Rama: `feat/hybrid-hardware-ui-system`.
+- SHA de código con corrección de secuenciador y agente: `24116e03d266d8c14e6cf5a92aa4636f20bb5f2d`.
+- GitHub Actions run `41885854130`: **SUCCESS**, job validate.
+- Documentación y commits de agente se mantienen sólo en rama de desarrollo. No se ha solicitado ni ejecutado merge a main.
+
+### Estado de infraestructura observado
+- Supabase `dirtyfingaz-os`: `ACTIVE_HEALTHY`, PostgreSQL 17, schema `public` sin tablas y sin Edge Functions.
+- No se crearon tablas, políticas RLS, secrets ni migraciones.
+- Wrangler configura Worker-first para `/api/*` y binding Durable Object `RADIO_ROOMS`; no se verificó despliegue Cloudflare para este corte.
+- No existe todavía endpoint remoto de IA ni proveedor/modelo configurado.
+
+### Próximo orden técnico
+1. QA de ventana flotante y acciones en Safari iOS; validar ACK/error y no interferencia con pads/knobs.
+2. Añadir pruebas E2E de contexto y de las acciones registradas.
+3. Definir proveedor de IA, autenticación Supabase JWT, límites y permisos antes del endpoint Worker.
+4. Diseñar migraciones y RLS en Supabase; revisión previa antes de aplicarlas.
+5. Decidir almacenamiento binario R2 vs Supabase Storage.
+6. Habilitar herramientas de programación sólo con diff, rama feat/* y PR; nunca merge automático.
+
+
+## 14. Cuestionario V3 y Copiloto IA · 2026-11-04
+
+### Fuente canónica
+- Se creó `MASTER-QUESTIONNAIRE-V3-AGENT.md` en la raíz del repositorio.
+- Consolida las respuestas V2 del usuario: trim multi-selección `drag, pinch, independent, rubber, snap, free, knob, wave, remember, undo`; SHIFT+PAD para configuración personalizada; conexión trim-síntesis pendiente de contrato; prioridad IA; orientación `all`.
+- Se repararon los enlaces desde `docs/CUESTIONARIO-MAESTRO-DIRTYFINGAZ-ZP.md` al documento V3.
+
+### Copiloto contextual
+- SHIFT + PAD expone configuración rápida MUTE/SOLO/PREVIEW/LOAD SAMPLE e identidad del pad.
+- Agente contextual recibe pad activo, banco, BPM, proyecto y etiqueta/control visible.
+- Catálogo local incluye transporte, sample browse/preview/chop, patrón clear, save/project manager, BPM, bancos A-D, Drive, Mute y Solo.
+- Acciones destructivas y escrituras requieren confirmación; el modelo no ejecuta comandos directamente.
+- Ventana flotante tiene drag, minimizar, maximizar/restaurar, cierre, launcher y handle de resize táctil.
+
+### Workers AI
+- Worker tiene `POST /api/agent/chat` y `GET /api/agent/health`.
+- Modelo: `@cf/openai/gpt-oss-20b`, binding `AI`.
+- Endpoint bloqueado salvo `ENVIRONMENT=preview` y `AI_AGENT_ENABLED=true`; producción mantiene `AI_AGENT_ENABLED=false`.
+- Se validan Origin, método, tamaño, contexto, historial y rate limit temporal por IP.
+- El rate limit actual vive en memoria del isolate; no equivale a rate limit durable ni autenticación. Antes de beta pública deben añadirse identidad, autorización y límites durables.
+- No se ha verificado despliegue ni inferencia real en Cloudflare Preview.
+- No se habilitó function calling para acciones de app; sólo conversación contextual y Action Registry local.
+
+### Estado de integración
+- Supabase `dirtyfingaz-os` sigue sin tablas/migraciones/Edge Functions y no se modificó.
+- R2 vs Supabase Storage, autenticación, RLS, memoria persistente y backend definitivo siguen pendientes de decisión.
+- No se migró a Java; se mantiene HTML/CSS/JS y TypeScript gradual para contratos nuevos.
+- Modo de programación GitHub (diff, rama feature, PR) todavía no está conectado al agente.
+
+### CI
+- SHA validado: `d73270fe0c876025bbd87cce0ff895433706069f`.
+- GitHub Actions run `41887071325`: **SUCCESS**, job validate.
+- No se modificó `main`, no se hizo merge y no se desplegó producción.
+
+## 14. Piano Roll / Pattern Edit · mejoras de interacción · 2026-11-04
+
+- Controles de zoom `+` y `−` agrupados, mayores y con zona táctil ampliada.
+- El playhead del Piano Roll interpola entre pasos con `requestAnimationFrame`, usando el BPM y el último paso confirmado por el motor.
+- Al cambiar de pad, la GUI recibe su estado MIDI y resalta las notas de ese pad dentro del Piano Roll.
+- Barrido táctil sobre Pattern Edit alterna pasos pares (atajo de cada dos pasos) sin exigir taps individuales.
+- Pulsación de dos segundos sobre una nota abre MIDI Tools con información STEP / PITCH / LEN / VEL y selección del parámetro que controlará el rotor.
+- El botón `↕` activa edición libre; el rotor maestro `.pe` mueve pitch, step, length o velocity según el objetivo seleccionado. Si no hay nota seleccionada, desplaza el rango visible del teclado.
+- Mantener SHIFT durante el arrastre desactiva cuantización. En iPhone, el botón de modo libre sustituye la tecla SHIFT.
+- El cursor de movimiento libre se representa como retícula visible sobre el Piano Roll.
+- El motor conserva `micro` (0..0.999 de un paso) en cada nota y programa su reproducción con ese offset, permitiendo microtiming real en vez de sólo mover visualmente el bloque.
+- La edición MIDI sigue entrando por `creator.piano.note.upsert` y conserva persistencia de proyecto; no se modifica el contrato del bridge.
+- CI: run `41887880916` completó `validate` en SUCCESS para SHA `965e5bfcd9a903b0dca7f4541b9876c9594ca8d1`, incluyendo controles de información MIDI, selector de destino del rotor, cursor libre y nuevas aserciones.
+- Pruebas de dispositivo aún pendientes: gesto táctil continuo, rotor, SHIFT con teclado externo y reproducción de microtiming en Safari iOS.
+
+
+## 16. Agente contextual · Inspector JSON y herramientas de desarrollo · 2026-11-04
+
+- Se amplió el agente a v0.3 con selección contextual del control tocado, resaltado visual del objetivo y ficha de parámetro.
+- El cliente lee `zp-agent-registry.json`; ese registro define módulo, owner, tipo, min/max/step/default, comando y payload. La misma fuente JSON es consultada por el Worker para enriquecer el contexto de IA.
+- El inspector permite aplicar en vivo sólo parámetros con comando registrado. El payload se construye desde el JSON, sustituyendo `$value`, y la confirmación depende del ACK del motor. Parámetros MIDI aún sin comando dedicado quedan en modo informativo/desarrollo.
+- Se añadieron herramientas de composición por botón: JSON, GUI, BRIDGE, ENGINE y TEST. Los snippets son borradores revisables, copiables y consultables con la IA; no se ejecutan automáticamente ni escriben código en el repositorio.
+- El registro incluye contexto de arquitectura, responsabilidades de archivos, separación GUI/motor, reglas de rama, enlaces del proyecto y estado de handoff para retomar sesiones.
+- Ventana flotante: opacidad de reposo 20%, opacidad completa durante interacción/foco, drag desde cabecera, resize desde esquina, controles táctiles y sin autofocus al abrir para evitar zoom de Safari. El temporizador cierra el agente tras 10 segundos de inactividad y cancela confirmaciones pendientes.
+- Service Worker actualizado a caché v9 e incluye el registro JSON para disponibilidad offline.
+- Worker consulta el JSON del asset y entrega al modelo la definición del parámetro y el contexto de arquitectura. La IA permanece habilitada sólo en Preview.
+- Validación estática añadida para registro, inspector, snippets y carga PWA. Pendiente ejecutar CI en el SHA final y QA real en Safari iPhone 11.
+- Sin cambios en `main`, sin merge, sin cambios de esquema Supabase.
+
+
+## 17. Encoders Lx / Rx · 2026-11-04
+
+- Se incorporó Lx a la izquierda de Rx en la fila PUSH ENTER. Lx recorre en ciclo las herramientas y funciones visibles (botones, herramientas Piano Roll, marcadores IN/OUT, destinos MIDI y controles LCD), enfoca el elemento, lo resalta y lo desplaza a la vista. No ejecuta la acción seleccionada.
+- Rx conserva el comportamiento existente de PUSH ENTER: trim IN/OUT, MIDI en modo libre y FX amount cuando no hay otro modo activo. Se conserva el selector funcional `.pe` y se añade la identidad explícita `data-rotor=Rx`.
+- Ambos encoders quedan identificados en `zp-agent-registry.json`. El agente distingue Lx como navegación y Rx como control contextual; el Worker adjunta la definición del encoder seleccionado al contexto de IA.
+- Lx usa pasos de navegación de 14 grados y permite avanzar/retroceder mediante flechas de teclado cuando está enfocado.
+- Validación estática de sintaxis inline de Creator: PASS (3 scripts). JSON del registro válido. Pendiente CI en el SHA final y prueba real en Safari iPhone 11, incluyendo foco, scroll, tacto y ACK/error/persistencia de un parámetro.
+
+## 18. Ergonomía lateral adaptativa Lx/Rx
+
+**Decisión de diseño:** ubicación `sides`, comportamiento `adaptive`, separación `compact`.
+
+- **Lx** queda montado dentro del raíl lateral izquierdo `#cl`; conserva `data-rotor="Lx"`, su navegación secuencial, foco y desplazamiento al destino sin ejecutarlo.
+- **Rx** queda montado dentro del raíl lateral derecho `#cr`; conserva la clase `.pe`, `data-rotor="Rx"` y las rutas existentes de trim, MIDI y FX.
+- La fila principal libera las dos celdas de encoder y queda en seis columnas.
+- Rx incorpora desplazamiento contextual del contenedor del elemento seleccionado por Lx cuando no hay edición trim/MIDI activa. Prioriza eje vertical y utiliza horizontal cuando es el único desplazamiento disponible.
+- Los encoders se dimensionan en CSS a 50 px, 46 px en pantallas estrechas y 42 px en ventanas de poca altura.
+- `zp-agent-registry.json` documenta montaje, comportamiento adaptativo, fallback de scroll y exclusiones de edición.
+- El agente identifica Lx/Rx como navegación adaptativa lateral e información/PUSH ENTER lateral.
+- Se actualiza la caché PWA a `dirtyfingaz-zp-shell-v10`.
+- No se modifican `creator-engine.html`, el protocolo GUI-engine v1, los comandos de motor ni la persistencia. El cambio de Rx es una interacción de GUI que sólo desplaza contenedores.
+
+**Verificación pendiente:** ejecutar `node scripts/validate.mjs`, probar drag/rotación y scroll contextual en Safari iPhone 11 y revisar que trim/MIDI sigan teniendo prioridad sobre el fallback de scroll. No declarar validación funcional hasta completar esas pruebas.
+
+## 19. Paneles adaptativos laterales L3x / R3x
+
+**Decisión de interacción:** presentación `hybrid`, activación `hold`, dock `side`.
+
+- El panel izquierdo se divide en `L1x`, `L2x` y `L3x`; el derecho en `R1x`, `R2x` y `R3x`.
+- Cada lateral conserva su propio espacio dentro de las columnas `#cl` y `#cr`; los encoders Lx/Rx permanecen montados al pie de cada panel.
+- La presentación híbrida mantiene dos opciones principales visibles. Mantener pulsado un grupo durante 420 ms despliega opciones secundarias; tocar un grupo lo selecciona.
+- Los paneles cargan sus definiciones desde `zp-agent-registry.json`; se incluye fallback local para disponibilidad inicial.
+- El contexto cambia según el elemento seleccionado por Lx: Sample, Piano Roll, Pattern y FX. Las opciones se actualizan sin modificar el estado autoritativo del motor.
+- Seleccionar una opción emite `zp-panel-option-select` con `mode: selection-only`. Es una selección de interfaz/contexto para el agente, no una orden de audio ni una escritura al motor.
+- `zp-agent.js` recibe la selección y actualiza el inspector contextual.
+- El registro documenta presentación, activación, dock, opciones por grupo, contextos y política de ejecución.
+- Se actualiza la caché PWA a `dirtyfingaz-zp-shell-v11`.
+- No se modifican `creator-engine.html`, el protocolo GUI-engine v1, las allowlists de comandos ni la persistencia.
+
+**Pruebas pendientes:** ejecutar `node scripts/validate.mjs`; probar hold de 420 ms y toque corto en Safari iPhone 11; verificar que el panel secundario no tape controles críticos en pantallas estrechas; comprobar cambio de contexto real y confirmar que la selección no dispara comandos de motor. Las opciones son actualmente selectores contextuales, no efectos de audio implementados.

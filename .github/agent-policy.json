@@ -1,0 +1,217 @@
+{
+  "schema_version": "1.0.0",
+  "project": "DIRTYFINGAZ ZP",
+  "repository": "alexandermaulen/Dirtyfingaz-ZP",
+  "approved_level": "C",
+  "operating_branch": "feat/zp-master-implementation-roadmap",
+  "allowed_branch_pattern": "feat/*",
+  "protected_targets": {
+    "main": {
+      "source_changes": "deny",
+      "direct_push": "deny",
+      "ref_updates": "deny",
+      "merge": "deny",
+      "pull_request_target": "review_only",
+      "settings_changes": "deny_without_separate_authorization"
+    }
+  },
+  "allowed_actions": [
+    "read_repository",
+    "write_feature_branches",
+    "create_feature_branches",
+    "modify_github_actions_workflows",
+    "run_validation_workflows",
+    "create_or_update_pull_requests",
+    "deploy_preview_only_when_cloudflare_credentials_are_authorized"
+  ],
+  "denied_actions": [
+    "merge_pull_requests",
+    "write_main",
+    "deploy_production",
+    "read_or_export_secrets",
+    "modify_cloudflare_production_routes_or_dns",
+    "modify_supabase",
+    "modify_other_projects_or_repositories"
+  ],
+  "logical_agents": [
+    {
+      "id": "architecture-coordinator",
+      "runtime": "GPT-6",
+      "mode": "orchestrator",
+      "permissions": [
+        "read_repository",
+        "write_feature_branches",
+        "create_or_update_pull_requests"
+      ],
+      "responsibilities": [
+        "architecture",
+        "integration_contracts",
+        "task_decomposition",
+        "final_review"
+      ],
+      "restrictions": [
+        "no_main",
+        "no_merge",
+        "no_production",
+        "no_secrets",
+        "no_supabase"
+      ]
+    },
+    {
+      "id": "gui-specialist",
+      "runtime": "logical_role_not_separately_provisioned",
+      "permissions": [
+        "read_repository",
+        "write_feature_branches"
+      ],
+      "owned_areas": [
+        "index.html",
+        "creator.html",
+        "zp-ui-system.css",
+        "responsive_ui"
+      ],
+      "restrictions": [
+        "must_not_change_audio_engine_contract_without_coordinated_review"
+      ]
+    },
+    {
+      "id": "audio-engine-specialist",
+      "runtime": "logical_role_not_separately_provisioned",
+      "permissions": [
+        "read_repository",
+        "write_feature_branches"
+      ],
+      "owned_areas": [
+        "creator-engine.html",
+        "zp-core.js",
+        "zp-storage.js",
+        "audio_tests"
+      ],
+      "restrictions": [
+        "must_preserve_gui_engine_bridge_contract"
+      ]
+    },
+    {
+      "id": "infrastructure-specialist",
+      "runtime": "logical_role_not_separately_provisioned",
+      "permissions": [
+        "read_repository",
+        "write_feature_branches",
+        "modify_github_actions_workflows",
+        "preview_deploy_when_authorized"
+      ],
+      "owned_areas": [
+        ".github/workflows/**",
+        "wrangler.jsonc",
+        "radio-worker.mjs",
+        "scripts/**"
+      ],
+      "restrictions": [
+        "preview_only",
+        "no_production_secrets",
+        "no_main"
+      ]
+    },
+    {
+      "id": "qa-security-reviewer",
+      "runtime": "logical_role_not_separately_provisioned",
+      "permissions": [
+        "read_repository",
+        "run_validation_workflows"
+      ],
+      "responsibilities": [
+        "static_validation",
+        "contract_tests",
+        "regression_review",
+        "permission_audit"
+      ],
+      "restrictions": [
+        "read_only",
+        "no_secrets",
+        "no_main"
+      ]
+    },
+    {
+      "id": "documentation-specialist",
+      "runtime": "logical_role_not_separately_provisioned",
+      "permissions": [
+        "read_repository",
+        "write_feature_branches"
+      ],
+      "owned_areas": [
+        "*.md",
+        "docs/**"
+      ],
+      "restrictions": [
+        "no_main",
+        "no_merge"
+      ]
+    }
+  ],
+  "model_policy": {
+    "available_runtime": "GPT-6",
+    "model_routing": "not_configured; roles above are task boundaries, not separately launched model instances",
+    "external_models": "require named provider, model, account authorization, and explicit repository scope before use",
+    "deterministic_ci": "Node.js 22"
+  },
+  "integrations": {
+    "github": {
+      "connected": true,
+      "current_connector_permission": "Allow all actions",
+      "project_scope": "feature branches and PRs only",
+      "note": "Self-imposed policy does not technically override GitHub app permissions."
+    },
+    "notion": {
+      "connected": true,
+      "use": "project documentation only when requested",
+      "agent_directory": "unavailable on current workspace entitlement; agent search requires Notion Business or higher"
+    },
+    "cloudflare": {
+      "connected_plugin": false,
+      "deployment_path": "GitHub Actions + Wrangler",
+      "required_authorization": [
+        "Cloudflare account ID",
+        "scoped API token stored as GitHub Actions secret",
+        "preview Worker/environment"
+      ],
+      "status": "pending_user_cloudflare_setup"
+    },
+    "supabase": {
+      "connected": true,
+      "project": "dirtyfingaz-os",
+      "permission": "prohibited_for_this_project",
+      "changes_allowed": false
+    }
+  },
+  "deployment_policy": {
+    "preview": "allowed after scoped Cloudflare credentials and preview target are configured",
+    "production": "denied",
+    "secrets": "never exposed to agents or printed in logs",
+    "workflow_trigger": "manual preview deployment until credential and target verification is complete"
+  },
+  "integration_contract": {
+    "gui_and_engine": "separate ownership; coordinate shared protocol before cross-layer changes",
+    "required_message_fields": [
+      "type",
+      "payload",
+      "source",
+      "requestId",
+      "timestamp"
+    ],
+    "required_validation": [
+      "origin",
+      "source_window",
+      "request_correlation",
+      "ack_error_state"
+    ],
+    "persistence": "verify IndexedDB isolation by projectId",
+    "audio": "verify master bus routing and Safari iOS behavior"
+  },
+  "repository_state_observed_2026_11_04": {
+    "main_sha": "53b9151b96979da980bd446fa7dbb9f3c3cf3886",
+    "main_protected": false,
+    "repository_rulesets": [],
+    "note": "main settings were not changed; this policy is declarative until repository protection is separately configured.",
+    "active_development_branch": "feat/zp-master-implementation-roadmap"
+  }
+}

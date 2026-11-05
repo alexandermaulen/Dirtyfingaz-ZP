@@ -6,7 +6,9 @@
   "assets": {
     "directory": "./",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*"]
+    "run_worker_first": [
+      "/api/*"
+    ]
   },
   "durable_objects": {
     "bindings": [
@@ -23,11 +25,19 @@
     }
   },
   "vars": {
-    "ENVIRONMENT": "production"
+    "ENVIRONMENT": "production",
+    "AI_AGENT_ENABLED": "false"
   },
   "previews": {
     "vars": {
-      "ENVIRONMENT": "preview"
+      "ENVIRONMENT": "preview",
+      "AI_AGENT_ENABLED": "true"
+    },
+    "ai": {
+      "binding": "AI"
     }
+  },
+  "ai": {
+    "binding": "AI"
   }
 }
