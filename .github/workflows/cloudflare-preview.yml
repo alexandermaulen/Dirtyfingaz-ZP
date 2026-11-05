@@ -1,80 +1,38 @@
-name: DIRTYFINGAZ ZP Cloudflare Preview
+name: DIRTYFINGAZ ZP validation only (Pages mission)
 
 on:
   push:
     branches:
-      - "feat/**"
+      - "feat/mission-anchor-pages-main"
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: dirtyfingaz-zp-preview-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  preview:
-    name: Validate and publish isolated Worker Preview
+  validate:
+    name: Validate application before GitHub Pages merge
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch
+      - name: Checkout mission branch
         uses: actions/checkout@v4
-
       - name: Configure Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - name: Validate project contracts
         run: node scripts/validate.mjs
-
-      - name: Check Cloudflare credentials
-        id: credentials
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Confirm canonical deployment policy
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::notice::Preview not deployed. Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as GitHub Actions repository secrets."
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Publish isolated Cloudflare Worker Preview
-        if: steps.credentials.outputs.ready == 'true'
-        id: publish
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          set -euo pipefail
-          PREVIEW_NAME="dirtyfingaz-zp-preview"
-          npx --yes wrangler@4.135.0 deploy --config wrangler.preview.jsonc --name "$PREVIEW_NAME" 2>&1 | tee deploy-output.log
-          PREVIEW_URL="$(grep -Eo 'https://[^[:space:]]+workers\.dev' deploy-output.log | tail -n 1)"
-          if [ -z "$PREVIEW_URL" ]; then
-            echo "::error::Wrangler deployed without returning a workers.dev URL."
-            exit 1
-          fi
-          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
-          {
-            echo "## DIRTYFINGAZ ZP Preview"
-            echo
-            echo "Preview URL: $PREVIEW_URL"
-            echo
-            echo "Commit: $GITHUB_SHA"
-            echo
-            echo "Isolated Worker: $PREVIEW_NAME"
-            echo "Production Worker remains untouched."
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Report missing credentials
-        if: steps.credentials.outputs.ready != 'true'
-        run: |
-          {
-            echo "## Cloudflare Preview pendiente"
-            echo
-            echo "Agrega CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID en Repository secrets."
-            echo "La validación de código sí se ejecutó."
-          } >> "$GITHUB_STEP_SUMMARY"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p = JSON.parse(fs.readFileSync('.github/agent-policy.json', 'utf8'));
+          if (p.mission_anchor?.canonical_application_url !== 'https://alexandermaulen.github.io/Dirtyfingaz-ZP/') throw new Error('Canonical URL mismatch');
+          if (p.deployment_policy?.target !== 'GitHub Pages') throw new Error('Deployment target mismatch');
+          if (p.deployment_policy?.preview !== 'disabled') throw new Error('Preview must remain disabled');
+          if (p.operating_branch !== 'feat/mission-anchor-pages-main') throw new Error('Mission branch mismatch');
+          console.log('Mission anchor: PASS');
+          NODE
