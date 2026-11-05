@@ -297,9 +297,9 @@ assert.equal(agentRegistry.controls.Rx.master, true);
 assert.match(ui, /const knobNames=\["master","attack","decay","release"\]/);
 assert.match(ui, /creator\.envelope\.mode\.toggle/);
 assert.match(engine, /function scheduleAmpEnvelope\(/);
-assert.match(engine, /envelopeMode==="ADR"\?0:e\.sustain/);
+assert.match(engine, /envelopeMode==="ADR"\?\.35:e\.sustain/);
 assert.match(engine, /envelopes,envelopeMode/);
-assert.match(engine, /payload\.name==="attack"|\["attack","decay","release"\]/);
+assert.match(engine, /payload\.name==="attack"|\["attack","decay","release"\]/);\nassert.match(ui, /const projectMenu=mk/);\nassert.match(ui, /creator\.system\.menu\.navigate/);\nassert.match(ui, /zp-project-dialog/);\nassert.match(engine, /creator\.system\.menu\.open/);\nassert.match(engine, /creator\.system\.menu\.select/);\nassert.match(engine, /creator\.project\.rename/);\nassert.match(engine, /creator\.project\.export/);\nassert.match(engine, /creator\.project\.import/);
 
 
 
