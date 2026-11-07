@@ -237,7 +237,7 @@ assert.match(read("zp-agent-registry.json"), /"key": "trim\.start"/);
 assert.match(read("zp-agent-registry.json"), /"key": "midi\.velocity"/);
 assert.match(radioWorker, /selectedParameter/);
 assert.match(radioWorker, /zp-agent-registry\.json/);
-assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v13/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v14/);
 assert.match(read("sw.js"), /zp-agent-registry\.json/);
 
 assert.match(read("sw.js"), /\.\/zp-agent\.js/);
@@ -330,7 +330,7 @@ assert.match(layoutSystem, /EDIT LAYOUT/, "Debe existir el modo EDIT LAYOUT.");
 assert.match(layoutSystem, /DRAG \/ RESIZE BLOQUEADOS/, "La geometría debe esperar la política del Cuestionario 20.");
 assert.match(layoutSystem, /AUTOSAVE|DUPLICATE|RENAME|DELETE|RESTORE DEFAULT/, "Deben existir operaciones de perfiles.");
 assert.match(shell, /zp-panel-option-select/, "El shell debe validar y retransmitir selecciones del iframe.");
-assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v13/);
+assert.match(read("sw.js"), /dirtyfingaz-zp-shell-v14/);
 assert.match(read("sw.js"), /zp-layout\.js/);
 console.log("OK: paneles contextuales, perfiles híbridos y EDIT LAYOUT con CM20 protegido.");
 
